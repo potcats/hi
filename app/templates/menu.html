@@ -37,7 +37,7 @@ P02: Makers Makin' It, Act I
     /* BUTTONS */
     button:not(.btn-close) {
       font-family: font;
-      font-size: 240%;
+      font-size: 290%;
       background: none;
 
       border-style: solid;
@@ -48,7 +48,7 @@ P02: Makers Makin' It, Act I
 
       z-index: 1;
       position: relative;
-      left: 100%;
+      left: 80%;
     }
 
     button:hover:not(.btn-close, #audio) {
@@ -73,7 +73,7 @@ P02: Makers Makin' It, Act I
 
 <body>
   <!-- AUDIO -->
-  <audio loop id="bgm" src="TBA"> </audio>
+  <audio loop id="bgm" src="/static/sound/startbgm.mp3"> </audio>
 
   <input type="checkbox" id="audio" onclick="Aud()" style="border-style:none;">
   <label id='audiobut' for="audio">
@@ -84,19 +84,19 @@ P02: Makers Makin' It, Act I
   <!-- MAIN CONTENT OF PAGE-->
   <div style="margin-top:6vh;" class="container">
     <div class="container">
-      <image src="/static/images/title.png" id="title" class="center" style="margin-left: 82%;">
+      <image src="/static/images/title.png" id="title" class="center" style="margin-left: 62%;">
     </div>
-    <div style="margin-top:-30px; width:70%" class="container">
+    <div style="width:80%" class="container">
       <button type="submit" form="play" name="singleplayer" value="singleplayer" class="main" style="width:35%">
         PLAY
       </button>
     </div>
-    <div style="margin-top:20px; width:70%" class="container">
+    <div style="margin-top:20px; width:80%" class="container">
       <button type="button" class="main options" style="width:35%" data-bs-toggle="modal" data-bs-target="#classes">
         CLASSES
       </button>
     </div>
-    <div style="margin-top:20px; width:70%" class="container">
+    <div style="margin-top:20px; width:80%" class="container">
       <button type="button" class="main options" style="width:35%" data-bs-toggle="modal" data-bs-target="#settings">
         SETTINGS
       </button>
