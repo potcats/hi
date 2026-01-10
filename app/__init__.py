@@ -48,7 +48,7 @@ def dialogue():
     return render_template("dialogue.html", )
 
 @app.route('/scavenge', methods=['GET', 'POST'])
-def dialogue():
+def scavenge():
 
     return render_template("scavenge.html", )
 
