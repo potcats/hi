@@ -19,6 +19,32 @@ def login():
 
 @app.route('/menu', methods=['GET', 'POST'])
 def menu():
+    # # SETS DEFAULT SETTINGS
+    # difficulties = ['checked', '', '']
+    # cache=''
+    #
+    # # CHECKS FOR PREVIOUS SETTINGS
+    # if len(session) > 0:
+    #     if 'difficulty' in session:
+    #         difficulties[0] = ''
+    #         difficulties[session['difficulty']] = 'checked'
+    #
+    #     if 'cache' in session:
+    #         cache = 'checked'
+
+    # CREATES NEW GAME
+    if request.method == 'POST':
+        session.clear()
+        data = request.form
+
+        # # ADDS SETTINGS TO SESSION
+        # if 'difficulty' in data:
+        #     session['difficulty'] = int(data['difficulty'])
+        #
+        # if 'cache' in data:
+        #     session['cache'] = 'checked'
+
+        return redirect(url_for('battle'))
 
     return render_template("menu.html", )
 

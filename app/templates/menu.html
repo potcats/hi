@@ -51,6 +51,10 @@ P02: Makers Makin' It, Act I
       left: 80%;
     }
 
+    .btn-close {
+      font-size: 135%;
+    }
+
     button:hover:not(.btn-close, #audio) {
       transform: scale(110%);
     }
@@ -64,7 +68,23 @@ P02: Makers Makin' It, Act I
     }
 
     #audio:checked + label img {
-      content: url("/static/images/icons/audio.png")
+      content: url("/static/images/icons/audio.png");
+      filter: invert(70%);
+    }
+
+    /* MODAL POPUP */
+    .modal-content {
+      border-radius: 0;
+      font-family: font;
+      font-size: 130%;
+    }
+
+    .modal-dialog, .modal-content {
+      height:80%;
+    }
+
+    .form-check-reverse {
+      float: left;
     }
 
   </style>
@@ -72,32 +92,35 @@ P02: Makers Makin' It, Act I
 </head>
 
 <body>
+  <!-- FORM THAT ALL INPUTS/BUTTONS ARE LINKED TO -->
+  <form id="play" method="POST" action="/menu"> </form>
+
   <!-- AUDIO -->
   <audio loop id="bgm" src="/static/sound/startbgm.mp3"> </audio>
 
-  <input type="checkbox" id="audio" onclick="Aud()" style="border-style:none;">
+  <input type="checkbox" id="audio" onclick="Aud()" style="border-style: none;">
   <label id='audiobut' for="audio">
-    <img style="width:50px;height:auto;position:absolute;left:5px;top:-10px"
+    <img style="width: 50px; height: auto; position: absolute; left: 5px; top: -10px; filter: invert(70%);"
       src="/static/images/icons/mute.png">
   </label>
 
   <!-- MAIN CONTENT OF PAGE-->
-  <div style="margin-top:6vh;" class="container">
+  <div style="margin-top: 6vh;" class="container">
     <div class="container">
       <image src="/static/images/title.png" id="title" class="center" style="margin-left: 62%;">
     </div>
-    <div style="width:80%" class="container">
-      <button type="submit" form="play" name="singleplayer" value="singleplayer" class="main" style="width:35%">
+    <div style="width: 80%" class="container">
+      <button type="submit" form="play" name="start" value="start" class="main" style="width: 35%">
         PLAY
       </button>
     </div>
-    <div style="margin-top:20px; width:80%" class="container">
-      <button type="button" class="main options" style="width:35%" data-bs-toggle="modal" data-bs-target="#classes">
+    <div style="margin-top: 20px; width: 80%" class="container">
+      <button type="button" class="main" style="width: 35%" data-bs-toggle="modal" data-bs-target="#classes">
         CLASSES
       </button>
     </div>
-    <div style="margin-top:20px; width:80%" class="container">
-      <button type="button" class="main options" style="width:35%" data-bs-toggle="modal" data-bs-target="#settings">
+    <div style="margin-top: 20px; width: 80%" class="container">
+      <button type="button" class="main" style="width: 35%" data-bs-toggle="modal" data-bs-target="#settings">
         SETTINGS
       </button>
     </div>
@@ -108,7 +131,7 @@ P02: Makers Makin' It, Act I
     <div class="modal-dialog modal-dialog-centered modal-lg">
       <div class="modal-content">
         <div class="modal-header">
-          <h3 class="modal-title" style="margin-left:320px;" id="staticBackdropLabel">SETTINGS</h3>
+          <h3 class="modal-title" style="margin-left: 320px;" id="staticBackdropLabel">SETTINGS</h3>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
