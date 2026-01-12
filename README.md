@@ -1,7 +1,7 @@
-# [temp] by hi
-## Roster: Carrie Ko (PM), Christine Chen (uh), Joyce Lin (probably frontend), Cindy Liu (uh)  
+# A Disastrous Campaign by hi
+## Roster: Carrie Ko (PM, front/backend), Christine Chen (front/backend), Joyce Lin (frontend), Cindy Liu (backend)  
 **Description**:
-[temp] is a single-player, turn-based RPG web application based off the game AAC. Players progress through encounters and battles to grow stronger, ultimately aiming to defeat the final boss.
+A Disastrous Campaign (ADC) is a single-player, turn-based RPG web application based off the game AAC. Players progress through encounters and battles to grow stronger, ultimately aiming to defeat the final boss.
 
 ## Install guide
 1) Clone the repo into a local directory:
