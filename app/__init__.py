@@ -24,7 +24,9 @@ c.execute("""
     password TEXT NOT NULL,
     level INTEGER NOT NULL,
     HP INTEGER NOT NULL,
-    class TEXT NOT NULL,
+    attacks TEXT NOT NULL,
+    buff INT,
+    debuff INT,
     str INTEGER,
     dex INTEGER,
     con INTEGER,
@@ -52,14 +54,6 @@ c.execute("""
     res TEXT,
     resMultiplier INTEGER,
     drop TEXT NOT NULL, 
-);
-""")
-
-c.execute("""
-    CREATE TABLE IF NOT EXISTS classes (
-    type TEXT PRIMARY KEY NOT NULL,
-    HP INTEGER NOT NULL,
-    weaponType TEXT NOT NULL
 );
 """)
 
@@ -103,8 +97,60 @@ c.execute("""
 
 @app.route('/', methods=['GET', 'POST'])
 def login():
+    if loggedin():
+        return redirect(url_for('menu'))
 
-    return render_template("login.html", )
+    if request.method == 'POST':
+        session.clear()
+        session.permanent = True
+        with sqlite3.connect(DB_FILE) as db:
+                c = db.cursor()
+                rows = c.execute("SELECT * FROM player WHERE username = ?;", (request.form['username'],))
+                result = rows.fetchone()
+                
+                if result is None:
+                    return render_template("login.html", "Username does not exist")
+                elif (request.form['password'] != result[1]):
+                    return render_template("login.html", "Your password was incorrect")
+
+                session['username'] = request.form['username'].lower()
+                return redirect(url_for('menu'))
+    else:
+        return render_template("login.html")
+
+@app.route("/register", methods=['GET', 'POST'])
+def register():
+    if loggedin():
+        return redirect(url_for('menu'))
+    else:
+        if request.method == 'POST':
+            with sqlite3.connect(DB_FILE) as db:
+                c = db.cursor()
+                
+                rows = c.execute("SELECT username FROM player WHERE username = ?", (request.form['username'].lower(),))
+                result = rows.fetchone()
+                if result:
+                    return render_template("register.html", "Duplicate username")
+                session.permanent = True
+
+                # for invalid requests / empty form responses
+                t = ""
+                if(request.form['username'] == "" or request.form['password'] == ""):
+                    t = "Please enter a valid "
+                    if(request.form['username'] == ""):
+                        t = t + "username "
+                    if(request.form['password'] == ""):
+                        t = t + "password "
+                    return render_template("register.html", t)
+
+                c.execute("INSERT INTO user_profile VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);", (request.form['username'].lower(), request.form['password']), 0, 30, "strike,cross slash", 3, 0, 0, 0, 0, 0, "", "", "", "", "basic sword", "", "", "")
+                db.commit()
+                
+                session.clear()
+                session.permanent = True
+                session['username'] = request.form['username'].lower()             
+                return redirect(url_for('menu'))
+    return render_template("register.html")
 
 @app.route('/menu', methods=['GET', 'POST'])
 def menu():
