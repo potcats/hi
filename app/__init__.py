@@ -7,12 +7,99 @@
 from flask import Flask, render_template, request, redirect, url_for, session
 import sqlite3
 from combat import *
-from db import *
 
 app = Flask(__name__)
 app.secret_key = 'wahhhhhhhhhhhhhhhhh'
 
-init_db()
+# ------------------------ DATABASING  ------------------------ #
+
+DB_FILE = "data.db"
+
+db = sqlite3.connect(DB_FILE, check_same_thread=False)
+c = db.cursor()
+
+c.execute("""
+    CREATE TABLE IF NOT EXISTS player (
+    username TEXT PRIMARY KEY NOT NULL,
+    password TEXT NOT NULL,
+    level INTEGER NOT NULL,
+    HP INTEGER NOT NULL,
+    class TEXT NOT NULL,
+    str INTEGER,
+    dex INTEGER,
+    con INTEGER,
+    int INTEGER,
+    fth INTEGER,
+    lck INTEGER,
+    helmet TEXT,
+    chestplate TEXT,
+    pants TEXT,
+    boots TEXT,
+    weapon TEXT NOT NULL,
+    accessory1 TEXT,
+    accessory2 TEXT,
+    accessory3 TEXT
+);
+""")
+
+c.execute("""
+    CREATE TABLE IF NOT EXISTS enemies (
+    type TEXT PRIMARY KEY NOT NULL,
+    attacks TEXT NOT NULL,
+    HP INTEGER NOT NULL,
+    weakness TEXT,
+    wMultiplier INTEGER,
+    res TEXT,
+    resMultiplier INTEGER,
+    drop TEXT NOT NULL, 
+);
+""")
+
+c.execute("""
+    CREATE TABLE IF NOT EXISTS classes (
+    type TEXT PRIMARY KEY NOT NULL,
+    HP INTEGER NOT NULL,
+    weaponType TEXT NOT NULL
+);
+""")
+
+c.execute("""
+    CREATE TABLE IF NOT EXISTS encounters (
+    type TEXT PRIMARY KEY NOT NULL,
+    dialogue TEXT NOT NULL,
+    background TEXT NOT NULL,
+    desc TEXT NOT NULL,
+    diff INT NOT NULL
+);
+""")
+
+c.execute("""
+    CREATE TABLE IF NOT EXISTS items (
+    type TEXT PRIMARY KEY NOT NULL,
+    image TEXT,
+    scale TEXT,
+    str INTEGER,
+    dex INTEGER,
+    con INTEGER,
+    int INTEGER,
+    fth INTEGER,
+    lck INTEGER
+);
+""")
+
+c.execute("""
+    CREATE TABLE IF NOT EXISTS attacks (
+    name TEXT PRIMARY KEY NOT NULL,
+    level INTEGER NOT NULL,
+    energy TEXT,
+    cd INTEGER NOT NULL,
+    scale TEXT NOT NULL,
+    statusEffects TEXT,
+    baseDamage INTEGER
+);
+""")
+
+#  ------------------------------------------------------------ #
 
 @app.route('/', methods=['GET', 'POST'])
 def login():
