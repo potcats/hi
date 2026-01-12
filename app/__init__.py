@@ -12,6 +12,8 @@ from db import *
 app = Flask(__name__)
 app.secret_key = 'wahhhhhhhhhhhhhhhhh'
 
+init_db()
+
 @app.route('/', methods=['GET', 'POST'])
 def login():
 
