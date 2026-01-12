@@ -8,8 +8,14 @@ import sqlite3
 
 DB_FILE = "data.db"
 
-def init_db():
+def get_db():
     db = sqlite3.connect(DB_FILE)
+    db.row_factory = sqlite3.Row
+    # access rows based off col name rather than tuple indices (row["username"] vs row[0])
+    return db
+
+def init_db():
+    db = get_db()
     c = db.cursor()
 
     c.execute("""
