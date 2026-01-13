@@ -28,27 +28,25 @@ def randomEnemy(type):
     return [species, attacks, init, hp, energy, weakness, res, drop]
 
 '''
-[
-   [username, level, [attack1, attack2, attack3], init, HP, energy, str, dex, con, int, fth, lck]
+[ player, [enemies] ]
 
-   [
+ |
+ V
+ 
+[
+    [username, level, [attack1, attack2, attack3], init, HP, energy, str, dex, con, int, fth, lck],
+    [
         [
-            [
-                species
-                [
-                    attack1
-                    attack2
-                    attack3
-                ]
-                init
-                hp
-                energy
-                weakness
-                res
-                drop
-            ]
-        ]
-        [enemy2]
+            species,
+            [ attack1, attack2, attack3 ]
+            init,
+            hp,
+            energy,
+            weakness,
+            res,
+            drops,
+        ],
+        [enemy2],
         [enemy3]
     ]
 ]

@@ -55,7 +55,7 @@ c.execute("""
     wMultiplier INTEGER,
     res TEXT,
     resMultiplier INTEGER,
-    drop TEXT NOT NULL, 
+    drops TEXT NOT NULL
 );
 """)
 
@@ -109,13 +109,14 @@ def login():
                 c = db.cursor()
                 rows = c.execute("SELECT * FROM player WHERE username = ?;", (request.form['username'],))
                 result = rows.fetchone()
-                
+
                 if result is None:
                     return render_template("login.html", "Username does not exist")
                 elif (request.form['password'] != result[1]):
                     return render_template("login.html", "Your password was incorrect")
 
                 session['username'] = request.form['username'].lower()
+
                 return redirect(url_for('menu'))
     else:
         return render_template("login.html")
@@ -128,7 +129,7 @@ def register():
         if request.method == 'POST':
             with sqlite3.connect(DB_FILE) as db:
                 c = db.cursor()
-                
+
                 rows = c.execute("SELECT username FROM player WHERE username = ?", (request.form['username'].lower(),))
                 result = rows.fetchone()
                 if result:
@@ -145,45 +146,24 @@ def register():
                         t = t + "password "
                     return render_template("register.html", t)
 
-                c.execute("INSERT INTO user_profile VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);", (request.form['username'].lower(), request.form['password']), 0, 30, "strike,cross slash", "", 0, "", 0, 3, 0, 0, 0, 0, 0, "", "", "", "", "basic sword", "", "", "")
+                c.execute("INSERT INTO user_profile VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);",
+                    (request.form['username'].lower(),
+                        request.form['password']),
+                        0, 30, "strike,cross slash", "", 0,
+                        "", 0, 3, 0, 0,
+                        0, 0, 0, "", "",
+                        "", "", "basic sword", "", "", "")
                 db.commit()
-                
+
                 session.clear()
                 session.permanent = True
-                session['username'] = request.form['username'].lower()             
+                session['username'] = request.form['username'].lower()
                 return redirect(url_for('menu'))
     return render_template("register.html")
 
 @app.route('/menu', methods=['GET', 'POST'])
 def menu():
-    # # SETS DEFAULT SETTINGS
-    # difficulties = ['checked', '', '']
-    # cache=''
-    #
-    # # CHECKS FOR PREVIOUS SETTINGS
-    # if len(session) > 0:
-    #     if 'difficulty' in session:
-    #         difficulties[0] = ''
-    #         difficulties[session['difficulty']] = 'checked'
-    #
-    #     if 'cache' in session:
-    #         cache = 'checked'
-
-    # CREATES NEW GAME
-    if request.method == 'POST':
-        session.clear()
-        data = request.form
-
-        # # ADDS SETTINGS TO SESSION
-        # if 'difficulty' in data:
-        #     session['difficulty'] = int(data['difficulty'])
-        #
-        # if 'cache' in data:
-        #     session['cache'] = 'checked'
-
-        return redirect(url_for('battle'))
-
-    return render_template("menu.html", )
+    return render_template("menu.html")
 
 @app.route('/campfire', methods=['GET', 'POST'])
 def campfire():
@@ -214,6 +194,14 @@ def dialogue():
 def scavenge():
 
     return render_template("scavenge.html", )
+
+# ------------------------ FLASK HELPER FUNCTIONS  ------------------------ #
+
+def loggedin():
+    return "username" in session
+
+#  ------------------------------------------------------------------------ #
+
 
 # RUN FLASK
 if __name__=='__main__':
