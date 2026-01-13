@@ -13,6 +13,15 @@ app.secret_key = 'wahhhhhhhhhhhhhhhhh'
 
 # ------------------------ DATABASING  ------------------------ #
 
+gear = ["cloth robe", "cloth veil", "cloth leggings", "iron greaves", "iron chestplate", "iron helmet", "iron leggings", "rat hide boots", "rat hide cloak", "rat hide hood", "simple sword", "excalibur", "crude club"]
+
+statStr = [0, 0, 0, 3, 4, 2, 4, 0, 0, 0, 3, 0, 0]
+statDex = [0, 0, 0, 0, 0, 0, 0, 3, 5, 2, 0, 0, 0]
+statCon = [0, 0, 0, 1, 6, 2, 3, 0, 0, 0, 0, 0, 0]
+statInt = [5, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+statFth = [4, 8, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+statLck = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+statScl = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 DB_FILE = "data.db"
 
 db = sqlite3.connect(DB_FILE, check_same_thread=False)
@@ -74,7 +83,6 @@ c.execute("""
     name TEXT PRIMARY KEY NOT NULL,
     type TEXT NOT NULL,
     image TEXT,
-    scale TEXT,
     str INTEGER,
     dex INTEGER,
     con INTEGER,
@@ -159,7 +167,7 @@ def register():
                         0, 30, "strike,cross slash", "", 0,
                         "", 0, 3, 0, 0,
                         0, 0, 0, "", "",
-                        "", "", "basic sword", "", "", "")
+                        "", "", "simple sword", "", "", "")
                 db.commit()
 
                 session.clear()
@@ -171,7 +179,8 @@ def register():
 @app.route('/menu', methods=['GET', 'POST'])
 def menu():
     session['turn'] = 1
-    session['inventory'] = {} # [name] {consumable?, quantity}
+    session['inventory'] = {} # [name] {type, quantity, gold}
+    session['gold'] = 0
 
     return render_template("menu.html")
 
@@ -186,6 +195,16 @@ def campfire():
     inv = session['inventory']
     stats = fetch_stats() # [level, HP, str, dex, con, int, fth, lck]
     equips = fetch_equips() # [helmet, chestplate, pants, boots, accessory1, accessory2, accessory3]
+
+    # AJAX INTERACTIONSSSSSSSSSSSSSS
+    # if request.method == "POST":
+    #     data = request.headers
+    #
+    #     if 'sell' in data:
+    #
+    #     if 'use' in data:
+    #
+    #     if 'equip' in data:
 
     return render_template("campfire.html",
         currTurn=session['turn'],
@@ -318,9 +337,9 @@ def addItemToInventory(name):
         inv[name][1] = str(int(inv[name][1]) + 1)
     else:
         c = db.cursor()
-        info = c.execute("SELECT type FROM items WHERE name = ?", (name,)).fetchone()
+        info = c.execute("SELECT type, gold FROM items WHERE name = ?", (name,)).fetchone()
 
-        inv[name] = [info, str(1)]
+        inv[name] = [info[0], str(1), info[1]]
         session['inventory'] = inv
 
 # ------------------------------------------------------------------------- #
