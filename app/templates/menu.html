@@ -65,7 +65,7 @@ P02: Makers Makin' It, Act I
 
     #audio:checked + label img {
       content: url("/static/images/icons/audio.png");
-      filter: invert(70%);
+      filter: invert(80%);
     }
 
   </style>
@@ -73,26 +73,23 @@ P02: Makers Makin' It, Act I
 </head>
 
 <body>
-  <!-- FORM THAT ALL INPUTS/BUTTONS ARE LINKED TO -->
-  <form id="play" method="POST" action="/menu"> </form>
-
   <!-- AUDIO -->
   <audio loop id="bgm" src="/static/sound/startbgm.mp3"> </audio>
 
   <input type="checkbox" id="audio" onclick="Aud()" style="border-style: none;">
   <label id='audiobut' for="audio">
-    <img style="width: 50px; height: auto; position: absolute; left: 5px; top: -10px; filter: invert(70%);"
+    <img style="width: 50px; height: auto; position: absolute; left: 5px; top: -6px; filter: invert(80%);"
       src="/static/images/icons/mute.png">
   </label>
 
   <!-- MAIN CONTENT OF PAGE-->
   <div style="margin-top: 6vh;" class="container">
     <div class="container">
-      <image src="/static/images/title.png" id="title" class="center" style="margin-left: 62%;">
+      <image src="/static/images/title.png" id="title" class="center" style="margin-left: 72%; filter: invert(80%);">
     </div>
-    <div style="width: 80%" class="container">
-      <button type="submit" form="play" name="start" value="start" class="main" style="width: 35%">
-        PLAY
+    <div style="margin-top: 50px; width: 80%" class="container">
+      <button onclick="window.location.href='battle'" class="main" style="width: 35%">
+        READY
       </button>
     </div>
   </div>

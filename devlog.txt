@@ -17,11 +17,32 @@ LABEL
     -
     -
 
-Carrie -- 2026-1-12 14:11
+carrieK -- 2026-1-12 13:19
+DATABASING
+* NEW CHANGES:
+    - Begin setup of databases
+    - Revision of design doc
+
+cindyL -- 2026-1-12 13:19
+COMBAT SYSTEM
+* NEW CHANGES:
+    - Begin setup of combat system
+    - Written preliminary randomEnemy and createBattle functions
+
+carrieK -- 2026-1-12 14:11
 INITIAL DD REVIEW
-    - We should cut down on features since it's looking super ambitious (too ambitious...) for the time we have for the project
-    - Need to add a summary of what the project is to our design doc
-    - Need to fix our component map so it's not strange
-    - Need to assign roles to the role assignment section of the design doc
-    - Need to add section to say where we're using JS and what we plan to do with it
-    - Need to fix up our dbs, maybe add explanations if it still doesn't make sense
+  - We should cut down on features since it's looking super ambitious (too ambitious...) for the time we have for the project
+  - Need to add a summary of what the project is to our design doc
+  - Need to fix our component map so it's not strange
+  - Need to assign roles to the role assignment section of the design doc
+  - Need to add section to say where we're using JS and what we plan to do with it
+  - Need to fix up our dbs, maybe add explanations if it still doesn't make sense
+
+joyceL -- 2026-1-13 03:20
+GRAPHICS AND CAMPFIRE
+* NEW CHANGES:
+    - begin setup of campfire page
+    - Completed importing graphics
+* TO BE DONE:
+    - setup inventory system
+    - complete equip system

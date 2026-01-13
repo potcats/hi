@@ -119,6 +119,7 @@ def login():
                     return render_template("login.html", "Your password was incorrect")
 
                 session['username'] = request.form['username'].lower()
+
                 return redirect(url_for('menu'))
     else:
         return render_template("login.html")
@@ -148,7 +149,13 @@ def register():
                         t = t + "password "
                     return render_template("register.html", t)
 
-                c.execute("INSERT INTO player VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);", (request.form['username'].lower(), request.form['password']), 0, 30, "strike,cross slash", "", 0, "", 0, 3, 0, 0, 0, 0, 0, "", "", "", "", "basic sword", "", "", "")
+                c.execute("INSERT INTO user_profile VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);",
+                    (request.form['username'].lower(),
+                        request.form['password']),
+                        0, 30, "strike,cross slash", "", 0,
+                        "", 0, 3, 0, 0,
+                        0, 0, 0, "", "",
+                        "", "", "basic sword", "", "", "")
                 db.commit()
 
                 session.clear()
@@ -159,39 +166,39 @@ def register():
 
 @app.route('/menu', methods=['GET', 'POST'])
 def menu():
-    # # SETS DEFAULT SETTINGS
-    # difficulties = ['checked', '', '']
-    # cache=''
-    #
-    # # CHECKS FOR PREVIOUS SETTINGS
-    # if len(session) > 0:
-    #     if 'difficulty' in session:
-    #         difficulties[0] = ''
-    #         difficulties[session['difficulty']] = 'checked'
-    #
-    #     if 'cache' in session:
-    #         cache = 'checked'
+    session['turn'] = 1
+    session['inventory'] = {}
 
-    # CREATES NEW GAME
-    if request.method == 'POST':
-        session.clear()
-        data = request.form
-
-        # # ADDS SETTINGS TO SESSION
-        # if 'difficulty' in data:
-        #     session['difficulty'] = int(data['difficulty'])
-        #
-        # if 'cache' in data:
-        #     session['cache'] = 'checked'
-
-        return redirect(url_for('battle'))
-
-    return render_template("menu.html", )
+    return render_template("menu.html")
 
 @app.route('/campfire', methods=['GET', 'POST'])
 def campfire():
+    # for testing purposes
+    session['username'] = 'aaa'
+    session['hp'] = 10
+    session['currXP'] = 13
+    session['maxXP'] = 27
 
-    return render_template("campfire.html", )
+    inventory = session['inventory']
+    stats = fetch_stats() # [level, HP, str, dex, con, int, fth, lck]
+    equips = fetch_equips() # [helmet, chestplate, pants, boots, accessory1, accessory2, accessory3]
+
+    return render_template("campfire.html",
+        currTurn=session['turn'],
+        username=session['username'],
+        inventory=inventory,
+        HP=session['hp'],
+        # maxHP=stats[1],
+        # lvl=stats[0],
+        # currXP=session['currXP'],
+        # maxXP=session['maxXP'],
+        # str=stats[2],
+        # dex=stats[3],
+        # con=stats[4],
+        # int=stats[5],
+        # fth=stats[6],
+        # lck=stats[7],
+        )
 
 @app.route('/battle', methods=['GET', 'POST'])
 def battle():
@@ -258,6 +265,35 @@ def dialogue():
 def scavenge():
 
     return render_template("scavenge.html", )
+
+# ------------------------ FLASK HELPER FUNCTIONS  ------------------------ #
+
+def loggedin():
+    return "username" in session
+
+# ------------------------ DB HELPER FUNCTIONS  --------------------------- #
+
+# [helmet, chestplate, pants, boots, accessory1, accessory2, accessory3]
+def fetch_equips():
+    c = db.cursor()
+    equips = c.execute('''SELECT helmet,
+        chestplate, pants, boots,
+        accessory1, accessory2, accessory3
+        FROM player WHERE username = ?''', (session['username'],)).fetchone()
+
+    return equips
+
+# [level, HP, str, dex, con, int, fth, lck]
+def fetch_stats():
+    c = db.cursor()
+    stats = c.execute('''SELECT level, HP, str,
+        dex, con, int, fth, lck
+        FROM player WHERE username = ?''', (session['username'],)).fetchone()
+
+    return stats
+
+# ------------------------------------------------------------------------- #
+
 
 # RUN FLASK
 if __name__=='__main__':
