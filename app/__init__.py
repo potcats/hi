@@ -220,9 +220,9 @@ def battle():
                 "inventory": []
             },
             "enemies": [
-                {"species": "Goblin", "hp": 10, "max_hp": 10, "energy": 2},
-                {"species": "Goblin", "hp": 10, "max_hp": 10, "energy": 2},
-                {"species": "Goblin", "hp": 10, "max_hp": 10, "energy": 2},
+                {"species": "goblin", "hp": 10, "max_hp": 10, "energy": 2},
+                {"species": "bandit", "hp": 10, "max_hp": 10, "energy": 2},
+                {"species": "pebble", "hp": 10, "max_hp": 10, "energy": 2},
             ],
             "turn": 1
         }
