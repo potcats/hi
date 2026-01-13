@@ -45,12 +45,12 @@ P02: Makers Makin' It, Act I
 
     .panel {
       position: absolute;
-      bottom: 70px;
+      bottom: 105px;
       left: 50%;
       transform: translateX(-50%);
-      width: 300px;
+      width: 600px;
+      background: gray;
       padding: 10px;
-      border-radius: 8px;
     }
 
     .panel-btn {
@@ -73,16 +73,28 @@ P02: Makers Makin' It, Act I
     .items-grid {
       display: grid;
       gap: 10px;
+      min-height: 120px;
+    }
+
+    .items-grid {
+      display: grid;
+      gap: 10px;
     }
 
     .slot {
       width: 50px;
       height: 50px;
       border: 2px solid white;
+      border-radius: 6px;
+      cursor: pointer;
     }
 
     .slot.empty {
+      cursor: default;
+    }
 
+    .slot:hover {
+      outline: 2px solid white;
     }
 
   </style>
@@ -134,7 +146,7 @@ P02: Makers Makin' It, Act I
 
       <div class = "flex-grow-1 position-relative">
 
-        <div class = "player-wrap" style = "left: 20%; bottom: 100px;">
+        <div class = "player-wrap" style = "left: 20%; bottom: 150px;">
 
           <img class = "player-sprite" src = "/static/images/warrior.png" style = "width: 200px;">
 
@@ -163,7 +175,7 @@ P02: Makers Makin' It, Act I
 
         {% for enemy in battle.enemies %}
         <div class = "enemy-wrap"
-             style = "right: {{ 15 + loop.index0 * 8 }}%; bottom: {{ 100 + loop.index0 * 60 }}px;">
+             style = "right: {{ 15 + loop.index0 * 8 }}%; bottom: {{ 140 + loop.index0 * 60 }}px;">
 
           <img class = "enemy-sprite" src = "/static/images/enemies/{{ enemy.species }}.png" style = "width: 200px;">
 
@@ -226,7 +238,7 @@ P02: Makers Makin' It, Act I
         <div class = "d-flex gap-4 justify-content-center mx-3">
           <button class = "panel-btn fw-bold flex-grow-1" onclick = "show('attacks')"> Fight </button>
           <button class = "panel-btn fw-bold flex-grow-1" onclick = "show('items')"> Items </button>
-          <button class = "panel-btn fw-bold flex-grow-1" onclick = "focus()"> Focus </button>
+          <button class = "panel-btn fw-bold flex-grow-1" onclick = "gainEnergy()"> Focus </button>
         </div>
 
       </div>
@@ -234,17 +246,29 @@ P02: Makers Makin' It, Act I
 
     <!-- Button press panels -->
     <div id = "attacks-panel" class = "panel" style = "display: none;">
+      <div class = "d-flex gap-2 justify-content-center">
       {% for atk in battle.player.attacks %}
-      <div class = "atk-wrap mb-2">
-        <h5 class = "fw-bold"> {{ atk }} </h5>
-        <p> Cost: ? | Cooldown: ? </p>
+      <div class = "atk-wrap flex-grow-1 bg-dark px-2 gap-2 mb-1 py-1">
+        <img src = "/static/images/icons/atk-icon.png" style = "width: 50px;">
+        <div>
+          <div class = "fw-bold"> {{ atk }} </div>
+          <p style = "font-size: 10px;"> Cost: ? | Cooldown: ? </p>
+        </div>
       </div>
       {% endfor %}
     </div>
 
-    <div id = "items-panel" class = "panel">
-      <div class = "items-grid">
+    <div id = "items-panel" class = "panel" style = "display: none;">
+      <div class = "items-grid" style = "grid-template-columns: repeat(4, 1fr);">
+        {% for item in battle.player.inventory %}
+        <div class = "slot bg-dark d-flex flex-column align-items-center justify-content-center"
+              onclick = "useItem(item)">
+          <img src = "/static/images/gear/boots/cloth.png" style = "width: 32px; height: 32px;">
+        </div>
+        {% endfor %}
+        {% for i in range(8 - battle.player.inventory|length) %}
         <div class = "slot empty"></div>
+        {% endfor %}
       </div>
     </div>
 
@@ -256,15 +280,19 @@ P02: Makers Makin' It, Act I
   <!-- PAGE-SPECIFIC JS -->
   <script>
 
-    function show(type) {
-      document.querySelectorAll('.panel')
-        .forEach(p => p.style.display = 'none');
-      document.getElementById(type + '-panel').style.display = 'block';
-    }
+  function hide() {
+    document.querySelectorAll('.panel')
+      .forEach(p => p.style.display = 'none');
+  }
 
-    function focus() {
-      alert("Focus clicked");
-    }
+  function show(type) {
+    hide();
+    document.getElementById(type + '-panel').style.display = 'block';
+  }
+
+  function gainEnergy() {
+    hide();
+  }
 
   </script>
 
