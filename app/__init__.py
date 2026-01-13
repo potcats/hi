@@ -63,7 +63,7 @@ c.execute("""
     dialogue TEXT NOT NULL,
     background TEXT NOT NULL,
     desc TEXT NOT NULL,
-    diff INT NOT NULL
+    diff INTEGER NOT NULL
 );
 """)
 
