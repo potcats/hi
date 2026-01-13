@@ -72,13 +72,7 @@ P02: Makers Makin' It, Act I
 
     .items-grid {
       display: grid;
-      gap: 10px;
-      min-height: 120px;
-    }
-
-    .items-grid {
-      display: grid;
-      gap: 10px;
+      gap: 20px;
     }
 
     .slot {
@@ -256,10 +250,11 @@ P02: Makers Makin' It, Act I
         </div>
       </div>
       {% endfor %}
+      </div>
     </div>
 
     <div id = "items-panel" class = "panel" style = "display: none;">
-      <div class = "items-grid" style = "grid-template-columns: repeat(4, 1fr);">
+      <div class = "items-grid" style = "grid-template-columns: repeat(8, 1fr);">
         {% for item in battle.player.inventory %}
         <div class = "slot bg-dark d-flex flex-column align-items-center justify-content-center"
               onclick = "useItem(item)">
