@@ -58,3 +58,11 @@ BATTLE
     - Inventory and focus
     - Backend battle logic (turns, updates)
     - Animations
+
+
+carrieK -- 2026-1-13 13:11
+DB
+* NEW CHANGES:
+    - initializing dbs
+* TO BE DONE:
+    - field testing to get stats

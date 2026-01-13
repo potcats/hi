@@ -13,15 +13,14 @@ app.secret_key = 'wahhhhhhhhhhhhhhhhh'
 
 # ------------------------ DATABASING  ------------------------ #
 
-gear = ["cloth robe", "cloth veil", "cloth leggings", "iron greaves", "iron chestplate", "iron helmet", "iron leggings", "rat hide boots", "rat hide cloak", "rat hide hood", "simple sword", "excalibur", "crude club"]
+gear = ["cloth robe", "cloth veil", "cloth leggings", "iron greaves", "iron chestplate", "iron helmet", "iron leggings", "rat hide boots", "rat hide cloak", "rat hide hood", "stinger pendant", "ring of goblin ears", "simple sword", "excalibur", "crude club", "noble's sabre"]
 
-statStr = [0, 0, 0, 3, 4, 2, 4, 0, 0, 0, 3, 0, 0]
-statDex = [0, 0, 0, 0, 0, 0, 0, 3, 5, 2, 0, 0, 0]
-statCon = [0, 0, 0, 1, 6, 2, 3, 0, 0, 0, 0, 0, 0]
-statInt = [5, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-statFth = [4, 8, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-statLck = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-statScl = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+statStr = [0, 0, 0, 3, 4, 2, 4, 0, 0, 0, 0, 5, 3, 0, 0, 10]
+statDex = [0, 0, 0, 0, 0, 0, 0, 3, 5, 2, 0, 5, 0, 0, 0, 0]
+statCon = [0, 0, 0, 1, 6, 2, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+statInt = [6, 0, 3, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0]
+statFth = [4, 4, 4, 0, 0, 0, 0, 0, 0, 0, 6, 0, 0, 0, 0, 0]
+statLck = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 DB_FILE = "data.db"
 
 db = sqlite3.connect(DB_FILE, check_same_thread=False)
