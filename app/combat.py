@@ -50,15 +50,15 @@ def randomEnemy(type):
             species,
             [
                 [
-                    name
-                    level
-                    energy
-                    cd
-                    scale
-                    baseDamage
+                    name,
+                    level,
+                    energy,
+                    cd, <-- max cooldown
+                    scale,
+                    baseDamage,
                     effect
                 ]
-                attack2
+                attack2,
                 attack3
             ]
             init,
@@ -67,9 +67,9 @@ def randomEnemy(type):
             weakness,
             res,
             drops,
-            [cd0, cd1, cd2]
+            [cd0, cd1, cd2] <-- current cooldown per skill
         ]
-        enemy2
+        enemy2,
         enemy3
     ]
 ]

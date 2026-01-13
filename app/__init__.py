@@ -178,7 +178,8 @@ def register():
 @app.route('/menu', methods=['GET', 'POST'])
 def menu():
     session['turn'] = 1
-    session['inventory'] = {} # [name] {consumable?, quantity}
+    session['inventory'] = {} # [name] {type, quantity, gold}
+    session['gold'] = 0
 
     return render_template("menu.html")
 
@@ -193,6 +194,16 @@ def campfire():
     inv = session['inventory']
     stats = fetch_stats() # [level, HP, str, dex, con, int, fth, lck]
     equips = fetch_equips() # [helmet, chestplate, pants, boots, accessory1, accessory2, accessory3]
+
+    # AJAX INTERACTIONSSSSSSSSSSSSSS
+    # if request.method == "POST":
+    #     data = request.headers
+    #
+    #     if 'sell' in data:
+    #
+    #     if 'use' in data:
+    #
+    #     if 'equip' in data:
 
     return render_template("campfire.html",
         currTurn=session['turn'],
@@ -325,9 +336,9 @@ def addItemToInventory(name):
         inv[name][1] = str(int(inv[name][1]) + 1)
     else:
         c = db.cursor()
-        info = c.execute("SELECT type FROM items WHERE name = ?", (name,)).fetchone()
+        info = c.execute("SELECT type, gold FROM items WHERE name = ?", (name,)).fetchone()
 
-        inv[name] = [info, str(1)]
+        inv[name] = [info[0], str(1), info[1]]
         session['inventory'] = inv
 
 # ------------------------------------------------------------------------- #
