@@ -28,14 +28,14 @@ def randomEnemy(type):
     base_info[1] = attack_info
 
     species = type
-    attacks = base_info[1]
+    attacks = [base_info[1], [0, 0, 0]]
     init = random.randInt(0, 100)
     hp = base_info[3] + random.randInt(-3, 3)
     weakness = base_info[3]
     res = base_info[4]
     drop = base_info[5]
 
-    return [species, attacks, init, hp, 0, weakness, res, drops, [0, 0, 0]]
+    return [species, attacks, init, hp, 0, weakness, res, drops]
 
 '''
 [ player, [enemies] ]
@@ -44,30 +44,32 @@ def randomEnemy(type):
  V
 
 [
-    [username, level, [ [name, level, energy, cd, scale, baseDamage, effect], attack2, attack3], init, hp, energy, str, dex, con, int, fth, lck, [cd0, cd1, cd2]],
+    [username, level, [ [ [name, level, energy, cd, scale, baseDamage, effect], attack2, attack3], [0, 0, 0] ], init, hp, energy, str, dex, con, int, fth, lck, [cd0, cd1, cd2]],
     [
         [
             species,
             [
                 [
-                    name,
-                    level,
-                    energy,
-                    cd, <-- max cooldown
-                    scale,
-                    baseDamage,
-                    effect
+                    [
+                        name,
+                        level,
+                        energy,
+                        cd, <-- max cooldown
+                        scale,
+                        baseDamage,
+                        effect
+                    ]
+                    attack2,
+                    attack3
                 ]
-                attack2,
-                attack3
+                [0, 0, 0]
             ]
             init,
             hp,
             energy,
             weakness,
             res,
-            drops,
-            [cd0, cd1, cd2] <-- current cooldown per skill
+            drops
         ]
         enemy2,
         enemy3
@@ -101,7 +103,7 @@ def createBattle(enemies):
 
     player = [player_info[0],
             player_info[2],
-            attacks_info,
+            [attacks_info, [0, 0, 0]],
             random.randInt(0, 100),
             player_info[3] + player_info[11],
             0,
@@ -110,8 +112,7 @@ def createBattle(enemies):
             player_info[11],
             player_info[12],
             player_info[13],
-            player_info[14],
-            [0, 0, 0]
+            player_info[14]
         ]
 
     return [player, enemies]
@@ -126,5 +127,25 @@ def attack(battle_id, attacker):
     attacking_enemy_stats = battle_id[1][attacker]
     player_stats = battle_id[0]
 
+    #reduce all cd by 1
+    for i in attacking_enemy_stats[1][1]:
+        if i != 0:
+            i -= 1
+    #increase energy by 1
+    attacking_enemy_stats[4] += 1
+
     #check available attacks and respective cooldowns, use the highest available attack
-    attacking_enemy_stats[1]
+    for i in range(2, -1, -1):
+        if attacking_enemy_stats[1][0][i][2] >= attacking_enemy_stats[4] && attacking_enemy_stats[1][1][i] == 0:
+            #set cd
+            attacking_enemy_stats[1][1][i] = attacking_enemy_stats[1][0][i][3]
+
+#
+def dealDamage(attacker, victim, attack_info):
+    dodgeChance = random.randInt(0,100)
+    if dodgeChance > 95:
+
+    #flat dodge chance
+    #base dmg
+    #crit chance -> base dmg x multiplier
+    #block change -> base dmg x multiplier / 2
