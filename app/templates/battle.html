@@ -242,7 +242,7 @@ P02: Makers Makin' It, Act I
     <div id = "attacks-panel" class = "panel" style = "display: none;">
       <div class = "d-flex gap-2 justify-content-center">
       {% for atk in battle.player.attacks %}
-      <div class = "atk-wrap flex-grow-1 bg-dark px-2 gap-2 mb-1 py-1">
+      <div class = "atk-wrap flex-grow-1 bg-dark px-2 gap-2 mb-1 py-1" onclick = "selectAtk('{{ atk }}')">
         <img src = "/static/images/icons/atk-icon.png" style = "width: 50px;">
         <div>
           <div class = "fw-bold"> {{ atk }} </div>
@@ -250,6 +250,20 @@ P02: Makers Makin' It, Act I
         </div>
       </div>
       {% endfor %}
+      </div>
+    </div>
+
+    <div id = "targets-panel" class = "panel" style = "display: none;">
+      <div class = "d-flex gap-2 justify-content-center">
+
+        {% for enemy in battle.enemies %}
+        <div class = "atk-wrap flex-grow-1 bg-dark px-2 gap-2 mb-1 py-1" onclick = "selectTarget({{ loop.index0 }})">
+          <div class = "fw-bold">{{ enemy.species }}</div>
+        </div>
+        {% endfor %}
+
+        <button class = "panel-btn mt-2" onclick = "show('attacks')"> Back </button>
+
       </div>
     </div>
 
@@ -274,6 +288,7 @@ P02: Makers Makin' It, Act I
 
   <!-- PAGE-SPECIFIC JS -->
   <script>
+  let selected = null;
 
   function hide() {
     document.querySelectorAll('.panel')
@@ -283,6 +298,11 @@ P02: Makers Makin' It, Act I
   function show(type) {
     hide();
     document.getElementById(type + '-panel').style.display = 'block';
+  }
+
+  function selectAtk(atk) {
+    selected = atk;
+    show('targets');
   }
 
   function gainEnergy() {
