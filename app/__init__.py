@@ -25,8 +25,10 @@ c.execute("""
     level INTEGER NOT NULL,
     HP INTEGER NOT NULL,
     attacks TEXT NOT NULL,
-    buff INTEGER,
-    debuff INTEGER,
+    buff TEXT,
+    bMultiplier INTEGER,
+    debuff TEXT,
+    dMultiplier INTEGER,
     str INTEGER,
     dex INTEGER,
     con INTEGER,
@@ -143,7 +145,7 @@ def register():
                         t = t + "password "
                     return render_template("register.html", t)
 
-                c.execute("INSERT INTO user_profile VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);", (request.form['username'].lower(), request.form['password']), 0, 30, "strike,cross slash", 3, 0, 0, 0, 0, 0, "", "", "", "", "basic sword", "", "", "")
+                c.execute("INSERT INTO user_profile VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);", (request.form['username'].lower(), request.form['password']), 0, 30, "strike,cross slash", "", 0, "", 0, 3, 0, 0, 0, 0, 0, "", "", "", "", "basic sword", "", "", "")
                 db.commit()
                 
                 session.clear()
