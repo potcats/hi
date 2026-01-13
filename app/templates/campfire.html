@@ -93,8 +93,12 @@ P02: Makers Makin' It, Act I
       background-color: grey
     }
 
-    #close:hover, #next:hover, .inv:hover, #sell:hover {
+    #close:hover, #next:hover, .inv:hover:not(.sellable), #sell:hover {
       background-color: darkgrey;
+    }
+
+    .sellable {
+      background-color: indianred;
     }
 
     /* INVENTORY STUFF */
@@ -246,8 +250,8 @@ P02: Makers Makin' It, Act I
 
   <!-- MAIN INVENTORY -->
   <div class="container mod overflow-auto" id="inv">
-    {% for i in range(0,10) %}
-      <button class="center inv"> aaa </button>
+    {% for item in inventory|tojson %}
+      <button class="center inv" id="{{ item }}" onclick="clicked(this)"> {{ item }} </button>
       <br>
     {% endfor %}
   </div>
@@ -267,6 +271,8 @@ P02: Makers Makin' It, Act I
 
   <!-- PAGE-SPECIFIC JS -->
   <script>
+    var inv = {{ inventory | tojson }};
+
     /* EVENTS THAT WILL OCCUR ON LOAD */
     window.onload = function() {
       document.getElementById('audio').checked = false;
@@ -313,8 +319,37 @@ P02: Makers Makin' It, Act I
 
       for (item of items) {
         item.className = item.className + " sellable";
-        item.style.backgroundColor = 'red';
+        item.style.backgroundColor = 'firebrick';
       }
+    }
+
+    /* ITEM INTERACTIONS */
+    function clicked(itm) {
+      name = itm.id
+      if (itm.className.split(' ').length > 2) {
+        sell(itm);
+      } else {
+        if (inv[name][0].equals("consumable")) {
+          use(itm);
+        } else {
+          equip(itm);
+        }
+      }
+    }
+
+    function sell() {
+      let sell = new XMLHttpRequest();
+      
+    }
+
+    function use() {
+      let use = new XMLHttpRequest();
+
+    }
+
+    function equip() {
+      let equip = new XMLHttpRequest();
+
     }
 
   </script>
