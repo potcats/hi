@@ -55,7 +55,7 @@ c.execute("""
     wMultiplier INTEGER,
     res TEXT,
     resMultiplier INTEGER,
-    drop TEXT NOT NULL, 
+    drops TEXT NOT NULL
 );
 """)
 
@@ -97,6 +97,9 @@ c.execute("""
 
 #  ------------------------------------------------------------ #
 
+def loggedin():
+    return 'username' in session
+
 @app.route('/', methods=['GET', 'POST'])
 def login():
     if loggedin():
@@ -109,7 +112,7 @@ def login():
                 c = db.cursor()
                 rows = c.execute("SELECT * FROM player WHERE username = ?;", (request.form['username'],))
                 result = rows.fetchone()
-                
+
                 if result is None:
                     return render_template("login.html", "Username does not exist")
                 elif (request.form['password'] != result[1]):
@@ -128,7 +131,7 @@ def register():
         if request.method == 'POST':
             with sqlite3.connect(DB_FILE) as db:
                 c = db.cursor()
-                
+
                 rows = c.execute("SELECT username FROM player WHERE username = ?", (request.form['username'].lower(),))
                 result = rows.fetchone()
                 if result:
@@ -145,12 +148,12 @@ def register():
                         t = t + "password "
                     return render_template("register.html", t)
 
-                c.execute("INSERT INTO user_profile VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);", (request.form['username'].lower(), request.form['password']), 0, 30, "strike,cross slash", "", 0, "", 0, 3, 0, 0, 0, 0, 0, "", "", "", "", "basic sword", "", "", "")
+                c.execute("INSERT INTO player VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);", (request.form['username'].lower(), request.form['password']), 0, 30, "strike,cross slash", "", 0, "", 0, 3, 0, 0, 0, 0, 0, "", "", "", "", "basic sword", "", "", "")
                 db.commit()
-                
+
                 session.clear()
                 session.permanent = True
-                session['username'] = request.form['username'].lower()             
+                session['username'] = request.form['username'].lower()
                 return redirect(url_for('menu'))
     return render_template("register.html")
 
@@ -192,8 +195,49 @@ def campfire():
 
 @app.route('/battle', methods=['GET', 'POST'])
 def battle():
+    session.pop('battle', None)
 
-    return render_template("battle.html", )
+    # if not loggedin():
+    #     return redirect(url_for('login'))
+
+    if 'battle' not in session:
+        # placeholder battle state just for rendering
+        session['battle'] = {
+            "player": {
+                "name": "tester",
+                "hp": 30,
+                "max_hp": 30, # changes with equipment/stats?
+                "level": 1,
+                "energy": 2,
+                "attacks": ["Atk1", "Atk2", "Atk3"],
+                "inventory": []
+            },
+            "enemies": [
+                {"species": "Goblin", "hp": 10, "max_hp": 10, "energy": 2},
+                {"species": "Goblin", "hp": 10, "max_hp": 10, "energy": 2},
+                {"species": "Goblin", "hp": 10, "max_hp": 10, "energy": 2},
+            ],
+            "turn": 1
+        }
+
+    #     session['battle'] = createBattle([randomEnemy('goblin'), randomEnemy('goblin')])
+    #     # i change later!!!!
+    #
+    # if request.method == 'POST':
+    #     action = request.json.get('action')
+    #     if action == 'attack':
+    #         move = request.json.get('move')
+    #         target = request.json.get('target')
+    #         # session['battle'] = attack(session['battle'], target, move)
+    #     elif action == 'item':
+    #         item = request.json.get('item')
+    #         # session['battle'] = useItem(session['battle'], item)
+    #     elif action == 'focus':
+    #         # session['battle'] = focus(session['battle'])
+    #
+    #     return jsonify(session["battle"])
+
+    return render_template("battle.html", battle = session['battle'])
 
 @app.route('/encounters', methods=['GET', 'POST'])
 def encounters():
