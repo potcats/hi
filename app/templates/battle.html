@@ -99,6 +99,7 @@ P02: Makers Makin' It, Act I
 
   <div class = "container-fluid vh-100 bg d-flex flex-column px-0">
 
+    <!-- Left-Side Bar -->
     <div class = "row flex-grow-1 position-relative">
 
       <div class= "text-white" style = "position: absolute; top: 30%; left: 0; width: 200px;">
@@ -140,24 +141,25 @@ P02: Makers Makin' It, Act I
 
       <div class = "flex-grow-1 position-relative">
 
+        <!-- Player Display -->
         <div class = "player-wrap" style = "left: 20%; bottom: 150px;">
 
           <img class = "player-sprite" src = "/static/images/warrior.png" style = "width: 200px;">
 
           <div class = "d-flex justify-content-center" style = "position: absolute; bottom: -20px; left: -60px;">
-            <div class = "bg-dark text-white px-1" style = "width: 200px;">
+            <div class = "bg-dark text-white px-1" style = "border-radius: 8px; width: 200px;">
 
               <span class = "fw-bold small"> Warrior </span>
 
               <div class = "d-flex gap-1 mb-1">
-                <div class = "progress flex-grow-1" style = "height: 18px;">
+                <div class = "progress flex-grow-1" style = "height: 12px;">
                   <div class = "progress-bar bg-danger" style = "width: {{ (battle.player.hp / 30) * 100 }}%">
-                    {{ battle.player.hp }} / {{ battle.player.max_hp }}
+                    <small>{{ battle.player.hp }} / {{ battle.player.max_hp }} </small>
                   </div>
                 </div>
-                <div class = "progress flex-grow-1" style = "height: 18px;">
+                <div class = "progress flex-grow-1" style = "height: 12px;">
                   <div class = "progress-bar bg-info" style = "width: {{ (battle.player.energy / 6) * 100 }}%">
-                    {{ battle.player.energy }} / 6
+                    <small>{{ battle.player.energy }} / 6 </small>
                   </div>
                 </div>
               </div>
@@ -167,6 +169,7 @@ P02: Makers Makin' It, Act I
 
         </div>
 
+        <!-- Enemy Display -->
         {% for enemy in battle.enemies %}
         <div class = "enemy-wrap"
              style = "right: {{ 15 + loop.index0 * 8 }}%; bottom: {{ 140 + loop.index0 * 60 }}px;">
@@ -174,19 +177,19 @@ P02: Makers Makin' It, Act I
           <img class = "enemy-sprite" src = "/static/images/enemies/{{ enemy.species }}.png" style = "width: 200px;">
 
           <div class = "d-flex justify-content-center" style = "position: absolute; bottom: -20px; left: -60px;">
-            <div class = "bg-dark text-white px-1" style = "width: 200px;">
+            <div class = "bg-dark text-white px-1" style = "border-radius: 8px; width: 200px;">
 
               <span class = "fw-bold small"> {{ enemy.species }} </span>
 
               <div class = "d-flex gap-1 mb-1">
-                <div class = "progress flex-grow-1" style = "height: 18px;">
+                <div class = "progress flex-grow-1" style = "height: 12px;">
                   <div class = "progress-bar bg-danger" style = "width: {{ (enemy.hp / enemy.max_hp) * 100 }}%">
-                    {{ enemy.hp }} / {{ enemy.max_hp }}
+                    <small> {{ enemy.hp }} / {{ enemy.max_hp }} </small>
                   </div>
                 </div>
-                <div class = "progress flex-grow-1" style = "height: 18px;">
+                <div class = "progress flex-grow-1" style = "height: 12px;">
                   <div class = "progress-bar bg-info" style = "width: {{ (enemy.energy / 6) * 100 }}%">
-                    {{ enemy.energy }} / 6
+                    <small> {{ enemy.energy }} / 6 </small>
                   </div>
                 </div>
               </div>
@@ -216,7 +219,7 @@ P02: Makers Makin' It, Act I
           </div>
         </div>
 
-        <div class = "d-flex gap-4 mb-2 mx-3">
+        <div class = "d-flex gap-2 mb-2 mx-3">
           <div class = "progress flex-grow-1" style = "height: 18px;">
             <div class = "progress-bar bg-danger" style = "width: {{ (battle.player.hp / 30) * 100 }}%">
               {{ battle.player.hp }} / {{ battle.player.max_hp }}
@@ -229,7 +232,7 @@ P02: Makers Makin' It, Act I
           </div>
         </div>
 
-        <div class = "d-flex gap-4 justify-content-center mx-3">
+        <div class = "d-flex gap-3 justify-content-center mx-3">
           <button class = "panel-btn fw-bold flex-grow-1" onclick = "show('attacks')"> Fight </button>
           <button class = "panel-btn fw-bold flex-grow-1" onclick = "show('items')"> Items </button>
           <button class = "panel-btn fw-bold flex-grow-1" onclick = "gainEnergy()"> Focus </button>
@@ -238,7 +241,7 @@ P02: Makers Makin' It, Act I
       </div>
     </div>
 
-    <!-- Button press panels -->
+    <!-- Attack Panel-->
     <div id = "attacks-panel" class = "panel" style = "display: none;">
       <div class = "d-flex gap-2 justify-content-center">
       {% for atk in battle.player.attacks %}
@@ -253,20 +256,27 @@ P02: Makers Makin' It, Act I
       </div>
     </div>
 
+    <!-- Targets Panel -->
     <div id = "targets-panel" class = "panel" style = "display: none;">
       <div class = "d-flex gap-2 justify-content-center">
 
         {% for enemy in battle.enemies %}
         <div class = "atk-wrap flex-grow-1 bg-dark px-2 gap-2 mb-1 py-1" onclick = "selectTarget({{ loop.index0 }})">
           <div class = "fw-bold">{{ enemy.species }}</div>
+          <div class = "progress flex-grow-1" style = "height: 15px;">
+            <div class = "progress-bar bg-danger" style = "width: {{ (enemy.hp / enemy.max_hp) * 100 }}%">
+              {{ enemy.hp }} / {{ enemy.max_hp }}
+            </div>
+          </div>
         </div>
         {% endfor %}
 
-        <button class = "panel-btn mt-2" onclick = "show('attacks')"> Back </button>
+        <button class = "panel-btn" onclick = "show('attacks')"> Back </button>
 
       </div>
     </div>
 
+    <!-- Items Panel -->
     <div id = "items-panel" class = "panel" style = "display: none;">
       <div class = "items-grid" style = "grid-template-columns: repeat(8, 1fr);">
         {% for item in battle.player.inventory %}

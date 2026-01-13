@@ -79,7 +79,21 @@ P02: Makers Makin' It, Act I
       background-color: grey
     }
 
-    #close:hover, #next:hover, .inv:hover {
+    #sell {
+      position: absolute;
+      bottom: 2.7em;
+
+      width: 23%;
+      height: 10%;
+
+      border-style: solid;
+      border-width: thick;
+      border-color: dimgrey;
+
+      background-color: grey
+    }
+
+    #close:hover, #next:hover, .inv:hover, #sell:hover {
       background-color: darkgrey;
     }
 
@@ -204,6 +218,11 @@ P02: Makers Makin' It, Act I
     CLOSE
   </button>
 
+  <!-- MODAL CLOSE BUTTON -->
+  <button class="mod" onclick="sellMode()" id="sell" style="right: 10px;">
+    CLOSE
+  </button>
+
   <!-- LEVELS + GENERAL STATS -->
   <div class="container mod" id="levelsOut">
     <div class="container" id="levelsIn">
@@ -286,6 +305,16 @@ P02: Makers Makin' It, Act I
 
       document.getElementById('close').style.display = "none";
       document.getElementById('next').style.display = "block";
+    }
+
+    /* SELL MODE */
+    function sellMode() {
+      items = document.getElementsByClassName("inv");
+
+      for (item of items) {
+        item.className = item.className + " sellable";
+        item.style.backgroundColor = 'red';
+      }
     }
 
   </script>
