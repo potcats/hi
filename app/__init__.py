@@ -163,12 +163,35 @@ def register():
 
 @app.route('/menu', methods=['GET', 'POST'])
 def menu():
+    session['turn'] = 1;
     return render_template("menu.html")
 
 @app.route('/campfire', methods=['GET', 'POST'])
 def campfire():
+    # for testing purposes
+    session['username'] = 'aaa'
+    session['hp'] = 10
+    session['currXP'] = 13
+    session['maxXP'] = 27
 
-    return render_template("campfire.html", )
+    stats = fetch_stats() # [level, HP, str, dex, con, int, fth, lck]
+    equips = fetch_equips() # [helmet, chestplate, pants, boots, accessory1, accessory2, accessory3]
+
+    return render_template("campfire.html",
+        currTurn=session['turn'],
+        username=session['username'],
+        HP=session['hp'],
+        # maxHP=stats[1],
+        # lvl=stats[0],
+        # currXP=session['currXP'],
+        # maxXP=session['maxXP'],
+        # str=stats[2],
+        # dex=stats[3],
+        # con=stats[4],
+        # int=stats[5],
+        # fth=stats[6],
+        # lck=stats[7],
+        )
 
 @app.route('/battle', methods=['GET', 'POST'])
 def battle():
@@ -200,7 +223,28 @@ def scavenge():
 def loggedin():
     return "username" in session
 
-#  ------------------------------------------------------------------------ #
+# ------------------------ DB HELPER FUNCTIONS  --------------------------- #
+
+# [helmet, chestplate, pants, boots, accessory1, accessory2, accessory3]
+def fetch_equips():
+    c = db.cursor()
+    equips = c.execute('''SELECT helmet,
+        chestplate, pants, boots,
+        accessory1, accessory2, accessory3
+        FROM player WHERE username = ?''', (session['username'],)).fetchone()
+
+    return equips
+
+# [level, HP, str, dex, con, int, fth, lck]
+def fetch_stats():
+    c = db.cursor()
+    stats = c.execute('''SELECT level, HP, str,
+        dex, con, int, fth, lck
+        FROM player WHERE username = ?''', (session['username'],)).fetchone()
+
+    return stats
+
+# ------------------------------------------------------------------------- #
 
 
 # RUN FLASK
