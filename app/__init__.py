@@ -71,7 +71,8 @@ c.execute("""
 
 c.execute("""
     CREATE TABLE IF NOT EXISTS items (
-    type TEXT PRIMARY KEY NOT NULL,
+    name TEXT PRIMARY KEY NOT NULL,
+    type TEXT NOT NULL,
     image TEXT,
     scale TEXT,
     str INTEGER,
@@ -79,7 +80,10 @@ c.execute("""
     con INTEGER,
     int INTEGER,
     fth INTEGER,
-    lck INTEGER
+    lck INTEGER,
+    hpIncr INTEGER,
+    energyIncr INTEGER
+
 );
 """)
 
@@ -167,7 +171,7 @@ def register():
 @app.route('/menu', methods=['GET', 'POST'])
 def menu():
     session['turn'] = 1
-    session['inventory'] = {}
+    session['inventory'] = {} # [name] {consumable?, quantity}
 
     return render_template("menu.html")
 
@@ -179,14 +183,14 @@ def campfire():
     session['currXP'] = 13
     session['maxXP'] = 27
 
-    inventory = session['inventory']
+    inv = session['inventory']
     stats = fetch_stats() # [level, HP, str, dex, con, int, fth, lck]
     equips = fetch_equips() # [helmet, chestplate, pants, boots, accessory1, accessory2, accessory3]
 
     return render_template("campfire.html",
         currTurn=session['turn'],
         username=session['username'],
-        inventory=inventory,
+        inventory=inv,
         HP=session['hp'],
         # maxHP=stats[1],
         # lvl=stats[0],
@@ -277,7 +281,7 @@ def loggedin():
 def fetch_equips():
     c = db.cursor()
     equips = c.execute('''SELECT helmet,
-        chestplate, pants, boots,
+        chestplate, pants, boots, weapon,
         accessory1, accessory2, accessory3
         FROM player WHERE username = ?''', (session['username'],)).fetchone()
 
@@ -291,6 +295,33 @@ def fetch_stats():
         FROM player WHERE username = ?''', (session['username'],)).fetchone()
 
     return stats
+
+# [str, dex, con, int, fth, lck]
+def fetch_itemStats(name):
+    c = db.cursor()
+    stats = c.execute('''SELECT str, dex, con, int, fth, lck
+        FROM items WHERE name = ?''', (name,)).fetchone()
+
+    return stats
+
+# [hpIncr, energyIncr]
+def fetch_itemEffects(name):
+    c = db.cursor()
+    effects = c.execute("SELECT hpIncr, energyIncr FROM items WHERE name = ?", (name,)).fetchone()
+
+    return effects
+
+def addItemToInventory(name):
+    inv = session['inventory']
+
+    if name in inv:
+        inv[name][1] = str(int(inv[name][1]) + 1)
+    else:
+        c = db.cursor()
+        info = c.execute("SELECT type FROM items WHERE name = ?", (name,)).fetchone()
+
+        inv[name] = [info, str(1)]
+        session['inventory'] = inv
 
 # ------------------------------------------------------------------------- #
 
