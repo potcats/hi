@@ -35,7 +35,7 @@ P02: Makers Makin' It, Act I
     }
 
     /* BUTTONS */
-    button:not(.btn-close) {
+    button {
       font-family: font;
       font-size: 290%;
       background: none;
@@ -51,11 +51,7 @@ P02: Makers Makin' It, Act I
       left: 80%;
     }
 
-    .btn-close {
-      font-size: 135%;
-    }
-
-    button:hover:not(.btn-close, #audio) {
+    button:hover:not(#audio) {
       transform: scale(110%);
     }
 
@@ -70,21 +66,6 @@ P02: Makers Makin' It, Act I
     #audio:checked + label img {
       content: url("/static/images/icons/audio.png");
       filter: invert(70%);
-    }
-
-    /* MODAL POPUP */
-    .modal-content {
-      border-radius: 0;
-      font-family: font;
-      font-size: 130%;
-    }
-
-    .modal-dialog, .modal-content {
-      height:80%;
-    }
-
-    .form-check-reverse {
-      float: left;
     }
 
   </style>
@@ -113,52 +94,6 @@ P02: Makers Makin' It, Act I
       <button type="submit" form="play" name="start" value="start" class="main" style="width: 35%">
         PLAY
       </button>
-    </div>
-    <div style="margin-top: 20px; width: 80%" class="container">
-      <button type="button" class="main" style="width: 35%" data-bs-toggle="modal" data-bs-target="#classes">
-        CLASSES
-      </button>
-    </div>
-    <div style="margin-top: 20px; width: 80%" class="container">
-      <button type="button" class="main" style="width: 35%" data-bs-toggle="modal" data-bs-target="#settings">
-        SETTINGS
-      </button>
-    </div>
-  </div>
-
-  <!-- MODAL + SETTINGS INPUTS -->
-  <div class="modal fade" id="settings" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h3 class="modal-title" style="margin-left: 320px;" id="staticBackdropLabel">SETTINGS</h3>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <!-- CHECKBOX TYPE SETTINGS -->
-          <div class="form-check form-switch">
-            <input class="form-check-input" type="checkbox" form="play" id="cache" name="cache" {{ placeholder2 }}>
-            <label for="cache"> quick &nbsp&nbsp load </label>
-            <br>
-            <input class="form-check-input" type="checkbox" onclick="Time()" form="play" id="reverseTime" name="reverseTime" {{ reverseStatus }}>
-            <label for="reverseTime"> reversed &nbsp&nbsp time </label>
-          </div>
-          <hr>
-          <!-- RADIO TYPE SETTINGS -->
-          <div>
-            <text> DIFFICULTY &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp </text>
-            <input type="radio" class="btn-check" form="play" name="difficulty" id="easy" value="0" autocomplete="off" {{ dEasy }}>
-            <label class="btn btn-outline-secondary" for="easy">easy</label>
-            &nbsp&nbsp&nbsp
-            <input type="radio" class="btn-check" form="play" name="difficulty" id="medium" value="1" autocomplete="off" {{ dMed }}>
-            <label class="btn btn-outline-secondary" for="medium">medium</label>
-            &nbsp&nbsp&nbsp
-            <input type="radio" class="btn-check" form="play" name="difficulty" id="hard" value="2" autocomplete="off" {{ dHard }}>
-            <label class="btn btn-outline-secondary" for="hard">hard</label>
-          </div>
-          <br>
-        </div>
-      </div>
     </div>
   </div>
 
