@@ -46,3 +46,15 @@ GRAPHICS AND CAMPFIRE
 * TO BE DONE:
     - setup inventory system
     - complete equip system
+
+christineC -- 2026-1-13 05:13
+BATTLE
+* NEW CHANGES:
+    - Battle screen UI
+    - Rendered player + enemies
+    - Action bar with basic JS
+    - Basic setup of AJAX backend (POST + JSON; rest incomplete)
+* TO BE DONE:
+    - Inventory and focus
+    - Backend battle logic (turns, updates)
+    - Animations
