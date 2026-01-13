@@ -163,7 +163,9 @@ def register():
 
 @app.route('/menu', methods=['GET', 'POST'])
 def menu():
-    session['turn'] = 1;
+    session['turn'] = 1
+    session['inventory'] = {}
+
     return render_template("menu.html")
 
 @app.route('/campfire', methods=['GET', 'POST'])
@@ -174,12 +176,14 @@ def campfire():
     session['currXP'] = 13
     session['maxXP'] = 27
 
+    inventory = session['inventory']
     stats = fetch_stats() # [level, HP, str, dex, con, int, fth, lck]
     equips = fetch_equips() # [helmet, chestplate, pants, boots, accessory1, accessory2, accessory3]
 
     return render_template("campfire.html",
         currTurn=session['turn'],
         username=session['username'],
+        inventory=inventory,
         HP=session['hp'],
         # maxHP=stats[1],
         # lvl=stats[0],
