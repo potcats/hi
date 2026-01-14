@@ -150,7 +150,7 @@ P02: Makers Makin' It, Act I
           <div class = "d-flex justify-content-center" style = "position: absolute; bottom: -20px; left: -60px;">
             <div class = "bg-dark text-white px-1" style = "border-radius: 8px; width: 200px;">
 
-              <span class = "fw-bold small"> Warrior </span>
+              <span class = "fw-bold small"> {{ battle.player.username }} </span>
 
               <div class = "d-flex gap-1 mb-1">
                 <div class = "progress flex-grow-1" style = "height: 12px;">
@@ -185,12 +185,12 @@ P02: Makers Makin' It, Act I
               <div class = "d-flex gap-1 mb-1">
                 <div class = "progress flex-grow-1" style = "height: 12px;">
                   <div class = "progress-bar bg-danger enemy-hp" style = "width: {{ (enemy.hp / enemy.max_hp) * 100 }}%">
-                    <small> {{ enemy.hp }} / {{ enemy.max_hp }} </small>
+                    <small class = "enemy-hp-text"> {{ enemy.hp }} / {{ enemy.max_hp }} </small>
                   </div>
                 </div>
                 <div class = "progress flex-grow-1" style = "height: 12px;">
                   <div class = "progress-bar bg-info enemy-energy" style = "width: {{ (enemy.energy / 6) * 100 }}%">
-                    <small> {{ enemy.energy }} / 6 </small>
+                    <small class = "enemy-energy-text"> {{ enemy.energy }} / 6 </small>
                   </div>
                 </div>
               </div>
@@ -224,18 +224,19 @@ P02: Makers Makin' It, Act I
         <div class = "d-flex gap-2 mb-2 mx-3">
           <div class = "progress flex-grow-1" style = "height: 18px;">
             <div class = "progress-bar bg-danger player-hp" style = "width: {{ (battle.player.hp / 30) * 100 }}%">
-              {{ battle.player.hp }} / {{ battle.player.max_hp }}
+              <div class = "player-hp-text" {{ battle.player.hp }} / {{ battle.player.max_hp }} </div>
             </div>
           </div>
           <div class = "progress flex-grow-1" style = "height: 18px;">
             <div class = "progress-bar bg-info player-energy" style = "width: {{ (battle.player.energy / 6) * 100 }}%">
-              {{ battle.player.energy }} / 6
+              <div class = "player-energy-text"> {{ battle.player.energy }} / 6 </div>
             </div>
           </div>
         </div>
 
         <div class = "d-flex gap-3 justify-content-center mx-3">
           <button class = "panel-btn fw-bold flex-grow-1" onclick = "show('attacks')"> Fight </button>
+          <button class = "panel-btn fw-bold flex-grow-1" onclick = "guard()"> Guard </button>
           <button class = "panel-btn fw-bold flex-grow-1" onclick = "show('items')"> Items </button>
           <button class = "panel-btn fw-bold flex-grow-1" onclick = "gainEnergy()"> Focus </button>
         </div>
@@ -287,13 +288,12 @@ P02: Makers Makin' It, Act I
           <img src = "/static/images/gear/boots/cloth.png" style = "width: 32px; height: 32px;">
         </div>
         {% endfor %}
-        {# {% for i in range(8 - battle.player.inventory|length) %} #}
-        {% for i in range(8) %}
+        {% for i in range(8 - battle.player.inventory|length) %}
         <div class = "slot empty"></div>
         {% endfor %}
       </div>
     </div>
-
+ 
   <!-- BOOTSTRAP JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
     integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
