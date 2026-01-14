@@ -13,11 +13,12 @@ app.secret_key = 'wahhhhhhhhhhhhhhhhh'
 
 # ------------------------ DATABASING  ------------------------ #
 
-gear = ["cloth robe", "cloth veil", "cloth leggings", "iron greaves", "iron chestplate", "iron helmet", "iron leggings", "rat hide boots", "rat hide cloak", "rat hide hood", "stinger pendant", "ring of goblin ears", "simple sword", "excalibur", "crude club", "noble's sabre"]
+gear = ["cloth robe", "cloth veil", "cloth leggings", "iron greaves", "iron chestplate", "iron helmet", "iron leggings", "rat hide boots", 
+        "rat hide cloak", "rat hide hood", "stinger pendant", "ring of goblin ears", "simple sword", "excalibur", "crude club", "noble's sabre"]
 
-statStr = [0, 0, 0, 3, 4, 2, 4, 0, 0, 0, 0, 5, 3, 0, 0, 10]
+statStr = [0, 0, 0, 3, 4, 2, 4, 0, 0, 0, 0, 5, 3, 16, 12, 10]
 statDex = [0, 0, 0, 0, 0, 0, 0, 3, 5, 2, 0, 5, 0, 0, 0, 0]
-statCon = [0, 0, 0, 1, 6, 2, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+statCon = [0, 0, 0, 1, 6, 2, 3, 0, 0, 0, 0, 0, 0, 0, 6, 0]
 statInt = [6, 0, 3, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0]
 statFth = [4, 4, 4, 0, 0, 0, 0, 0, 0, 0, 6, 0, 0, 0, 0, 0]
 statLck = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
@@ -31,6 +32,7 @@ c.execute("""
     username TEXT PRIMARY KEY NOT NULL,
     password TEXT NOT NULL,
     level INTEGER NOT NULL,
+    exp INTEGER,
     HP INTEGER NOT NULL,
     attacks TEXT NOT NULL,
     buff TEXT,
