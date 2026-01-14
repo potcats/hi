@@ -90,3 +90,14 @@ CAMPFIRE
 * TO BE DONE:
     - setup point allocation system
     - anything else that still needs to be done
+
+christineC -- 2026-1-14 5:40
+ENCOUNTERS + BATTLE
+* NEW CHANGES:
+    - Completed frontend for encounters page
+    - AJAX backend for battles
+* TO BE DONE:
+    - Complete battle/combat
+    - Encounters based off DB
+    - Everything!
+
