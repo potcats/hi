@@ -140,14 +140,12 @@ P02: Makers Makin' It, Act I
     }
 
     .inspect {
-      align-self: right;
+      position: relative;
+      bottom: 20px;
+      left: 70%;
 
-      width: 23%;
-      height: 10%;
-
-      border-style: solid;
-      border-width: thick;
-      border-color: dimgrey;
+      width: 30%;
+      font-size: 140%;
 
       background-color: grey
     }
@@ -275,14 +273,14 @@ P02: Makers Makin' It, Act I
       {% endfor %}
     </div>
     <div class="container" id="inspect" style="height: 40%">
-      <div class="container overflow-auto" style="height: 90%; padding: 15px">
+      <div class="container overflow-auto" style="height: 90%; padding: 15px; font-size: 130%">
         <!-- IF NO ITEMS SELECTED -->
-        <h3 class="center" style="text-align: center; display: none;" id="noInspect">
+        <h3 style="text-align: center; display: none;" id="noInspect">
           SELECT AN ITEM TO INSPECT
         </h3>
 
         <!-- ITEMS SELECTED -->
-        <h3 style="text-align: center;" id="itemName"> </h3>
+        <h3 id="itemName"> </h3>
         <p id="itemDesc"> </p>
         <div id="extension"> </div>
       </div>
@@ -368,6 +366,12 @@ P02: Makers Makin' It, Act I
       document.getElementById("inspectSell").style.display = "none";
       document.getElementById("inspectUse").style.display = "none";
       document.getElementById("inspectEquip").style.display = "none";
+
+      document.getElementById('itemName').innerHTML = "";
+      document.getElementById('itemDesc').innerHTML = "";
+
+      if (sellMode) { toggleSellMode() };
+      selectedItm = "";
     }
 
     /* SELL MODE */
@@ -381,12 +385,27 @@ P02: Makers Makin' It, Act I
         for (item of items) {
           item.classList.remove("sellable");
         }
+
+        if (selectedItm != "") {
+          document.getElementById("inspectSell").style.display = "none"
+          if (inv[selectedItm][1] == "consumable") {
+            document.getElementById("inspectUse").style.display = "block"
+          } else {
+            document.getElementById("inspectEquip").style.display = "block"
+          };
+        }
       } else {
         sellMode = true;
         document.getElementById('sell').style.backgroundColor = "forestgreen"
 
         for (item of items) {
           item.classList.add("sellable");
+        }
+
+        if (selectedItm != "") {
+          document.getElementById("inspectSell").style.display = "block"
+          document.getElementById("inspectUse").style.display = "none";
+          document.getElementById("inspectEquip").style.display = "none";
         }
       }
     }
@@ -395,18 +414,20 @@ P02: Makers Makin' It, Act I
     function clicked(itm) {
       let select = new XMLHttpRequest();
       name = itm.id
+      selectedItm = name;
 
       document.getElementById('noInspect').style.display = "none";
       document.getElementById('itemName').innerHTML = inv[name][0];
       document.getElementById('itemDesc').innerHTML = inv[name][5];
 
-      if (inv[name][0] == "consumable") {
+      if (inv[name][1] == "consumable") {
         select.open('POST', window.location.href, true);
         select.setRequestHeader("select", "consumable," + name);
         select.send();
 
-        cont = document.getElementById("extension")
-        textExtension = "<p> EFFECTS </p><br>"
+        document.getElementById('itemName').innerHTML += " (CONSUMABLE)";
+        cont = document.getElementById("extension");
+        textExtension = "<h3> EFFECTS </h3><br>";
 
         select.onload = function() {
           if (this.readyState == 4 && this.status == 200) {
@@ -426,8 +447,9 @@ P02: Makers Makin' It, Act I
         select.setRequestHeader("select", "gear," + name);
         select.send();
 
-        cont = document.getElementById("extension")
-        textExtension = "<p> STATS </p><br>"
+        document.getElementById('itemName').innerHTML += " (GEAR)";
+        cont = document.getElementById("extension");
+        textExtension = "<h3> STATS </h3>";
 
         select.onload = function() {
           if (this.readyState == 4 && this.status == 200) {
@@ -445,7 +467,7 @@ P02: Makers Makin' It, Act I
         }
 
         if (sellMode) { document.getElementById("inspectSell").style.display = "block"
-        } else { document.getElementById("inspectUse").style.display = "block" };
+        } else { document.getElementById("inspectEquip").style.display = "block" };
       }
     }
 
