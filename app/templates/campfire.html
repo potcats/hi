@@ -536,9 +536,7 @@ P02: Makers Makin' It, Act I
     function sell() {
       let newGold = "";
       let sell = new XMLHttpRequest();
-<<<<<<< HEAD
 
-=======
       sell.open('POST', window.location.href, true);
       sell.setRequestHeader("sell", selectedItm);
       sell.send();
@@ -557,7 +555,6 @@ P02: Makers Makin' It, Act I
 
         document.getElementById('gold').innerHTML = `GOLD: ${newGold}`;
       }
->>>>>>> ad06f4d1f1613e9cae5fbdfa3c35af5e295d3a2b
     }
 
     function use() {
