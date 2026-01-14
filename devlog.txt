@@ -66,9 +66,17 @@ DB
 * TO BE DONE:
     - field testing to get stats
 
-carrieK -- 2026-1-43 00:30
+carrieK -- 2026-1-14 00:30
 DB
 * NEW CHANGES:
     - many database many values many numbers
 * TO BE DONE:
     - enemies,dialguegu
+
+cindyL -- 2026-1-14 00:52
+COMBAT SYSTEM
+* NEW CHANGES:
+    - created/completed prelin attack fxns and dealDamage
+    - cleaned up data storage
+* TO BE DONE:
+    - literally everything else in combat like wtf
