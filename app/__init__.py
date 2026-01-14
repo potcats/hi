@@ -145,6 +145,7 @@ for i in range(len(items)):
     q = "INSERT OR REPLACE INTO items(name, type, image, str, dex, con, inte, fth, lck, hpInc, gold, gearType) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
     d = (items[i], type[i], img[i], statStr[i], statDex[i], statCon[i], statInt[i], statFth[i], statLck[i], hpInc[i], gold[i], gearType[i])
     c.execute(q, d)
+    db.commit()
 #  ------------------------------------------------------------ #
 
 def loggedin():
