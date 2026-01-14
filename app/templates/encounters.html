@@ -90,6 +90,10 @@ P02: Makers Makin' It, Act I
     object-fit: cover;
     margin: 10px 0;
   }
+    
+  .button:hover {
+    outline: 2px solid white;
+  }
 
   </style>
 
@@ -131,13 +135,13 @@ P02: Makers Makin' It, Act I
   <div class = "container mt-3">
     <div class = "row justify-content-center align-items-center text-center">
       <div class = "col-md-3 px-0" style = "min-width: 180px;">
-        <a href = "{{ url_for('scavenge') }}" class = "btn text-wrap"> Scavenge </a>
+        <a href = "{{ url_for('scavenge') }}" class = "button text-wrap"> Scavenge </a>
       </div>
       <div class = "col-md-3 px-0 d-flex justify-content-center align-items-center">
         <div class = "text-wrap"> x </div>
       </div>
       <div class = "col-md-3 px-0" style = "min-width: 180px;">
-        <a href = "{{ url_for('campfire') }}" class = "btn text-wrap"> Rest </a>
+        <a href = "{{ url_for('campfire') }}" class = "button text-wrap"> Rest </a>
       </div>
     </div>
   </div>
