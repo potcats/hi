@@ -62,6 +62,10 @@ P02: Makers Makin' It, Act I
       cursor: pointer;
     }
 
+    .progress-bar {
+      transition: width 0.3s ease;
+    }
+    
     .atk-wrap {
       background: gray;
       color: white;
@@ -159,7 +163,7 @@ P02: Makers Makin' It, Act I
               <div class = "d-flex gap-1 mb-1">
                 <div class = "progress flex-grow-1" style = "height: 12px;">
                   <div class = "progress-bar bg-danger player-hp" style = "width: {{ (battle.player.hp / 30) * 100 }}%">
-                    <small class = player-hp-text>{{ battle.player.hp }} / {{ battle.player.max_hp }} </small>
+                    <small class = "player-hp-text">{{ battle.player.hp }} / {{ battle.player.max_hp }} </small>
                   </div>
                 </div>
                 <div class = "progress flex-grow-1" style = "height: 12px;">
@@ -226,7 +230,7 @@ P02: Makers Makin' It, Act I
         <div class = "d-flex gap-2 mb-2 mx-3">
           <div class = "progress flex-grow-1" style = "height: 18px;">
             <div class = "progress-bar bg-danger player-hp" style = "width: {{ (battle.player.hp / 30) * 100 }}%">
-              <div class = "player-hp-text" {{ battle.player.hp }} / {{ battle.player.max_hp }} </div>
+              <div class = "player-hp-text"> {{ battle.player.hp }} / {{ battle.player.max_hp }} </div>
             </div>
           </div>
           <div class = "progress flex-grow-1" style = "height: 18px;">
@@ -324,6 +328,9 @@ P02: Makers Makin' It, Act I
   }
 
   function selectTarget(idx) {
+    document.querySelectorAll(".enemy-wrap")
+      .forEach(e => e.classList.remove("targeted"));
+    
     let xhttp = new XMLHttpRequest();
     xhttp.open("POST", "/battle", true);
     xhttp.setRequestHeader("Content-Type", "application/json");
@@ -345,7 +352,11 @@ P02: Makers Makin' It, Act I
     hide();
   }
 
-  function highlight(idx) {
+  function guard() {
+    hide();
+  }
+
+  function highlight(i) {
     const enemies = document.querySelectorAll(".enemy-wrap");
     if (enemies[i]) {
       enemies[i].classList.add("targeted");
