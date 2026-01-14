@@ -71,6 +71,10 @@ P02: Makers Makin' It, Act I
       cursor: pointer;
     }
 
+    .enemy-wrap.targeted img {
+      outline: 4px solid white;
+    }
+
     .items-grid {
       display: grid;
       gap: 20px;
@@ -262,7 +266,10 @@ P02: Makers Makin' It, Act I
       <div class = "d-flex gap-2 justify-content-center">
 
         {% for enemy in battle.enemies %}
-        <div class = "atk-wrap flex-grow-1 bg-dark px-2 gap-2 mb-1 py-1" onclick = "selectTarget({{ loop.index0 }})">
+        <div class = "atk-wrap flex-grow-1 bg-dark px-2 gap-2 mb-1 py-1"
+             onmouseenter = "highlight({{ loop.index0 }})"
+             onmouseleave = "unhighlight({{ loop.index0 }})"
+             onclick = "selectTarget({{ loop.index0 }})">
           <div class = "fw-bold">{{ enemy.species }}</div>
           <div class = "progress flex-grow-1" style = "height: 15px;">
             <div class = "progress-bar bg-danger enemy-hp" style = "width: {{ (enemy.hp / enemy.max_hp) * 100 }}%">
@@ -336,6 +343,20 @@ P02: Makers Makin' It, Act I
 
   function gainEnergy() {
     hide();
+  }
+
+  function highlight(idx) {
+    const enemies = document.querySelectorAll(".enemy-wrap");
+    if (enemies[i]) {
+      enemies[i].classList.add("targeted");
+    }
+  }
+    
+  function unhighlight(i) {
+    const enemies = document.querySelectorAll(".enemy-wrap");
+    if (enemies[i]) {
+      enemies[i].classList.remove("targeted");
+    }
   }
 
   function updateBattle(battle) {
