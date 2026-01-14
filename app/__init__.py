@@ -229,10 +229,9 @@ def menu():
 @app.route('/campfire', methods=['GET', 'POST'])
 def campfire():
     # for testing purposes
-    session['hp'] = 10
+    # session['hp'] = 5
     session['currXP'] = 13
     session['maxXP'] = 27
-    addItemToInventory("rat hide cloak")
 
     inv = session['inventory'] # [name] {name, type, quantity, gold}
     stats = fetch_stats() # [level, HP, str, dex, con, int, fth, lck]
@@ -255,8 +254,14 @@ def campfire():
         # if 'sell' in data:
         #
         #
-        # if 'use' in data:
+        if 'use' in data:
+            consumable = data['use']
+            session['hp'] = session['hp'] + fetch_itemEffects(consumable)
 
+            inv[consumable][2] = str(int(inv[consumable][2]) - 1)
+
+            if int(inv[consumable][2]) == 0:
+                inv.pop(consumable)
 
         if 'equip' in data:
             itm = data['equip']
@@ -280,7 +285,10 @@ def campfire():
             return dumps(equips)
 
         if 'stats' in data:
-            return dumps(fetch_stats())
+            currStats = list(fetch_stats())
+            currStats[1] = session['hp']
+
+            return dumps(currStats)
 
     return render_template("campfire.html",
         currTurn=session['turn'],
@@ -429,12 +437,12 @@ def fetch_itemStats(name):
 
     return stats
 
-# [hpIncr, energyIncr]
+# [hpInc, energyIncr]
 def fetch_itemEffects(name):
     c = db.cursor()
-    effects = c.execute("SELECT hpIncr, energyIncr FROM items WHERE name = ?", (name,)).fetchone()
+    effects = c.execute("SELECT hpInc FROM items WHERE name = ?", (name,)).fetchone()
 
-    return effects
+    return effects[0]
 
 # [name] {name, type, quantity, gold, image}
 def addItemToInventory(name):

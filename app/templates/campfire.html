@@ -292,8 +292,13 @@ P02: Makers Makin' It, Act I
   <div class="container mod" id="inv">
     <div class="container overflow-auto" id="invInner" style="height: 60%">
       {% for item in inventory %}
-        <button class="center inv" id="{{ item }}" onclick="clicked(this)"> {{ item }} </button>
-        <br>
+        {% if inventory[item][1] == "consumable" %}
+          <button class="center inv" id="{{ item }}" onclick="clicked(this)"> {{ inventory[item][2] }}x {{ item }} </button>
+          <br>
+        {% else %}
+          <button class="center inv" id="{{ item }}" onclick="clicked(this)"> {{ item }} </button>
+          <br>
+        {% endif %}
       {% endfor %}
     </div>
     <div class="container" id="inspect" style="height: 40%; border-top: solid medium; border-color: #545454">
@@ -479,6 +484,10 @@ P02: Makers Makin' It, Act I
       document.getElementById('noInspect').style.display = "none";
       document.getElementById('itemName').innerHTML = inv[name][0];
 
+      document.getElementById("inspectSell").style.display = "none"
+      document.getElementById("inspectUse").style.display = "none";
+      document.getElementById("inspectEquip").style.display = "none";
+
       if (inv[name][1] == "consumable") {
         let effects = "";
 
@@ -488,17 +497,14 @@ P02: Makers Makin' It, Act I
 
         document.getElementById('itemName').innerHTML += " (CONSUMABLE)";
         cont = document.getElementById("extension");
-        textExtension = "<h4> EFFECTS </h4><br>";
+        textExtension = "<h4> EFFECTS </h4><hr>";
 
         select.onload = function() {
           if (this.readyState == 4 && this.status == 200) {
             effects = JSON.parse(this.response);
-            console.log(effects)
           }
 
           textExtension += "<text> HP: " + effects[0] + "</text><br>";
-          textExtension += "<text> ENERGY: " + effects[1] + "</text><br>";
-
           cont.innerHTML = textExtension;
         };
 
@@ -547,6 +553,17 @@ P02: Makers Makin' It, Act I
       use.open('POST', window.location.href, true);
       use.setRequestHeader("use", selectedItm);
       use.send();
+
+      use.onload = function() {
+        updateStats();
+
+        inv[selectedItm][2] = (parseInt(inv[selectedItm][2]) - 1).toString();
+        if (parseInt(inv[selectedItm][2]) == 0) {
+          document.getElementById(selectedItm).remove()
+        } else {
+          document.getElementById(selectedItm).innerHTML = `${inv[selectedItm][2]}x ${selectedItm}`
+        }
+      }
     }
 
     function equip() {
