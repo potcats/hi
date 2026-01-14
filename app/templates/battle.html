@@ -99,6 +99,70 @@ P02: Makers Makin' It, Act I
     .slot:hover {
       outline: 2px solid white;
     }
+    
+    @keyframes player-atk {
+      0% {
+        transform: translateX(0);
+      }
+      50% {
+        transform: translateX(120px);
+      }
+      100% {
+        transform: translateX(0);
+      }
+    }
+
+   @keyframes enemy-atk {
+      0% {
+        transform: translateX(0);
+      }
+      50% {
+        transform: translateX(-120px);
+      }
+      100% {
+        transform: translateX(0);
+      }
+    }
+
+    @keyframes shake {
+      0% {
+        transform: translateX(0);
+      }
+      25% {
+        transform: translateX(-8px);
+      }
+      50% {
+        transform: translateX(8px);
+      }
+      75% {
+        transform: translateX(-8px);
+      }
+      100% {
+        transform: translateX(0);
+      }
+    }
+
+    .player-atk {
+      animation: player-atk 0.4s ease;
+    }
+
+    .enemy-atk {
+      animation: enemy-atk 0.4s ease;
+    }
+
+    .shake {
+      animation: shake 0.3s ease;
+    }
+
+    #actions {
+      transition: transform 0.4s ease, opacity 0.4s ease;
+    }
+
+    #action.hidden {
+      transform: translateY(80px);
+      opacity: 0;
+      pointer-events: none;
+    }
 
   </style>
 
@@ -240,7 +304,7 @@ P02: Makers Makin' It, Act I
           </div>
         </div>
 
-        <div class = "d-flex gap-3 justify-content-center mx-3">
+        <div id = "actions" class = "d-flex gap-3 justify-content-center mx-3">
           <button class = "panel-btn fw-bold flex-grow-1" onclick = "show('attacks')"> Fight </button>
           <button class = "panel-btn fw-bold flex-grow-1" onclick = "guard()"> Guard </button>
           <button class = "panel-btn fw-bold flex-grow-1" onclick = "show('items')"> Items </button>
@@ -291,9 +355,9 @@ P02: Makers Makin' It, Act I
     <!-- Items Panel -->
     <div id = "items-panel" class = "panel" style = "display: none;">
       <div class = "items-grid" style = "grid-template-columns: repeat(8, 1fr);">
-        {% for item in [] %}
+        {% for item in battle.player.inventory %}
         <div class = "slot bg-dark d-flex flex-column align-items-center justify-content-center"
-              onclick = "useItem(item)">
+             onclick = "useItem(item)">
           <img src = "/static/images/gear/boots/cloth.png" style = "width: 32px; height: 32px;">
         </div>
         {% endfor %}
@@ -327,9 +391,12 @@ P02: Makers Makin' It, Act I
     show('targets');
   }
 
-  function selectTarget(idx) {
+  function selectTarget(i) {
     document.querySelectorAll(".enemy-wrap")
       .forEach(e => e.classList.remove("targeted"));
+
+    hideActions();
+    playerAtkAnim(i);
     
     let xhttp = new XMLHttpRequest();
     xhttp.open("POST", "/battle", true);
@@ -344,7 +411,7 @@ P02: Makers Makin' It, Act I
     xhttp.send(JSON.stringify({
       action: "attack",
       move: selected,
-      target: idx
+      target: i
     }));
   }
 
@@ -370,6 +437,50 @@ P02: Makers Makin' It, Act I
     }
   }
 
+  function hideActions() {
+    document.getElementById("actions")
+      .classList.add("hidden");
+  }
+
+  function showActions() {
+    document.getElementById("actions")
+      .classList.remove("hidden");
+  }
+    
+  function playerAtkAnim(i) {
+    const player = document.querySelector(".player-wrap");
+    const enemy = document.querySelectorAll(".enemy-wrap");
+    
+    if (!player || !enemy[i]) return;
+    
+    player.classList.add("player-atk");
+    
+    setTimeout(() => {
+      enemy[i].classList.add("shake");
+    }, 200);
+    setTimeout(() => {
+      player.classList.remove("player-atk");
+      enemy[i].classList.remove("shake");
+    }, 600);
+  }
+
+  function enemyAtkAnim(i) {
+    const player = document.querySelector(".player-wrap");
+    const enemy = document.querySelectorAll(".enemy-wrap");
+
+    if (!player || !enemy[i]) return;
+
+    enemy[i].classList.add("enemy-atk");
+
+    setTimeout(() => {
+      player.classList.add("shake");
+    }, 200);
+    setTimeout(() => {
+      enemy[i].classList.remove("enemy-atk");
+      player.classList.remove("shake");
+    }, 600);
+  }
+
   function updateBattle(battle) {
     // Player Bars
     let p_hp = (battle.player.hp / battle.player.max_hp) * 100;
@@ -388,6 +499,8 @@ P02: Makers Makin' It, Act I
       bar.style.width = e_hp + "%";
       bar.innerText = `${enemy.hp} / ${enemy.max_hp}`;
     });
+
+    showActions();
 
   }
 
