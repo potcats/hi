@@ -58,3 +58,46 @@ BATTLE
     - Inventory and focus
     - Backend battle logic (turns, updates)
     - Animations
+
+carrieK -- 2026-1-13 13:11
+DB
+* NEW CHANGES:
+    - initializing dbs
+* TO BE DONE:
+    - field testing to get stats
+
+carrieK -- 2026-1-14 00:30
+DB
+* NEW CHANGES:
+    - many database many values many numbers
+* TO BE DONE:
+    - enemies,dialguegu
+
+cindyL -- 2026-1-14 00:52
+COMBAT SYSTEM
+* NEW CHANGES:
+    - created/completed prelin attack fxns and dealDamage
+    - cleaned up data storage
+* TO BE DONE:
+    - literally everything else in combat like wtf
+
+joyceL -- 2026-1-14 04:07
+CAMPFIRE
+* NEW CHANGES:
+    - Completed equip system
+    - Completed item use system
+    - Completed sell system
+* TO BE DONE:
+    - setup point allocation system
+    - anything else that still needs to be done
+
+christineC -- 2026-1-14 5:40
+ENCOUNTERS + BATTLE
+* NEW CHANGES:
+    - Completed frontend for encounters page
+    - AJAX backend for battles
+* TO BE DONE:
+    - Complete battle/combat
+    - Encounters based off DB
+    - Everything!
+
