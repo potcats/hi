@@ -80,3 +80,13 @@ COMBAT SYSTEM
     - cleaned up data storage
 * TO BE DONE:
     - literally everything else in combat like wtf
+
+joyceL -- 2026-1-14 04:07
+CAMPFIRE
+* NEW CHANGES:
+    - Completed equip system
+    - Completed item use system
+    - Completed sell system
+* TO BE DONE:
+    - setup point allocation system
+    - anything else that still needs to be done

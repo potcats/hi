@@ -249,15 +249,16 @@ def menu():
     session['inventory'] = {} # [name] {name, type, quantity, gold}
     session['gold'] = 0
 
+    addItemToInventory("simple sword")
+
     return render_template("menu.html")
 
 @app.route('/campfire', methods=['GET', 'POST'])
 def campfire():
     # for testing purposes
-    session['hp'] = 10
+    # session['hp'] = 5
     session['currXP'] = 13
     session['maxXP'] = 27
-    addItemToInventory("rat hide cloak")
 
     inv = session['inventory'] # [name] {name, type, quantity, gold}
     stats = fetch_stats() # [level, HP, str, dex, con, int, fth, lck]
@@ -277,11 +278,26 @@ def campfire():
 
             return dumps(results)
 
-        # if 'sell' in data:
-        #
-        #
-        # if 'use' in data:
+        if 'sell' in data:
+            item = data['sell']
+            session['gold'] = session['gold'] + inv[item][3]
 
+            inv[item][2] = str(int(inv[item][2]) - 1)
+
+            if int(inv[item][2]) == 0:
+                inv.pop(item)
+
+            newGold = session['gold']
+            return str(newGold)
+
+        if 'use' in data:
+            consumable = data['use']
+            session['hp'] = session['hp'] + fetch_itemEffects(consumable)
+
+            inv[consumable][2] = str(int(inv[consumable][2]) - 1)
+
+            if int(inv[consumable][2]) == 0:
+                inv.pop(consumable)
 
         if 'equip' in data:
             itm = data['equip']
@@ -304,6 +320,12 @@ def campfire():
             equips = fetch_equips()
             return dumps(equips)
 
+        if 'stats' in data:
+            currStats = list(fetch_stats())
+            currStats[1] = session['hp']
+
+            return dumps(currStats)
+
     return render_template("campfire.html",
         currTurn=session['turn'],
         username=session['username'],
@@ -312,6 +334,7 @@ def campfire():
         HP=session['hp'],
         maxHP=stats[1],
         lvl=stats[0],
+        gold=session['gold'],
         currXP=session['currXP'],
         maxXP=session['maxXP'],
         str=stats[2],
@@ -464,12 +487,12 @@ def fetch_itemStats(name):
 
     return stats
 
-# [hpIncr, energyIncr]
+# [hpInc, energyIncr]
 def fetch_itemEffects(name):
     c = db.cursor()
-    effects = c.execute("SELECT hpIncr, energyIncr FROM items WHERE name = ?", (name,)).fetchone()
+    effects = c.execute("SELECT hpInc FROM items WHERE name = ?", (name,)).fetchone()
 
-    return effects
+    return effects[0]
 
 # [name] {name, type, quantity, gold, image}
 def addItemToInventory(name):
