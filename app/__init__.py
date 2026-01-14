@@ -251,9 +251,18 @@ def campfire():
 
             return dumps(results)
 
-        # if 'sell' in data:
-        #
-        #
+        if 'sell' in data:
+            item = data['sell']
+            session['gold'] = session['gold'] + inv[item][3]
+
+            inv[item][2] = str(int(inv[item][2]) - 1)
+
+            if int(inv[item][2]) == 0:
+                inv.pop(item)
+
+            newGold = session['gold']
+            return str(newGold)
+
         if 'use' in data:
             consumable = data['use']
             session['hp'] = session['hp'] + fetch_itemEffects(consumable)
@@ -298,6 +307,7 @@ def campfire():
         HP=session['hp'],
         maxHP=stats[1],
         lvl=stats[0],
+        gold=session['gold'],
         currXP=session['currXP'],
         maxXP=session['maxXP'],
         str=stats[2],

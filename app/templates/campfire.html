@@ -271,6 +271,7 @@ P02: Makers Makin' It, Act I
       <h3 style="text-align: center; margin-top: 10px;"> {{ username }} </h3>
       <text id='hp'> HP: {{ HP }}/{{ maxHP }} </text> <br>
       <text> Level: {{ lvl }} ({{currXP}}/{{reqXP}}) </text> <br>
+      <text id='gold'> Gold: {{ gold }} </text> <br>
       <br>
       <text id='str'> STR: {{ str }} </text> <br>
       <text id='dex'> DEX: {{ dex }} </text> <br>
@@ -409,6 +410,7 @@ P02: Makers Makin' It, Act I
 
     /* CLOSE MODAL */
     function closeMod() {
+      selectedItm = "";
       modalWindows = document.getElementsByClassName("mod");
 
       for (modal of modalWindows) {
@@ -425,6 +427,7 @@ P02: Makers Makin' It, Act I
       document.getElementById('bpbut').style.display = "block";
 
       document.getElementById('itemName').innerHTML = "";
+      document.getElementById('extension').innerHTML = "";
 
       if (sellMode) { toggleSellMode() };
       selectedItm = "";
@@ -501,10 +504,11 @@ P02: Makers Makin' It, Act I
 
         select.onload = function() {
           if (this.readyState == 4 && this.status == 200) {
-            effects = JSON.parse(this.response);
+            effect = this.response;
           }
 
-          textExtension += "<text> HP: " + effects[0] + "</text><br>";
+          textExtension += "<text> HP: " + effect + "</text><br><br>";
+          textExtension += "<text> COST: " + inv[selectedItm][3] + "</text><br>";
           cont.innerHTML = textExtension;
         };
 
@@ -531,7 +535,8 @@ P02: Makers Makin' It, Act I
           textExtension += "<text> DEX: " + stats[2] + "</text><br>";
           textExtension += "<text> INT: " + stats[3] + "</text><br>";
           textExtension += "<text> FTH: " + stats[4] + "</text><br>";
-          textExtension += "<text> LCK: " + stats[5] + "</text><br>";
+          textExtension += "<text> LCK: " + stats[5] + "</text><br><br>";
+          textExtension += "<text> COST: " + inv[selectedItm][3] + "</text><br>";
 
           cont.innerHTML = textExtension;
         };
@@ -542,10 +547,26 @@ P02: Makers Makin' It, Act I
     }
 
     function sell() {
+      let newGold = "";
       let sell = new XMLHttpRequest();
       sell.open('POST', window.location.href, true);
       sell.setRequestHeader("sell", selectedItm);
       sell.send();
+
+      sell.onload = function() {
+        if (this.readyState == 4 && this.status == 200) {
+          newGold = parseInt(this.response);
+        }
+
+        inv[selectedItm][2] = (parseInt(inv[selectedItm][2]) - 1).toString();
+        if (parseInt(inv[selectedItm][2]) == 0) {
+          document.getElementById(selectedItm).remove()
+        } else {
+          document.getElementById(selectedItm).innerHTML = `${inv[selectedItm][2]}x ${selectedItm}`
+        }
+
+        document.getElementById('gold').innerHTML = `GOLD: ${newGold}`;
+      }
     }
 
     function use() {
