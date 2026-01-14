@@ -27,12 +27,119 @@ P02: Makers Makin' It, Act I
 
   <!-- PAGE SPECIFIC CSS -->
   <style>
+    /* BACKGROUND */
+    body {
+      background-image: url("{{ bg }}");
+      background-repeat: no-repeat;
+      background-size: 100vw 100vh;
+
+      font-family: font;
+    }
+
+    /* SHOP AREA */
+    #shop {
+      width: 50%;
+      height: 90vh;
+      padding: 20px;
+      padding-bottom: 10px;
+
+      position: absolute;
+      top: 3em;
+      left: 10px;
+
+      background-color: dimgrey;
+    }
+
+    /* INVENTORY AREA */
+    #inv {
+      width: 50%;
+      height: 90vh;
+      padding: 20px;
+      padding-bottom: 10px;
+
+      background-color: dimgrey;
+    }
+
+    /* STATS/EQUIPS AREA */
+    #extras {
+      width: 50%;
+      height: 70%;
+      padding: 20px;
+      padding-bottom: 10px;
+
+      position: absolute;
+      top: 3em;
+      right: 10px;
+
+      background-color: dimgrey;
+    }
+
+    /* PROCEED BUTTON */
+    #next {
+      position: absolute;
+      bottom: 1.5em;
+      right : 20px;
+
+      width: 15%;
+      height: 10%;
+
+      border-style: solid;
+      border-width: thick;
+      border-color: dimgrey;
+
+      background-color: grey
+    }
+
+    .item {
+      width: 100%;
+      height: 10vh;
+
+      font-size: 125%;
+
+      border-style: none;
+      background-color: grey;
+    }
 
   </style>
 
 </head>
 
 <body>
+  <!-- AUDIO -->
+  <audio loop id="bgm" src="/static/sound/shop.mp3"> </audio>
+
+  <input type="checkbox" id="audio" onclick="Aud()" style="border-style: none;">
+  <label id='audiobut' for="audio">
+    <img style="width: 50px; height: auto; position: absolute; left: 5px; top: -6px; filter: invert(80%);"
+      src="/static/images/icons/mute.png">
+  </label>
+
+  <!-- NEXT ENCOUNTER BUTTON -->
+  <button onclick="window.location.href='campfire'" id="next">
+    CONTINUE
+  </button>
+
+  <div id="shop">
+    {% for item in shop %}
+      <button class="center item" id="{{ item }}" onclick="clicked(this, 'shop')"> {{ item }} </button>
+      <br>
+    {% endfor %}
+  </div>
+
+  <div id="inv">
+    {% for item in inventory %}
+      <button class="center item" id="{{ item }}" onclick="clicked(this, 'inv')"> {{ item }} </button>
+      <br>
+    {% endfor %}
+  </div>
+
+  <div id="extras">
+    <div id="stats">
+    </div>
+
+    <div id="equipped">
+    </div>
+  </div>
 
   <!-- BOOTSTRAP JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"

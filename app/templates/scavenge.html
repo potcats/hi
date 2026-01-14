@@ -27,12 +27,28 @@ P02: Makers Makin' It, Act I
 
   <!-- PAGE SPECIFIC CSS -->
   <style>
+  /* BACKGROUND */
+  body {
+    background-color: dimgrey;
 
+    font-family: font;
+  }
+
+  /* MAIN TEXT*/
+  #scavengeText {
+    font-size: 150%;
+    color: #595959;
+
+    text-align: center;
+  }
   </style>
 
 </head>
 
 <body>
+
+  <!-- CONTAINER FOR TEXT -->
+  <div class="container center" id="scavengeText"> </div>
 
   <!-- BOOTSTRAP JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
@@ -41,7 +57,24 @@ P02: Makers Makin' It, Act I
 
   <!-- PAGE-SPECIFIC JS -->
   <script>
+  var scavText = ["scavenging", "scavenging.", "scavenging..", "scavenging..."];
+  var textIndex = 0;
 
+  function displayText() {
+    document.getElementById("scavengeText".innerHTML = scavText[textIndex]);
+
+    if (textIndex == 3) { textIndex = 0 }
+    else { textIndex += 1 };
+  }
+
+  function postReq() {
+    let post = new XMLHttpRequest();
+    post.open("POST", window.location.href, true);
+    post.send();
+  }
+
+  setInterval(displayText(), 400);
+  setTimeout(postReq(), 2500)
   </script>
 
 </body>

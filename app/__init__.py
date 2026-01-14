@@ -274,10 +274,12 @@ def encounters():
 
     return render_template("encounters.html", )
 
-@app.route('/shop', methods=['GET', 'POST'])
-def shop():
+@app.route('/shop/<string:type>', methods=['GET', 'POST'])
+def shop(type):
+    bg = fetch_bg(type)
 
-    return render_template("shop.html", )
+    return render_template("shop.html",
+        bg=bg,)
 
 @app.route('/dialogue', methods=['GET', 'POST'])
 def dialogue():
@@ -286,8 +288,11 @@ def dialogue():
 
 @app.route('/scavenge', methods=['GET', 'POST'])
 def scavenge():
+    if request.method == "POST":
+        addItemToInventory(random.choice(items))
+        return redirect(url_for('campfire'))
 
-    return render_template("scavenge.html", )
+    return render_template("scavenge.html")
 
 # ------------------------ FLASK HELPER FUNCTIONS  ------------------------ #
 
