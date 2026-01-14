@@ -230,7 +230,7 @@ def campfire():
     session['hp'] = 10
     session['currXP'] = 13
     session['maxXP'] = 27
-    session['inventory'] = {"aaaa" : ["aaaa", "gear", "1", "10"]}
+    addItemToInventory("rat hide cloak")
 
     inv = session['inventory'] # [name] {name, type, quantity, gold}
     stats = fetch_stats() # [level, HP, str, dex, con, int, fth, lck]
@@ -266,22 +266,33 @@ def campfire():
             equips = fetch_equips()
             return dumps(equips)
 
+        if 'unequip' in data:
+            itm = data['unequip']
+            gear = equips[itm]
+
+            stats = fetch_itemStats(gear)
+            updateStats(stats[0], stats[1], stats[2], stats[3], stats[4], stats[5], False)
+            unEquipGear(itm)
+
+            equips = fetch_equips()
+            return dumps(equips)
+
     return render_template("campfire.html",
         currTurn=session['turn'],
         username=session['username'],
         inventory=inv,
         equips=equips,
         HP=session['hp'],
-        # maxHP=stats[1],
-        # lvl=stats[0],
-        # currXP=session['currXP'],
-        # maxXP=session['maxXP'],
-        # str=stats[2],
-        # dex=stats[3],
-        # con=stats[4],
-        # int=stats[5],
-        # fth=stats[6],
-        # lck=stats[7],
+        maxHP=stats[1],
+        lvl=stats[0],
+        currXP=session['currXP'],
+        maxXP=session['maxXP'],
+        str=stats[2],
+        dex=stats[3],
+        con=stats[4],
+        int=stats[5],
+        fth=stats[6],
+        lck=stats[7],
         )
 
 @app.route('/battle', methods=['GET', 'POST'])
@@ -434,7 +445,7 @@ def addItemToInventory(name):
         session['inventory'] = inv
 
 # sets player stats with new gear
-def updateStats(str, dex, con, int, fth, lck):
+def updateStats(str, dex, con, int, fth, lck, increase=True):
     statTypes = ["str", "dex", "con", "inte", "fth", "lck"]
     addedStats = [str, dex, con, int, fth, lck]
     currStats = fetch_stats()
@@ -444,8 +455,12 @@ def updateStats(str, dex, con, int, fth, lck):
     for type in statTypes:
         i = statTypes.index(type)
         if addedStats[i] != 0:
-            c.execute(f"UPDATE player SET {type} = ? WHERE username = ?",
-                (currStats[2+i] + addedStats[i], user))
+            if increase:
+                c.execute(f"UPDATE player SET {type} = ? WHERE username = ?",
+                    (currStats[2+i] + addedStats[i], user))
+            else:
+                c.execute(f"UPDATE player SET {type} = ? WHERE username = ?",
+                    (currStats[2+i] - addedStats[i], user))
 
     db.commit()
 
@@ -453,9 +468,18 @@ def updateStats(str, dex, con, int, fth, lck):
 def equipGear(gear):
     c = db.cursor()
 
-    type = c.execute("SELECT gearType FROM items WHERE name = ?", (gear,)).fetchone()
+    type = c.execute("SELECT gearType FROM items WHERE name = ?", (gear,)).fetchone()[0]
     c.execute(f"UPDATE player SET {type} = ? WHERE username = ?",
         (gear, session['username'],))
+
+    db.commit()
+
+# removes gear from player db
+def unEquipGear(gearType):
+    c = db.cursor()
+
+    c.execute(f"UPDATE player SET {gearType} = '' WHERE username = ?",
+        (session['username'],))
 
     db.commit()
 
