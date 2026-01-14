@@ -15,11 +15,11 @@ app.secret_key = 'wahhhhhhhhhhhhhhhhh'
 # ------------------------ DATABASING  ------------------------ #
 
 # ITEMS
-items = ["honey", "cookie", "healing potion", "magical vial of water", "cloth robe", "cloth veil", "cloth leggings", "iron greaves", "iron chestplate", "iron helmet", "iron leggings", "rat hide boots", 
+items = ["honey", "cookie", "healing potion", "magical vial of water", "cloth robe", "cloth veil", "cloth leggings", "iron greaves", "iron chestplate", "iron helmet", "iron leggings", "rat hide boots",
         "rat hide cloak", "rat hide hood", "stinger pendant", "ring of goblin ears", "simple sword", "excalibur", "crude club", "noble's sabre"]
-img = ["", "", "", "", "/app/static/images/gear/chestplate/cloth.png", "/app/static/images/gear/helmet/cloth.png", "/app/static/images/gear/pants/cloth.png", "/app/static/images/gear/boots/iron.png", 
-       "/app/static/images/gear/chestplate/iron.png", "/app/static/images/gear/helmet/iron.png", "/app/static/images/gear/pants/iron.png", "/app/static/images/gear/boots/rathide.png", 
-       "/app/static/images/gear/chestplate/rathide.png", "/app/static/images/gear/helmet/rathide.png", "/app/static/images/gear/accessory/", "/app/static/images/gear/accessory/", 
+img = ["", "", "", "", "/app/static/images/gear/chestplate/cloth.png", "/app/static/images/gear/helmet/cloth.png", "/app/static/images/gear/pants/cloth.png", "/app/static/images/gear/boots/iron.png",
+       "/app/static/images/gear/chestplate/iron.png", "/app/static/images/gear/helmet/iron.png", "/app/static/images/gear/pants/iron.png", "/app/static/images/gear/boots/rathide.png",
+       "/app/static/images/gear/chestplate/rathide.png", "/app/static/images/gear/helmet/rathide.png", "/app/static/images/gear/accessory/", "/app/static/images/gear/accessory/",
        "/app/static/images/gear/weapon/", "/app/static/images/gear/weapon/", "/app/static/images/gear/weapon/", "/app/static/images/gear/weapon/"]
 statStr = [0, 0, 0, 0, 0, 0, 3, 4, 2, 4, 0, 0, 0, 0, 5, 3, 16, 12, 10, 0]
 statDex = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 5, 2, 0, 5, 0, 0, 0, 0, 0]
@@ -37,22 +37,22 @@ species = ["bandit", "bee", "dwarf", "dwarfchief", "goblin", "grandma", "pebble"
 attacks = ["", "", "", "", "", "", "", "", "", ""]
 
 # ENCOUNTERS
-name = ["Travelling Merchant", "Elven Camp", "Wanderer's Wares", "Busted Caravan", "Grandma's house", "Wizard Tower", 
+name = ["Travelling Merchant", "Elven Camp", "Wanderer's Wares", "Busted Caravan", "Grandma's house", "Wizard Tower",
        "The Sword in the Stone", "Potion Seller"]
 dialogue = []
-background = ["/app/static/images/bgs/caravanshop.jpg", 
+background = ["/app/static/images/bgs/caravanshop.jpg",
               "/app/static/images/bgs/dwarvencamp.jpg",
-              "/app/static/images/bgs/forestshop.jpg", 
-              "/app/static/images/bgs/tippedcaravan.jpg", 
-              "/app/static/images/bgs/grandmahouse.jpg", 
+              "/app/static/images/bgs/forestshop.jpg",
+              "/app/static/images/bgs/tippedcaravan.jpg",
+              "/app/static/images/bgs/grandmahouse.jpg",
               "/app/static/images/bgs/insidetower.jpg",
               "/app/static/images/bgs/swordstone.jpg",
               "/app/static/images/bgs/witchhouse.jpg"]
-desc = ["A merchant with a well-worn wagon waves you down (shop)", 
-        "You see a bunch of sad, depressed elves in a sad, depressed camp", 
-        "You spot a friendly person with a strange stand in the middle of the woods (shop)", 
-        "You spot a tipped caravan", 
-        "You spot the home of an old woman", 
+desc = ["A merchant with a well-worn wagon waves you down (shop)",
+        "You see a bunch of sad, depressed elves in a sad, depressed camp",
+        "You spot a friendly person with a strange stand in the middle of the woods (shop)",
+        "You spot a tipped caravan",
+        "You spot the home of an old woman",
         "You spot a wizard tower in the woods",
         "You spot a familiar sword plunged into a rock",
         "You spot a strange hut in the woods"]
@@ -229,7 +229,7 @@ def campfire():
     session['hp'] = 10
     session['currXP'] = 13
     session['maxXP'] = 27
-    session['inventory'] = {"aaaa" : ["aaaa", "gear", "1", "10"]}
+    addItemToInventory("rat hide cloak")
 
     inv = session['inventory'] # [name] {name, type, quantity, gold}
     stats = fetch_stats() # [level, HP, str, dex, con, int, fth, lck]
@@ -265,22 +265,33 @@ def campfire():
             equips = fetch_equips()
             return dumps(equips)
 
+        if 'unequip' in data:
+            itm = data['unequip']
+            gear = equips[itm]
+
+            stats = fetch_itemStats(gear)
+            updateStats(stats[0], stats[1], stats[2], stats[3], stats[4], stats[5], False)
+            unEquipGear(itm)
+
+            equips = fetch_equips()
+            return dumps(equips)
+
     return render_template("campfire.html",
         currTurn=session['turn'],
         username=session['username'],
         inventory=inv,
         equips=equips,
         HP=session['hp'],
-        # maxHP=stats[1],
-        # lvl=stats[0],
-        # currXP=session['currXP'],
-        # maxXP=session['maxXP'],
-        # str=stats[2],
-        # dex=stats[3],
-        # con=stats[4],
-        # int=stats[5],
-        # fth=stats[6],
-        # lck=stats[7],
+        maxHP=stats[1],
+        lvl=stats[0],
+        currXP=session['currXP'],
+        maxXP=session['maxXP'],
+        str=stats[2],
+        dex=stats[3],
+        con=stats[4],
+        int=stats[5],
+        fth=stats[6],
+        lck=stats[7],
         )
 
 @app.route('/battle', methods=['GET', 'POST'])
@@ -420,7 +431,7 @@ def addItemToInventory(name):
         session['inventory'] = inv
 
 # sets player stats with new gear
-def updateStats(str, dex, con, int, fth, lck):
+def updateStats(str, dex, con, int, fth, lck, increase=True):
     statTypes = ["str", "dex", "con", "inte", "fth", "lck"]
     addedStats = [str, dex, con, int, fth, lck]
     currStats = fetch_stats()
@@ -430,8 +441,12 @@ def updateStats(str, dex, con, int, fth, lck):
     for type in statTypes:
         i = statTypes.index(type)
         if addedStats[i] != 0:
-            c.execute(f"UPDATE player SET {type} = ? WHERE username = ?",
-                (currStats[2+i] + addedStats[i], user))
+            if increase:
+                c.execute(f"UPDATE player SET {type} = ? WHERE username = ?",
+                    (currStats[2+i] + addedStats[i], user))
+            else:
+                c.execute(f"UPDATE player SET {type} = ? WHERE username = ?",
+                    (currStats[2+i] - addedStats[i], user))
 
     db.commit()
 
@@ -439,9 +454,18 @@ def updateStats(str, dex, con, int, fth, lck):
 def equipGear(gear):
     c = db.cursor()
 
-    type = c.execute("SELECT gearType FROM items WHERE name = ?", (gear,)).fetchone()
+    type = c.execute("SELECT gearType FROM items WHERE name = ?", (gear,)).fetchone()[0]
     c.execute(f"UPDATE player SET {type} = ? WHERE username = ?",
         (gear, session['username'],))
+
+    db.commit()
+
+# removes gear from player db
+def unEquipGear(gearType):
+    c = db.cursor()
+
+    c.execute(f"UPDATE player SET {gearType} = '' WHERE username = ?",
+        (session['username'],))
 
     db.commit()
 

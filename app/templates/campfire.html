@@ -204,6 +204,14 @@ P02: Makers Makin' It, Act I
       background-color: grey;
     }
 
+    .square:hover {
+      filter: brightness(110%);
+    }
+
+    .square:hover text {
+      filter: brightness(90%);
+    }
+
     /* PROCEED BUTTON */
     #next {
       position: absolute;
@@ -282,10 +290,12 @@ P02: Makers Makin' It, Act I
 
   <!-- MAIN INVENTORY -->
   <div class="container mod" id="inv">
-    <div class="container overflow-auto" style="height: 60%">
+    <div class="container overflow-auto" id="invInner" style="height: 60%">
       {% for item in inventory %}
-        <button class="center inv" id="{{ item }}" onclick="clicked(this)"> {{ item }} </button>
-        <br>
+        {% if item not in equips.values() %}
+          <button class="center inv" id="{{ item }}" onclick="clicked(this)"> {{ item }} </button>
+          <br>
+        {% endif %}
       {% endfor %}
     </div>
     <div class="container" id="inspect" style="height: 40%; border-top: solid medium; border-color: #545454">
@@ -320,19 +330,21 @@ P02: Makers Makin' It, Act I
 
   <!-- EQUIPMENT DISPLAY -->
   <div class="container mod" id="equippedOut">
-    {% set equipArr = [["accessory", "accessory"],
-                        ["accessory", "helmet"],
+    {% set equipArr = [["accessory1", "accessory2"],
+                        ["accessory3", "helmet"],
                         ["chestplate", "pants"],
                         ["boots", "weapon"]] %}
-    {% set accNum = 1 %}
     {% for row in equipArr %}
       <div class="row" style="gap:10px;">
         {% for e in row %}
-          {% if e == "accessory" %}
-            <div class="col square" id="{{ e }}{{ accNum }}"> {{ e }} </div>
-            {% set accNum = accNum + 1 %}
+          {% if "accessory" in e %}
+            <div class="col square" onclick="unequip(this.id)" id="{{ e }}">
+              <text style="color: #a1a1a1"> accessory </text>
+            </div>
           {% else %}
-            <div class="col square" id="{{ e }}"> {{ e }} </div>
+            <div class="col square" onclick="unequip(this.id)" id="{{ e }}">
+              <text style="color: #a1a1a1"> {{ e }} </text>
+            </div>
           {% endif %}
         {% endfor %}
       </div>
@@ -383,6 +395,8 @@ P02: Makers Makin' It, Act I
       document.getElementById('noInspect').style.display = "block";
 
       document.getElementById('bpbut').style.display = "none";
+
+      displayEquips()
     }
 
     /* CLOSE MODAL */
@@ -411,6 +425,7 @@ P02: Makers Makin' It, Act I
       for (img of document.getElementsByClassName("gear")) {
         cont.removeChild(img);
       }
+
     }
 
     /* SELL MODE */
@@ -474,7 +489,7 @@ P02: Makers Makin' It, Act I
 
         select.onload = function() {
           if (this.readyState == 4 && this.status == 200) {
-            effects = this.response;
+            effects = JSON.parse(this.response);
             console.log(effects)
           }
 
@@ -499,7 +514,7 @@ P02: Makers Makin' It, Act I
 
         select.onload = function() {
           if (this.readyState == 4 && this.status == 200) {
-            stats = this.response;
+            stats = JSON.parse(this.response);
             console.log(stats)
           }
 
@@ -540,10 +555,50 @@ P02: Makers Makin' It, Act I
 
       equip.onload = function() {
         if (this.readyState == 4 && this.status == 200) {
-          equipped = this.response;
+          equipped = JSON.parse(this.response);
         }
 
+        document.getElementById(selectedItm).style.display = "none";
+        displayEquips();
       };
+    }
+
+    function unequip(itm) {
+      let g = equipped[itm];
+
+      if (g == "") {
+        return;
+      }
+
+      let unequip = new XMLHttpRequest();
+      unequip.open('POST', window.location.href, true);
+      unequip.setRequestHeader("unequip", itm);
+      unequip.send();
+
+      unequip.onload = function() {
+        if (this.readyState == 4 && this.status == 200) {
+          equipped = JSON.parse(this.response);
+        }
+
+        document.getElementById(g).style.display = "block";
+        displayEquips();
+      };
+    }
+
+    function displayEquips() {
+      for (gear in equipped) {
+        if (equipped[gear] != "") {
+          if (document.getElementById(gear).innerHTML.includes("<br>")) {
+            if (!document.getElementById(gear).innerHTML.includes(equipped[gear])) {
+              document.getElementById(gear).innerHTML = document.getElementById(gear).innerHTML.split("<br><br>")[0] + "<br><br>" + equipped[gear];
+            }
+          } else {
+            document.getElementById(gear).innerHTML += "<br><br>" + equipped[gear];
+          }
+        } else if (document.getElementById(gear).innerHTML.includes("<br>")) {
+          document.getElementById(gear).innerHTML = document.getElementById(gear).innerHTML.split("<br><br>")[0];
+        }
+      }
     }
 
   </script>
