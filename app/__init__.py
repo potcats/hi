@@ -13,6 +13,7 @@ app.secret_key = 'wahhhhhhhhhhhhhhhhh'
 
 # ------------------------ DATABASING  ------------------------ #
 
+# ITEMS
 items = ["honey", "cookie", "healing potion", "magical vial of water", "cloth robe", "cloth veil", "cloth leggings", "iron greaves", "iron chestplate", "iron helmet", "iron leggings", "rat hide boots", 
         "rat hide cloak", "rat hide hood", "stinger pendant", "ring of goblin ears", "simple sword", "excalibur", "crude club", "noble's sabre"]
 img = ["", "", "", "", "/app/static/images/gear/chestplate/cloth.png", "/app/static/images/gear/helmet/cloth.png", "/app/static/images/gear/pants/cloth.png", "/app/static/images/gear/boots/iron.png", 
@@ -29,6 +30,15 @@ hpInc = [5, 3, 18, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 gold = [5, 5, 20, 10, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 20, 20, 5, 30, 30, 30]
 type = ["consumable", "consumable", "consumable", "consumable", "gear", "gear", "gear", "gear", "gear", "gear", "gear", "gear", "gear", "gear", "gear", "gear", "gear", "gear", "gear", "gear"]
 gearType = ["", "", "", "", chestplate, helmet, pants, shoes, chestplate, helmet, pants, shoes, chestplate, helmet, accessory, accessory, wepaon, weapon, weapon, weapon]
+
+# ENEMIES
+species = ["bandit", "bee", "dwarf", "dwarfchief", "goblin", "grandma", "pebble", "pixie", "rat", "wizard"]
+attacks = ["", "", "", "", "", "", "", "", "", ""]
+
+# ENCOUNTERS
+
+# ATTACKS
+
 DB_FILE = "data.db"
 
 db = sqlite3.connect(DB_FILE, check_same_thread=False)
@@ -39,15 +49,14 @@ c.execute("""
     username TEXT PRIMARY KEY NOT NULL,
     password TEXT NOT NULL,
     level INTEGER NOT NULL,
-    exp INTEGER,
-    HP INTEGER NOT NULL,
+    hp INTEGER NOT NULL,
     attacks TEXT NOT NULL,
     buff TEXT,
     debuff TEXT,
     str INTEGER,
     dex INTEGER,
     con INTEGER,
-    int INTEGER,
+    inte INTEGER,
     fth INTEGER,
     lck INTEGER,
     helmet TEXT,
@@ -63,9 +72,9 @@ c.execute("""
 
 c.execute("""
     CREATE TABLE IF NOT EXISTS enemies (
-    type TEXT PRIMARY KEY NOT NULL,
+    species TEXT PRIMARY KEY NOT NULL,
     attacks TEXT NOT NULL,
-    HP INTEGER NOT NULL,
+    hp INTEGER NOT NULL,
     weakness TEXT,
     res TEXT,
     drops TEXT NOT NULL
@@ -90,7 +99,7 @@ c.execute("""
     str INTEGER,
     dex INTEGER,
     con INTEGER,
-    int INTEGER,
+    inte INTEGER,
     fth INTEGER,
     lck INTEGER,
     hpInc INTEGER,
@@ -112,7 +121,7 @@ c.execute("""
 """)
 
 for i in range(len(items)):
-    q = "INSERT OR REPLACE INTO items(name, type, image, str, dex, con, int, fth, lck, hpInc, gold, gearType) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+    q = "INSERT OR REPLACE INTO items(name, type, image, str, dex, con, inte, fth, lck, hpInc, gold, gearType) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
     d = (items[i], type[i]], img[i], statStr[i], statDex[i], statCon[i], statInt[i], statFth[i], statLck[i], hpInc[i], gold[i], gearType[i])
     c.execute(q, d)
 #  ------------------------------------------------------------ #
