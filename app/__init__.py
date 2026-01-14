@@ -8,6 +8,7 @@ from flask import Flask, render_template, request, redirect, url_for, session
 import sqlite3
 from combat import *
 from json import dumps
+import random
 
 app = Flask(__name__)
 app.secret_key = 'wahhhhhhhhhhhhhhhhh'
@@ -40,14 +41,14 @@ attacks = ["", "", "", "", "", "", "", "", "", ""]
 name = ["Travelling Merchant", "Elven Camp", "Wanderer's Wares", "Busted Caravan", "Grandma's house", "Wizard Tower",
        "The Sword in the Stone", "Potion Seller"]
 dialogue = []
-background = ["/app/static/images/bgs/caravanshop.jpg",
-              "/app/static/images/bgs/dwarvencamp.jpg",
-              "/app/static/images/bgs/forestshop.jpg",
-              "/app/static/images/bgs/tippedcaravan.jpg",
-              "/app/static/images/bgs/grandmahouse.jpg",
-              "/app/static/images/bgs/insidetower.jpg",
-              "/app/static/images/bgs/swordstone.jpg",
-              "/app/static/images/bgs/witchhouse.jpg"]
+background = ["/static/images/bgs/caravanshop.jpg",
+              "/static/images/bgs/dwarvencamp.jpg",
+              "/static/images/bgs/forestshop.jpg",
+              "/static/images/bgs/tippedcaravan.jpg",
+              "/static/images/bgs/grandmahouse.jpg",
+              "/static/images/bgs/insidetower.jpg",
+              "/static/images/bgs/swordstone.jpg",
+              "/static/images/bgs/witchhouse.jpg"]
 desc = ["A merchant with a well-worn wagon waves you down (shop)",
         "You see a bunch of sad, depressed elves in a sad, depressed camp",
         "You spot a friendly person with a strange stand in the middle of the woods (shop)",
@@ -347,8 +348,21 @@ def battle():
 
 @app.route('/encounters', methods=['GET', 'POST'])
 def encounters():
+    if not loggedin():
+        return redirect(url_for('login'))
+    # testttttt
+    encounters = []
+    for i in range(len(name)):
+        encounters.append({
+            "id": i,
+            "name": name[i],
+            "background": background[i],
+            "desc": desc[i],
+            "diff": diff[i]
+        })
+    rd = random.sample(encounters, 3)
 
-    return render_template("encounters.html", )
+    return render_template("encounters.html", encounters=rd, turn=session.get("turn", 1))
 
 @app.route('/shop', methods=['GET', 'POST'])
 def shop():
