@@ -86,7 +86,8 @@ P02: Makers Makin' It, Act I
       width: 23%;
       height: 10%;
 
-      border-style: none;
+      border-style: solid;
+      border-width: thick;
       background-color: firebrick;
     }
 
@@ -94,7 +95,11 @@ P02: Makers Makin' It, Act I
       filter: brightness(120%);
     }
 
-    #close:hover, #next:hover, .inv:hover:not(.sellable), .inspect:hover {
+    #pts {
+      background-color: grey;
+    }
+
+    #close:hover, #next:hover, .inv:hover:not(.sellable), .inspect:hover, #pts:hover {
       background-color: darkgrey;
     }
 
@@ -114,7 +119,7 @@ P02: Makers Makin' It, Act I
 
     #inv {
       width: 50%;
-      height: 90vh;
+      height: 95vh;
       padding: 20px;
       padding-bottom: 10px;
 
@@ -142,11 +147,12 @@ P02: Makers Makin' It, Act I
     .inspect {
       position: relative;
       bottom: 20px;
-      left: 70%;
+      left: 68%;
 
       width: 30%;
       font-size: 140%;
 
+      border-style: none;
       background-color: grey
     }
 
@@ -157,7 +163,7 @@ P02: Makers Makin' It, Act I
       padding-bottom: 0;
 
       position: absolute;
-      top: 3em;
+      top: 4em;
       left: 10px;
 
       background-color: dimgrey;
@@ -172,20 +178,28 @@ P02: Makers Makin' It, Act I
       background-color: grey;
     }
 
-    /* CHARACTER DISPLAY */
-    #charOut {
+    /* EQUIPMENT DISPLAY */
+    #equippedOut {
       width: 23%;
-      padding: 20px;
+      height: 70%;
+      padding: 15px 25px 5px 25px;
 
       position: absolute;
-      top: 3em;
+      top: 4em;
       right: 10px;
 
       background-color: dimgrey;
     }
 
-    #charIn {
-      width: 90%;
+    .row {
+      height: 25%;
+    }
+
+    .square {
+      margin-bottom: 10px;
+
+      text-align: center;
+      font-size: 110%;
 
       background-color: grey;
     }
@@ -229,7 +243,7 @@ P02: Makers Makin' It, Act I
   </button>
 
   <!-- INVENTORY BUTTON -->
-  <button onclick="openMod()" style="border-style: none; background: none;">
+  <button id="bpbut" onclick="openMod()" style="border-style: none; background: none;">
     <img src="/static/images/icons/backpack.png" id="bp">
   </button>
 
@@ -260,6 +274,8 @@ P02: Makers Makin' It, Act I
       <!-- temp range -->
       <text> INITIATIVE: 4 -- 7 </text> <br>
       <br>
+      <button id="pts"> POINTS </button>
+      <br><br>
     </div>
     <br>
   </div>
@@ -272,7 +288,7 @@ P02: Makers Makin' It, Act I
         <br>
       {% endfor %}
     </div>
-    <div class="container" id="inspect" style="height: 40%">
+    <div class="container" id="inspect" style="height: 40%; border-top: solid medium; border-color: #545454">
       <div class="container overflow-auto" style="height: 90%; padding: 15px; font-size: 130%">
         <!-- IF NO ITEMS SELECTED -->
         <h3 style="text-align: center; display: none;" id="noInspect">
@@ -281,7 +297,6 @@ P02: Makers Makin' It, Act I
 
         <!-- ITEMS SELECTED -->
         <h3 id="itemName"> </h3>
-        <p id="itemDesc"> </p>
         <div id="extension"> </div>
       </div>
       <div class="container" style="height: 10%">
@@ -303,12 +318,25 @@ P02: Makers Makin' It, Act I
     </div>
   </div>
 
-  <!-- CHARACTER DISPLAY -->
-  <div class="container mod" id="charOut">
-    <div class="container" id="charIn" style="overflow: hidden">
-      <img src="/static/images/warrior-nosword.png" style="position: relative;
-        z-index: 0; margin-left: -135px; margin-bottom: -60px;">
-    </div>
+  <!-- EQUIPMENT DISPLAY -->
+  <div class="container mod" id="equippedOut">
+    {% set equipArr = [["accessory", "accessory"],
+                        ["accessory", "helmet"],
+                        ["chestplate", "pants"],
+                        ["boots", "weapon"]] %}
+    {% set accNum = 1 %}
+    {% for row in equipArr %}
+      <div class="row" style="gap:10px;">
+        {% for e in row %}
+          {% if e == "accessory" %}
+            <div class="col square" id="{{ e }}{{ accNum }}"> {{ e }} </div>
+            {% set accNum = accNum + 1 %}
+          {% else %}
+            <div class="col square" id="{{ e }}"> {{ e }} </div>
+          {% endif %}
+        {% endfor %}
+      </div>
+    {% endfor %}
   </div>
 
   <!-- BOOTSTRAP JS -->
@@ -321,10 +349,13 @@ P02: Makers Makin' It, Act I
     var inv = {{ inventory | tojson }};
     var selectedItm = "";
     var sellMode = false;
+    var equipped = {{ equips | tojson }}
 
     /* EVENTS THAT WILL OCCUR ON LOAD */
     window.onload = function() {
       document.getElementById('audio').checked = false;
+      document.getElementById('sell').style.borderColor = "darkred";
+      console.log(equipped)
     };
 
     /* AUDIO BUTTON INTERACTIONS */
@@ -350,6 +381,8 @@ P02: Makers Makin' It, Act I
       document.getElementById('next').style.display = "none";
 
       document.getElementById('noInspect').style.display = "block";
+
+      document.getElementById('bpbut').style.display = "none";
     }
 
     /* CLOSE MODAL */
@@ -367,20 +400,28 @@ P02: Makers Makin' It, Act I
       document.getElementById("inspectUse").style.display = "none";
       document.getElementById("inspectEquip").style.display = "none";
 
+      document.getElementById('bpbut').style.display = "block";
+
       document.getElementById('itemName').innerHTML = "";
-      document.getElementById('itemDesc').innerHTML = "";
 
       if (sellMode) { toggleSellMode() };
       selectedItm = "";
+
+      cont = document.getElementById("charIn");
+      for (img of document.getElementsByClassName("gear")) {
+        cont.removeChild(img);
+      }
     }
 
     /* SELL MODE */
     function toggleSellMode() {
       items = document.getElementsByClassName("inv");
+      sellBut = document.getElementById('sell')
 
       if (sellMode) {
         sellMode = false;
-        document.getElementById('sell').style.backgroundColor = "firebrick"
+        sellBut.style.backgroundColor = "firebrick"
+        sellBut.style.borderColor = "darkred"
 
         for (item of items) {
           item.classList.remove("sellable");
@@ -396,7 +437,8 @@ P02: Makers Makin' It, Act I
         }
       } else {
         sellMode = true;
-        document.getElementById('sell').style.backgroundColor = "forestgreen"
+        sellBut.style.backgroundColor = "forestgreen"
+        sellBut.style.borderColor = "darkgreen"
 
         for (item of items) {
           item.classList.add("sellable");
@@ -418,43 +460,48 @@ P02: Makers Makin' It, Act I
 
       document.getElementById('noInspect').style.display = "none";
       document.getElementById('itemName').innerHTML = inv[name][0];
-      document.getElementById('itemDesc').innerHTML = inv[name][5];
 
       if (inv[name][1] == "consumable") {
+        let effects = "";
+
         select.open('POST', window.location.href, true);
         select.setRequestHeader("select", "consumable," + name);
         select.send();
 
         document.getElementById('itemName').innerHTML += " (CONSUMABLE)";
         cont = document.getElementById("extension");
-        textExtension = "<h3> EFFECTS </h3><br>";
+        textExtension = "<h4> EFFECTS </h4><br>";
 
         select.onload = function() {
           if (this.readyState == 4 && this.status == 200) {
-            effects = this.response.split(",");
-          };
+            effects = this.response;
+            console.log(effects)
+          }
 
           textExtension += "<text> HP: " + effects[0] + "</text><br>";
           textExtension += "<text> ENERGY: " + effects[1] + "</text><br>";
 
           cont.innerHTML = textExtension;
-        }
+        };
 
-        if (sellMode) { document.getElementById("inspectSell").style.display = "block"
-        } else { document.getElementById("inspectUse").style.display = "block" };
+        if (sellMode) { document.getElementById("inspectSell").style.display = "block" }
+        else { document.getElementById("inspectUse").style.display = "block" };
       } else {
+        let stats = "";
+
         select.open('POST', window.location.href, true);
         select.setRequestHeader("select", "gear," + name);
         select.send();
 
         document.getElementById('itemName').innerHTML += " (GEAR)";
         cont = document.getElementById("extension");
-        textExtension = "<h3> STATS </h3>";
+        textExtension = "<h4> STATS </h4><hr>";
 
         select.onload = function() {
           if (this.readyState == 4 && this.status == 200) {
-            stats = this.response.split(",");
-          };
+            stats = this.response;
+            console.log(stats)
+          }
 
           textExtension += "<text> STR: " + stats[0] + "</text><br>";
           textExtension += "<text> CON: " + stats[1] + "</text><br>";
@@ -464,26 +511,39 @@ P02: Makers Makin' It, Act I
           textExtension += "<text> LCK: " + stats[5] + "</text><br>";
 
           cont.innerHTML = textExtension;
-        }
+        };
 
-        if (sellMode) { document.getElementById("inspectSell").style.display = "block"
-        } else { document.getElementById("inspectEquip").style.display = "block" };
+        if (sellMode) { document.getElementById("inspectSell").style.display = "block" }
+        else { document.getElementById("inspectEquip").style.display = "block" };
       }
     }
 
     function sell() {
       let sell = new XMLHttpRequest();
-
+      sell.open('POST', window.location.href, true);
+      sell.setRequestHeader("sell", selectedItm);
+      sell.send();
     }
 
     function use() {
       let use = new XMLHttpRequest();
-
+      use.open('POST', window.location.href, true);
+      use.setRequestHeader("use", selectedItm);
+      use.send();
     }
 
     function equip() {
       let equip = new XMLHttpRequest();
+      equip.open('POST', window.location.href, true);
+      equip.setRequestHeader("equip", selectedItm);
+      equip.send();
 
+      equip.onload = function() {
+        if (this.readyState == 4 && this.status == 200) {
+          equipped = this.response;
+        }
+
+      };
     }
 
   </script>

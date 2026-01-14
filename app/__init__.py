@@ -7,6 +7,7 @@
 from flask import Flask, render_template, request, redirect, url_for, session
 import sqlite3
 from combat import *
+from json import dumps
 
 app = Flask(__name__)
 app.secret_key = 'wahhhhhhhhhhhhhhhhh'
@@ -40,7 +41,7 @@ c.execute("""
     str INTEGER,
     dex INTEGER,
     con INTEGER,
-    int INTEGER,
+    inte INTEGER,
     fth INTEGER,
     lck INTEGER,
     helmet TEXT,
@@ -81,12 +82,11 @@ c.execute("""
     CREATE TABLE IF NOT EXISTS items (
     name TEXT PRIMARY KEY NOT NULL,
     type TEXT NOT NULL,
-    desc TEXT NOT NULL,
     image TEXT,
     str INTEGER,
     dex INTEGER,
     con INTEGER,
-    int INTEGER,
+    inte INTEGER,
     fth INTEGER,
     lck INTEGER,
     hpIncr INTEGER,
@@ -162,13 +162,13 @@ def register():
                         t = t + "password "
                     return render_template("register.html", t)
 
-                c.execute("INSERT INTO user_profile VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);",
+                c.execute("INSERT INTO player VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);",
                     (request.form['username'].lower(),
-                        request.form['password']),
+                        request.form['password'],
                         0, 30, "strike,cross slash", "", 0,
                         "", 0, 3, 0, 0,
                         0, 0, 0, "", "",
-                        "", "", "simple sword", "", "", "")
+                        "", "", "simple sword", "", "", ""))
                 db.commit()
 
                 session.clear()
@@ -180,7 +180,7 @@ def register():
 @app.route('/menu', methods=['GET', 'POST'])
 def menu():
     session['turn'] = 1
-    session['inventory'] = {} # [name] {name, type, quantity, gold, image, desc}
+    session['inventory'] = {} # [name] {name, type, quantity, gold}
     session['gold'] = 0
 
     return render_template("menu.html")
@@ -188,15 +188,14 @@ def menu():
 @app.route('/campfire', methods=['GET', 'POST'])
 def campfire():
     # for testing purposes
-    session['username'] = 'aaa'
     session['hp'] = 10
     session['currXP'] = 13
     session['maxXP'] = 27
-    session['inventory'] = {"aaaa" : ["aaaa", "gear", "1", "10", "", "aaaa"]}
+    session['inventory'] = {"aaaa" : ["aaaa", "gear", "1", "10"]}
 
-    inv = session['inventory'] # [name] {name, type, quantity, gold, image, desc}
+    inv = session['inventory'] # [name] {name, type, quantity, gold}
     stats = fetch_stats() # [level, HP, str, dex, con, int, fth, lck]
-    equips = fetch_equips() # [helmet, chestplate, pants, boots, accessory1, accessory2, accessory3]
+    equips = fetch_equips() # [gearType] {name}
 
     # AJAX INTERACTIONSSSSSSSSSSSSSS
     if request.method == "POST":
@@ -210,7 +209,7 @@ def campfire():
             elif info[0] == "gear":
                 results = fetch_itemStats(info[1])
 
-            return ",".join(results)
+            return dumps(results)
 
         # if 'sell' in data:
         #
@@ -226,12 +225,13 @@ def campfire():
             equipGear(itm)
 
             equips = fetch_equips()
-            return ",".join(equips)
+            return dumps(equips)
 
     return render_template("campfire.html",
         currTurn=session['turn'],
         username=session['username'],
         inventory=inv,
+        equips=equips,
         HP=session['hp'],
         # maxHP=stats[1],
         # lvl=stats[0],
@@ -318,21 +318,37 @@ def loggedin():
 
 # ------------------------ DB HELPER FUNCTIONS  --------------------------- #
 
-# [helmet, chestplate, pants, boots, accessory1, accessory2, accessory3]
+# [helmet, chestplate, pants, boots, weapon, accessory1, accessory2, accessory3]
 def fetch_equips():
+    gearTypes = ["helmet", "chestplate", "pants", "boots", "weapon", "accessory1", "accessory2", "accessory3"]
+    equipDict = {}
+
     c = db.cursor()
     equips = c.execute('''SELECT helmet,
         chestplate, pants, boots, weapon,
         accessory1, accessory2, accessory3
         FROM player WHERE username = ?''', (session['username'],)).fetchone()
 
-    return equips
+    for i in range(0,len(gearTypes)):
+        equipDict[gearTypes[i]] = equips[i]
+
+    return equipDict
+
+def fetch_images(items):
+    c = db.cursor()
+    images = []
+
+    for item in items:
+        image = c.execute("SELECT image FROM items WHERE name = ?", (item,)).fetchone()
+        images.append(image)
+
+    return images
 
 # [level, HP, str, dex, con, int, fth, lck]
 def fetch_stats():
     c = db.cursor()
     stats = c.execute('''SELECT level, HP, str,
-        dex, con, int, fth, lck
+        dex, con, inte, fth, lck
         FROM player WHERE username = ?''', (session['username'],)).fetchone()
 
     return stats
@@ -340,7 +356,7 @@ def fetch_stats():
 # [str, dex, con, int, fth, lck]
 def fetch_itemStats(name):
     c = db.cursor()
-    stats = c.execute('''SELECT str, dex, con, int, fth, lck
+    stats = c.execute('''SELECT str, dex, con, inte, fth, lck
         FROM items WHERE name = ?''', (name,)).fetchone()
 
     return stats
@@ -360,14 +376,14 @@ def addItemToInventory(name):
         inv[name][2] = str(int(inv[name][2]) + 1)
     else:
         c = db.cursor()
-        info = c.execute("SELECT type, gold, image, desc FROM items WHERE name = ?", (name,)).fetchone()
+        info = c.execute("SELECT type, gold FROM items WHERE name = ?", (name,)).fetchone()
 
-        inv[name] = [name, info[0], str(1), info[1], info[2], info[3]]
+        inv[name] = [name, info[0], str(1), info[1]]
         session['inventory'] = inv
 
 # sets player stats with new gear
 def updateStats(str, dex, con, int, fth, lck):
-    statTypes = ["str", "dex", "con", "int", "fth", "lck"]
+    statTypes = ["str", "dex", "con", "inte", "fth", "lck"]
     addedStats = [str, dex, con, int, fth, lck]
     currStats = fetch_stats()
 
@@ -385,7 +401,7 @@ def updateStats(str, dex, con, int, fth, lck):
 def equipGear(gear):
     c = db.cursor()
 
-    type = c.execute("SELECT gearType FROM items WHERE name = ?", (gear,))
+    type = c.execute("SELECT gearType FROM items WHERE name = ?", (gear,)).fetchone()
     c.execute(f"UPDATE player SET {type} = ? WHERE username = ?",
         (gear, session['username'],))
 
