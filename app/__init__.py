@@ -4,7 +4,7 @@
 # P02: Makers Makin' It, Act I
 # 01/16/2026
 
-from flask import Flask, render_template, request, redirect, url_for, session
+from flask import Flask, render_template, request, redirect, url_for, session, jsonify
 import sqlite3
 from combat import *
 from json import dumps
@@ -147,10 +147,37 @@ for i in range(len(items)):
     d = (items[i], type[i], img[i], statStr[i], statDex[i], statCon[i], statInt[i], statFth[i], statLck[i], hpInc[i], gold[i], gearType[i])
     c.execute(q, d)
     db.commit()
-#  ------------------------------------------------------------ #
 
-def loggedin():
-    return 'username' in session
+# test test test!!!!!!!!!!!!!!!!!!)
+# c.execute("""
+# INSERT or REPLACE INTO enemies
+# (species, attacks, hp, weakness, res, drops)
+# VALUES (?, ?, ?, ?, ?, ?)
+# """, (
+#     "goblin",
+#     "slash,stab",
+#     12,
+#     "help",
+#     "help",
+#     "gold"
+# ))
+# db.commit()
+#
+# c.execute("""
+# INSERT or REPLACE INTO player
+# (username, password, level, hp, attacks, weapon)
+# VALUES (?, ?, ?, ?, ?, ?)
+# """, (
+#     "tester",
+#     "pass",
+#     1,
+#     12,
+#     "slash, hit",
+#     "help",
+# ))
+# db.commit()
+
+#  ------------------------------------------------------------ #
 
 @app.route('/', methods=['GET', 'POST'])
 def login():
@@ -297,47 +324,60 @@ def campfire():
 
 @app.route('/battle', methods=['GET', 'POST'])
 def battle():
-    session.pop('battle', None)
-
-    # if not loggedin():
+    if not loggedin():
+        session['username'] = 'tester'
     #     return redirect(url_for('login'))
 
     if 'battle' not in session:
-        # placeholder battle state just for rendering
-        session['battle'] = {
-            "player": {
-                "name": "tester",
-                "hp": 30,
-                "max_hp": 30, # changes with equipment/stats?
-                "level": 1,
-                "energy": 2,
-                "attacks": ["Atk1", "Atk2", "Atk3"],
-                "inventory": []
-            },
-            "enemies": [
-                {"species": "goblin", "hp": 10, "max_hp": 10, "energy": 2},
-                {"species": "bandit", "hp": 10, "max_hp": 10, "energy": 2},
-                {"species": "pebble", "hp": 10, "max_hp": 10, "energy": 2},
-            ],
-            "turn": 1
-        }
+        session['battle'] = createBattle([randomEnemy('goblin'), randomEnemy('goblin')])
+    #     # placeholder battle state just for rendering
+    #     session['battle'] = {
+    #         "player": {
+    #             "name": "tester",
+    #             "hp": 30,
+    #             "max_hp": 30, # changes with equipment/stats?
+    #             "level": 1,
+    #             "energy": 2,
+    #             "attacks": ["Atk1", "Atk2", "Atk3"],
+    #             "inventory": []
+    #         },
+    #         "enemies": [
+    #             {"species": "goblin", "hp": 10, "max_hp": 10, "energy": 2},
+    #             {"species": "bandit", "hp": 10, "max_hp": 10, "energy": 2},
+    #             {"species": "pebble", "hp": 10, "max_hp": 10, "energy": 2},
+    #         ],
+    #         "turn": 1
+    #     }
 
-    #     session['battle'] = createBattle([randomEnemy('goblin'), randomEnemy('goblin')])
-    #     # i change later!!!!
-    #
-    # if request.method == 'POST':
-    #     action = request.json.get('action')
-    #     if action == 'attack':
-    #         move = request.json.get('move')
-    #         target = request.json.get('target')
-    #         # session['battle'] = attack(session['battle'], target, move)
-    #     elif action == 'item':
-    #         item = request.json.get('item')
-    #         # session['battle'] = useItem(session['battle'], item)
-    #     elif action == 'focus':
-    #         # session['battle'] = focus(session['battle'])
-    #
-    #     return jsonify(session["battle"])
+    if request.method == 'POST':
+        data = request.get_json()
+        action = data.get('action')
+        turn_over = False
+
+        if action == 'attack':
+            move = data.get('move')
+            target = data.get('target')
+            session['battle'] = playerAttack(session['battle'], target, move)
+            turn_over = True
+        elif action == 'item':
+            item = data.get('item')
+            # session['battle'] = useItem(session['battle'], item)
+            # turn_over = True
+        elif action == 'focus':
+            # session['battle'] = focus(session['battle'])
+            # turn_over = True
+            pass
+
+        # Enemy Turn
+        if turn_over and session['battle']['enemies']:
+            session['battle'] = enemyTurn(session['battle'])
+
+        # Player Death Check
+        if session['battle']['player']['hp'] <= 0:
+            session.pop('battle')
+            return jsonify({"redirect": "/menu"})
+
+        return jsonify(session["battle"])
 
     return render_template("battle.html", battle = session['battle'])
 
