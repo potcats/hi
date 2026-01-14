@@ -221,6 +221,8 @@ def menu():
     session['inventory'] = {} # [name] {name, type, quantity, gold}
     session['gold'] = 0
 
+    addItemToInventory("simple sword")
+
     return render_template("menu.html")
 
 @app.route('/campfire', methods=['GET', 'POST'])
@@ -275,6 +277,9 @@ def campfire():
 
             equips = fetch_equips()
             return dumps(equips)
+
+        if 'stats' in data:
+            return dumps(fetch_stats())
 
     return render_template("campfire.html",
         currTurn=session['turn'],

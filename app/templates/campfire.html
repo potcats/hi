@@ -269,15 +269,15 @@ P02: Makers Makin' It, Act I
   <div class="container mod" id="levelsOut">
     <div class="container" id="levelsIn">
       <h3 style="text-align: center; margin-top: 10px;"> {{ username }} </h3>
-      <text> HP: {{ HP }}/{{ maxHP }} </text> <br>
+      <text id='hp'> HP: {{ HP }}/{{ maxHP }} </text> <br>
       <text> Level: {{ lvl }} ({{currXP}}/{{reqXP}}) </text> <br>
       <br>
-      <text> STR: {{ str }} </text> <br>
-      <text> DEX: {{ dex }} </text> <br>
-      <text> CON: {{ con }} </text> <br>
-      <text> INT: {{ int }} </text> <br>
-      <text> FTH: {{ fth }} </text> <br>
-      <text> LCK: {{ lck }} </text> <br>
+      <text id='str'> STR: {{ str }} </text> <br>
+      <text id='dex'> DEX: {{ dex }} </text> <br>
+      <text id='con'> CON: {{ con }} </text> <br>
+      <text id='int'> INT: {{ int }} </text> <br>
+      <text id='fth'> FTH: {{ fth }} </text> <br>
+      <text id='lck'> LCK: {{ lck }} </text> <br>
       <br>
       <!-- temp range -->
       <text> INITIATIVE: 4 -- 7 </text> <br>
@@ -292,10 +292,8 @@ P02: Makers Makin' It, Act I
   <div class="container mod" id="inv">
     <div class="container overflow-auto" id="invInner" style="height: 60%">
       {% for item in inventory %}
-        {% if item not in equips.values() %}
-          <button class="center inv" id="{{ item }}" onclick="clicked(this)"> {{ item }} </button>
-          <br>
-        {% endif %}
+        <button class="center inv" id="{{ item }}" onclick="clicked(this)"> {{ item }} </button>
+        <br>
       {% endfor %}
     </div>
     <div class="container" id="inspect" style="height: 40%; border-top: solid medium; border-color: #545454">
@@ -367,7 +365,12 @@ P02: Makers Makin' It, Act I
     window.onload = function() {
       document.getElementById('audio').checked = false;
       document.getElementById('sell').style.borderColor = "darkred";
-      console.log(equipped)
+
+      for (items in inv) {
+        if (Object.values(equipped).includes(items)) {
+          document.getElementById(items).style.display = "none";
+        }
+      }
     };
 
     /* AUDIO BUTTON INTERACTIONS */
@@ -515,7 +518,6 @@ P02: Makers Makin' It, Act I
         select.onload = function() {
           if (this.readyState == 4 && this.status == 200) {
             stats = JSON.parse(this.response);
-            console.log(stats)
           }
 
           textExtension += "<text> STR: " + stats[0] + "</text><br>";
@@ -560,6 +562,7 @@ P02: Makers Makin' It, Act I
 
         document.getElementById(selectedItm).style.display = "none";
         displayEquips();
+        updateStats();
       };
     }
 
@@ -582,6 +585,7 @@ P02: Makers Makin' It, Act I
 
         document.getElementById(g).style.display = "block";
         displayEquips();
+        updateStats();
       };
     }
 
@@ -598,6 +602,29 @@ P02: Makers Makin' It, Act I
         } else if (document.getElementById(gear).innerHTML.includes("<br>")) {
           document.getElementById(gear).innerHTML = document.getElementById(gear).innerHTML.split("<br><br>")[0];
         }
+      }
+    }
+
+    function updateStats() {
+      let stats = "";
+
+      let update = new XMLHttpRequest();
+      update.open('POST', window.location.href, true);
+      update.setRequestHeader("stats", 'aaaaaaaa');
+      update.send();
+
+      update.onload = function() {
+        if (this.readyState == 4 && this.status == 200) {
+          stats = JSON.parse(this.response);
+        }
+
+        document.getElementById('hp').innerHTML = `HP: ${stats[1]}/{{ maxHP }}`;
+        document.getElementById('str').innerHTML = `STR: ${stats[2]}`;
+        document.getElementById('dex').innerHTML = `DEX: ${stats[3]}`;
+        document.getElementById('con').innerHTML = `CON: ${stats[4]}`;
+        document.getElementById('int').innerHTML = `INT: ${stats[5]}`;
+        document.getElementById('fth').innerHTML = `FTH: ${stats[6]}`;
+        document.getElementById('lck').innerHTML = `LCK: ${stats[7]}`;
       }
     }
 
