@@ -97,7 +97,7 @@ def createBattle(enemies):
         c = db.cursor()
         cmd = "SELECT * FROM attacks WHERE name=?"
         c.execute(cmd, (i,))
-        attack_info_array.append(c.fetchone()))
+        attack_info_array.append(c.fetchone())
         db.close()
     attacks_info = attack_info_array
 
@@ -136,14 +136,14 @@ def attack(battle_id, attacker):
 
     #check available attacks and respective cooldowns, use the highest available attack
     for i in range(2, -1, -1):
-        if attacking_enemy_stats[1][0][i][2] >= attacking_enemy_stats[4] && attacking_enemy_stats[1][1][i] == 0:
+        if attacking_enemy_stats[1][0][i][2] >= attacking_enemy_stats[4] and attacking_enemy_stats[1][1][i] == 0:
             #set cd
             attacking_enemy_stats[1][1][i] = attacking_enemy_stats[1][0][i][3]
 
 #
 def dealDamage(attacker, victim, attack_info):
     dodgeChance = random.randInt(0,100)
-    if dodgeChance > 95:
+    # if dodgeChance > 95:
 
     #flat dodge chance
     #base dmg

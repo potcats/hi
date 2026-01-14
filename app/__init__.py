@@ -81,6 +81,7 @@ c.execute("""
     CREATE TABLE IF NOT EXISTS items (
     name TEXT PRIMARY KEY NOT NULL,
     type TEXT NOT NULL,
+    desc TEXT NOT NULL,
     image TEXT,
     str INTEGER,
     dex INTEGER,
@@ -89,8 +90,9 @@ c.execute("""
     fth INTEGER,
     lck INTEGER,
     hpIncr INTEGER,
-    energyIncr INTEGER
-
+    energyIncr INTEGER,
+    gold INTEGER,
+    gearType TEXT
 );
 """)
 
@@ -178,7 +180,7 @@ def register():
 @app.route('/menu', methods=['GET', 'POST'])
 def menu():
     session['turn'] = 1
-    session['inventory'] = {} # [name] {type, quantity, gold}
+    session['inventory'] = {} # [name] {name, type, quantity, gold, image, desc}
     session['gold'] = 0
 
     return render_template("menu.html")
@@ -190,20 +192,41 @@ def campfire():
     session['hp'] = 10
     session['currXP'] = 13
     session['maxXP'] = 27
+    session['inventory'] = {"aaaa" : ["aaaa", "gear", "1", "10", "", "aaaa"]}
 
-    inv = session['inventory']
+    inv = session['inventory'] # [name] {name, type, quantity, gold, image, desc}
     stats = fetch_stats() # [level, HP, str, dex, con, int, fth, lck]
     equips = fetch_equips() # [helmet, chestplate, pants, boots, accessory1, accessory2, accessory3]
 
     # AJAX INTERACTIONSSSSSSSSSSSSSS
-    # if request.method == "POST":
-    #     data = request.headers
-    #
-    #     if 'sell' in data:
-    #
-    #     if 'use' in data:
-    #
-    #     if 'equip' in data:
+    if request.method == "POST":
+        data = request.headers
+
+        if 'select' in data:
+            info = data['select'].split(",") # [type, name]
+
+            if info[0] == "consumable":
+                results = fetch_itemEffects(info[1])
+            elif info[0] == "gear":
+                results = fetch_itemStats(info[1])
+
+            return ",".join(results)
+
+        # if 'sell' in data:
+        #
+        #
+        # if 'use' in data:
+
+
+        if 'equip' in data:
+            itm = data['equip']
+
+            stats = fetch_itemStats(itm)
+            updateStats(stats[0], stats[1], stats[2], stats[3], stats[4], stats[5])
+            equipGear(itm)
+
+            equips = fetch_equips()
+            return ",".join(equips)
 
     return render_template("campfire.html",
         currTurn=session['turn'],
@@ -329,17 +352,44 @@ def fetch_itemEffects(name):
 
     return effects
 
+# [name] {name, type, quantity, gold, image}
 def addItemToInventory(name):
     inv = session['inventory']
 
     if name in inv:
-        inv[name][1] = str(int(inv[name][1]) + 1)
+        inv[name][2] = str(int(inv[name][2]) + 1)
     else:
         c = db.cursor()
-        info = c.execute("SELECT type, gold FROM items WHERE name = ?", (name,)).fetchone()
+        info = c.execute("SELECT type, gold, image, desc FROM items WHERE name = ?", (name,)).fetchone()
 
-        inv[name] = [info[0], str(1), info[1]]
+        inv[name] = [name, info[0], str(1), info[1], info[2], info[3]]
         session['inventory'] = inv
+
+# sets player stats with new gear
+def updateStats(str, dex, con, int, fth, lck):
+    statTypes = ["str", "dex", "con", "int", "fth", "lck"]
+    addedStats = [str, dex, con, int, fth, lck]
+    currStats = fetch_stats()
+
+    user = session['username']
+    c = db.cursor()
+    for type in statTypes:
+        i = statTypes.index(type)
+        if addedStats[i] != 0:
+            c.execute(f"UPDATE player SET {type} = ? WHERE username = ?",
+                (currStats[2+i] + addedStats[i], user))
+
+    db.commit()
+
+# sets new piece of gear in player db
+def equipGear(gear):
+    c = db.cursor()
+
+    type = c.execute("SELECT gearType FROM items WHERE name = ?", (gear,))
+    c.execute(f"UPDATE player SET {type} = ? WHERE username = ?",
+        (gear, session['username'],))
+
+    db.commit()
 
 # ------------------------------------------------------------------------- #
 

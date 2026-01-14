@@ -86,19 +86,16 @@ P02: Makers Makin' It, Act I
       width: 23%;
       height: 10%;
 
-      border-style: solid;
-      border-width: thick;
-      border-color: dimgrey;
-
-      background-color: grey
+      border-style: none;
+      background-color: firebrick;
     }
 
-    #close:hover, #next:hover, .inv:hover:not(.sellable), #sell:hover {
+    #sell:hover {
+      filter: brightness(120%);
+    }
+
+    #close:hover, #next:hover, .inv:hover:not(.sellable), .inspect:hover {
       background-color: darkgrey;
-    }
-
-    .sellable {
-      background-color: indianred;
     }
 
     /* INVENTORY STUFF */
@@ -132,6 +129,27 @@ P02: Makers Makin' It, Act I
 
       border-style: none;
       background-color: grey;
+    }
+
+    .sellable {
+      background-color: firebrick;
+    }
+
+    .sellable:hover {
+      filter: brightness(120%);
+    }
+
+    .inspect {
+      align-self: right;
+
+      width: 23%;
+      height: 10%;
+
+      border-style: solid;
+      border-width: thick;
+      border-color: dimgrey;
+
+      background-color: grey
     }
 
     /* LEVELS + GENERAL STATS CONTAINER */
@@ -222,9 +240,9 @@ P02: Makers Makin' It, Act I
     CLOSE
   </button>
 
-  <!-- MODAL CLOSE BUTTON -->
-  <button class="mod" onclick="sellMode()" id="sell" style="right: 10px;">
-    CLOSE
+  <!-- SELL BUTTON -->
+  <button class="mod" onclick="toggleSellMode()" id="sell" style="right: 10px;">
+    SELL
   </button>
 
   <!-- LEVELS + GENERAL STATS -->
@@ -249,11 +267,42 @@ P02: Makers Makin' It, Act I
   </div>
 
   <!-- MAIN INVENTORY -->
-  <div class="container mod overflow-auto" id="inv">
-    {% for item in inventory|tojson %}
-      <button class="center inv" id="{{ item }}" onclick="clicked(this)"> {{ item }} </button>
-      <br>
-    {% endfor %}
+  <div class="container mod" id="inv">
+    <div class="container overflow-auto" style="height: 60%">
+      {% for item in inventory %}
+        <button class="center inv" id="{{ item }}" onclick="clicked(this)"> {{ item }} </button>
+        <br>
+      {% endfor %}
+    </div>
+    <div class="container" id="inspect" style="height: 40%">
+      <div class="container overflow-auto" style="height: 90%; padding: 15px">
+        <!-- IF NO ITEMS SELECTED -->
+        <h3 class="center" style="text-align: center; display: none;" id="noInspect">
+          SELECT AN ITEM TO INSPECT
+        </h3>
+
+        <!-- ITEMS SELECTED -->
+        <h3 style="text-align: center;" id="itemName"> </h3>
+        <p id="itemDesc"> </p>
+        <div id="extension"> </div>
+      </div>
+      <div class="container" style="height: 10%">
+        <!-- SELL BUTTON -->
+        <button class="inspect" id="inspectSell" onclick="sell()" style="display: none">
+          SELL
+        </button>
+
+        <!-- USE BUTTON -->
+        <button class="inspect" id="inspectUse" onclick="use()" style="display: none">
+          USE
+        </button>
+
+        <!-- SELL BUTTON -->
+        <button class="inspect" id="inspectEquip" onclick="equip()" style="display: none">
+          EQUIP
+        </button>
+      </div>
+    </div>
   </div>
 
   <!-- CHARACTER DISPLAY -->
@@ -272,6 +321,8 @@ P02: Makers Makin' It, Act I
   <!-- PAGE-SPECIFIC JS -->
   <script>
     var inv = {{ inventory | tojson }};
+    var selectedItm = "";
+    var sellMode = false;
 
     /* EVENTS THAT WILL OCCUR ON LOAD */
     window.onload = function() {
@@ -299,6 +350,8 @@ P02: Makers Makin' It, Act I
 
       document.getElementById('close').style.display = "block";
       document.getElementById('next').style.display = "none";
+
+      document.getElementById('noInspect').style.display = "block";
     }
 
     /* CLOSE MODAL */
@@ -311,35 +364,94 @@ P02: Makers Makin' It, Act I
 
       document.getElementById('close').style.display = "none";
       document.getElementById('next').style.display = "block";
+
+      document.getElementById("inspectSell").style.display = "none";
+      document.getElementById("inspectUse").style.display = "none";
+      document.getElementById("inspectEquip").style.display = "none";
     }
 
     /* SELL MODE */
-    function sellMode() {
+    function toggleSellMode() {
       items = document.getElementsByClassName("inv");
 
-      for (item of items) {
-        item.className = item.className + " sellable";
-        item.style.backgroundColor = 'firebrick';
+      if (sellMode) {
+        sellMode = false;
+        document.getElementById('sell').style.backgroundColor = "firebrick"
+
+        for (item of items) {
+          item.classList.remove("sellable");
+        }
+      } else {
+        sellMode = true;
+        document.getElementById('sell').style.backgroundColor = "forestgreen"
+
+        for (item of items) {
+          item.classList.add("sellable");
+        }
       }
     }
 
     /* ITEM INTERACTIONS */
     function clicked(itm) {
+      let select = new XMLHttpRequest();
       name = itm.id
-      if (itm.className.split(' ').length > 2) {
-        sell(itm);
-      } else {
-        if (inv[name][0].equals("consumable")) {
-          use(itm);
-        } else {
-          equip(itm);
+
+      document.getElementById('noInspect').style.display = "none";
+      document.getElementById('itemName').innerHTML = inv[name][0];
+      document.getElementById('itemDesc').innerHTML = inv[name][5];
+
+      if (inv[name][0] == "consumable") {
+        select.open('POST', window.location.href, true);
+        select.setRequestHeader("select", "consumable," + name);
+        select.send();
+
+        cont = document.getElementById("extension")
+        textExtension = "<p> EFFECTS </p><br>"
+
+        select.onload = function() {
+          if (this.readyState == 4 && this.status == 200) {
+            effects = this.response.split(",");
+          };
+
+          textExtension += "<text> HP: " + effects[0] + "</text><br>";
+          textExtension += "<text> ENERGY: " + effects[1] + "</text><br>";
+
+          cont.innerHTML = textExtension;
         }
+
+        if (sellMode) { document.getElementById("inspectSell").style.display = "block"
+        } else { document.getElementById("inspectUse").style.display = "block" };
+      } else {
+        select.open('POST', window.location.href, true);
+        select.setRequestHeader("select", "gear," + name);
+        select.send();
+
+        cont = document.getElementById("extension")
+        textExtension = "<p> STATS </p><br>"
+
+        select.onload = function() {
+          if (this.readyState == 4 && this.status == 200) {
+            stats = this.response.split(",");
+          };
+
+          textExtension += "<text> STR: " + stats[0] + "</text><br>";
+          textExtension += "<text> CON: " + stats[1] + "</text><br>";
+          textExtension += "<text> DEX: " + stats[2] + "</text><br>";
+          textExtension += "<text> INT: " + stats[3] + "</text><br>";
+          textExtension += "<text> FTH: " + stats[4] + "</text><br>";
+          textExtension += "<text> LCK: " + stats[5] + "</text><br>";
+
+          cont.innerHTML = textExtension;
+        }
+
+        if (sellMode) { document.getElementById("inspectSell").style.display = "block"
+        } else { document.getElementById("inspectUse").style.display = "block" };
       }
     }
 
     function sell() {
       let sell = new XMLHttpRequest();
-      
+
     }
 
     function use() {
