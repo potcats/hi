@@ -200,12 +200,12 @@ def register():
                         t = t + "password "
                     return render_template("register.html", t)
 
-                c.execute("INSERT INTO player VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);",
+                c.execute("INSERT INTO player VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);",
                     (request.form['username'].lower(),
                         request.form['password'],
-                        0, 30, "strike,cross slash", "", 0,
+                        0, 30, "strike,cross slash", "",
                         "", 0, 3, 0, 0,
-                        0, 0, 0, "", "",
+                        0, 0, "", "",
                         "", "", "simple sword", "", "", ""))
                 db.commit()
 
