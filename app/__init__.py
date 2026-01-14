@@ -35,7 +35,7 @@ gearType = ["", "", "", "", "chestplate", "helmet", "pants", "shoes", "chestplat
 
 # ENEMIES
 species = ["bandit", "bee", "dwarf", "dwarfchief", "goblin", "grandma", "pebble", "pixie", "rat", "wizard"]
-attacks = ["fire bomb,quick slash,light stab", "sting,stinger burst", "load,", "", "", "", "", "", "", ""]
+attacks = ["fire bomb,quick slash,light stab", "sting,stinger burst", "load,", "", "tiny strike,jugg", "pie throw,granny kick,granny kick barrage", "boulder bump", "dust bolt,wondrous light,magic dust", "gnaw,rat flip", "spell scroll:magic missile,flame bolt,fireball"]
 
 # ENCOUNTERS
 name = ["Travelling Merchant", "Elven Camp", "Wanderer's Wares", "Busted Caravan", "Grandma's house", "Wizard Tower",
@@ -60,7 +60,9 @@ desc = ["A merchant with a well-worn wagon waves you down (shop)",
 diff = [1, 2, 1, 3, 2, 2, 1, 1]
 
 # ATTACKS
-attackName = ["pie throw", "granny kick", "granny kick barrage", "spell scroll: magic missile", "flame bolt", "fireball", "fire bomb", "quick slash", "light stab", "tiny strike", "jugg", "club smash", "beat down", "boulder bump", "sting", "stinger burst", "dust bolt", "wondrous lights", "magic dust", "boop", "swipe", "bark", "nom", "gnaw", "rat flip"]
+attackName = ["pie throw", "granny kick", "granny kick barrage", "spell scroll: magic missile", "flame bolt", "fireball", "fire bomb", "quick slash", "light stab", "tiny strike", "jugg", "club smash", "beat down", "boulder bump", "sting", "stinger burst", "dust bolt", "wondrous light", "magic dust", "boop", "swipe", "bark", "nom", "gnaw", "rat flip"]
+hits = [1, 1, 4, 5, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3, 1, 1, 1, 3, 1, 1, 2]
+energy = [1, 0, 2, 1, 0, 2, 1, 0, 1, 0, 1, 0, 3, 0, 0, 2, 0, 2, 1, 1, 0, 2, 2, 0, 2]
 
 DB_FILE = "data.db"
 
@@ -136,7 +138,7 @@ c.execute("""
     name TEXT PRIMARY KEY NOT NULL,
     hits INTEGER NOT NULL,
     level INTEGER NOT NULL,
-    energy TEXT,
+    energy INTEGER,
     cd INTEGER NOT NULL,
     scale TEXT,
     statusEffects TEXT,
