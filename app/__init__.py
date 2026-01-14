@@ -35,7 +35,7 @@ gearType = ["", "", "", "", "chestplate", "helmet", "pants", "shoes", "chestplat
 
 # ENEMIES
 species = ["bandit", "bee", "dwarf", "dwarfchief", "goblin", "grandma", "pebble", "pixie", "rat", "wizard"]
-attacks = ["fire bomb,", "", "", "", "", "", "", "", "", ""]
+attacks = ["fire bomb,quick slash,light stab", "sting,stinger burst", "load,", "", "", "", "", "", "", ""]
 
 # ENCOUNTERS
 name = ["Travelling Merchant", "Elven Camp", "Wanderer's Wares", "Busted Caravan", "Grandma's house", "Wizard Tower",
