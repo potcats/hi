@@ -13,15 +13,22 @@ app.secret_key = 'wahhhhhhhhhhhhhhhhh'
 
 # ------------------------ DATABASING  ------------------------ #
 
-gear = ["cloth robe", "cloth veil", "cloth leggings", "iron greaves", "iron chestplate", "iron helmet", "iron leggings", "rat hide boots", 
+items = ["honey", "cookie", "healing potion", "magical vial of water", "cloth robe", "cloth veil", "cloth leggings", "iron greaves", "iron chestplate", "iron helmet", "iron leggings", "rat hide boots", 
         "rat hide cloak", "rat hide hood", "stinger pendant", "ring of goblin ears", "simple sword", "excalibur", "crude club", "noble's sabre"]
-
-statStr = [0, 0, 0, 3, 4, 2, 4, 0, 0, 0, 0, 5, 3, 16, 12, 10]
-statDex = [0, 0, 0, 0, 0, 0, 0, 3, 5, 2, 0, 5, 0, 0, 0, 0]
-statCon = [0, 0, 0, 1, 6, 2, 3, 0, 0, 0, 0, 0, 0, 0, 6, 0]
-statInt = [6, 0, 3, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0]
-statFth = [4, 4, 4, 0, 0, 0, 0, 0, 0, 0, 6, 0, 0, 0, 0, 0]
-statLck = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+img = ["", "", "", "", "/app/static/images/gear/chestplate/cloth.png", "/app/static/images/gear/helmet/cloth.png", "/app/static/images/gear/pants/cloth.png", "/app/static/images/gear/boots/iron.png", 
+       "/app/static/images/gear/chestplate/iron.png", "/app/static/images/gear/helmet/iron.png", "/app/static/images/gear/pants/iron.png", "/app/static/images/gear/boots/rathide.png", 
+       "/app/static/images/gear/chestplate/rathide.png", "/app/static/images/gear/helmet/rathide.png", "/app/static/images/gear/accessory/", "/app/static/images/gear/accessory/", 
+       "/app/static/images/gear/weapon/", "/app/static/images/gear/weapon/", "/app/static/images/gear/weapon/", "/app/static/images/gear/weapon/"]
+statStr = [0, 0, 0, 0, 0, 0, 3, 4, 2, 4, 0, 0, 0, 0, 5, 3, 16, 12, 10]
+statDex = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 5, 2, 0, 5, 0, 0, 0, 0]
+statCon = [0, 0, 0, 0, 0, 0, 1, 6, 2, 3, 0, 0, 0, 0, 0, 0, 0, 6, 0]
+statInt = [0, 0, 0, 6, 0, 3, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0]
+statFth = [0, 0, 0, 4, 4, 4, 0, 0, 0, 0, 0, 0, 0, 6, 0, 0, 0, 0, 0]
+statLck = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+hpInc = [5, 3, 18, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+gold = [5, 5, 20, 10, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 20, 20, 5, 30, 30, 30]
+type = ["consumable", "consumable", "consumable", "consumable", "gear", "gear", "gear", "gear", "gear", "gear", "gear", "gear", "gear", "gear", "gear", "gear", "gear", "gear", "gear", "gear"]
+gearType = ["", "", "", "", chestplate, helmet, pants, shoes, chestplate, helmet, pants, shoes, chestplate, helmet, accessory, accessory, wepaon, weapon, weapon, weapon]
 DB_FILE = "data.db"
 
 db = sqlite3.connect(DB_FILE, check_same_thread=False)
@@ -36,9 +43,7 @@ c.execute("""
     HP INTEGER NOT NULL,
     attacks TEXT NOT NULL,
     buff TEXT,
-    bMultiplier INTEGER,
     debuff TEXT,
-    dMultiplier INTEGER,
     str INTEGER,
     dex INTEGER,
     con INTEGER,
@@ -62,9 +67,7 @@ c.execute("""
     attacks TEXT NOT NULL,
     HP INTEGER NOT NULL,
     weakness TEXT,
-    wMultiplier INTEGER,
     res TEXT,
-    resMultiplier INTEGER,
     drops TEXT NOT NULL
 );
 """)
@@ -83,7 +86,6 @@ c.execute("""
     CREATE TABLE IF NOT EXISTS items (
     name TEXT PRIMARY KEY NOT NULL,
     type TEXT NOT NULL,
-    desc TEXT NOT NULL,
     image TEXT,
     str INTEGER,
     dex INTEGER,
@@ -91,8 +93,7 @@ c.execute("""
     int INTEGER,
     fth INTEGER,
     lck INTEGER,
-    hpIncr INTEGER,
-    energyIncr INTEGER,
+    hpInc INTEGER,
     gold INTEGER,
     gearType TEXT
 );
@@ -104,12 +105,16 @@ c.execute("""
     level INTEGER NOT NULL,
     energy TEXT,
     cd INTEGER NOT NULL,
-    scale TEXT NOT NULL,
+    scale TEXT,
     statusEffects TEXT,
     baseDamage INTEGER
 );
 """)
 
+for i in range(len(items)):
+    q = "INSERT OR REPLACE INTO items(name, type, image, str, dex, con, int, fth, lck, hpInc, gold, gearType) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+    d = (items[i], type[i]], img[i], statStr[i], statDex[i], statCon[i], statInt[i], statFth[i], statLck[i], hpInc[i], gold[i], gearType[i])
+    c.execute(q, d)
 #  ------------------------------------------------------------ #
 
 def loggedin():
@@ -164,11 +169,11 @@ def register():
                         t = t + "password "
                     return render_template("register.html", t)
 
-                c.execute("INSERT INTO user_profile VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);",
+                c.execute("INSERT INTO user_profile VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);",
                     (request.form['username'].lower(),
                         request.form['password']),
-                        0, 30, "strike,cross slash", "", 0,
-                        "", 0, 3, 0, 0,
+                        0, 30, "strike,cross slash", "",
+                        "", 3, 0, 0,
                         0, 0, 0, "", "",
                         "", "", "simple sword", "", "", "")
                 db.commit()
