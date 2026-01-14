@@ -297,6 +297,8 @@ def campfire():
         if 'use' in data:
             consumable = data['use']
             session['hp'] = session['hp'] + fetch_itemEffects(consumable)
+            if session['hp'] > stats[1] + stats[4]:
+                session['hp'] = stats[1] + stats[4]
 
             inv[consumable][2] = str(int(inv[consumable][2]) - 1)
 
@@ -306,8 +308,10 @@ def campfire():
         if 'equip' in data:
             itm = data['equip']
 
-            stats = fetch_itemStats(itm)
-            updateStats(stats[0], stats[1], stats[2], stats[3], stats[4], stats[5])
+            itemStats = fetch_itemStats(itm)
+            updateStats(itemStats[0], itemStats[1], itemStats[2], itemStats[3], itemStats[4], itemStats[5])
+            stats = fetch_stats()
+
             equipGear(itm)
 
             equips = fetch_equips()
@@ -317,8 +321,10 @@ def campfire():
             itm = data['unequip']
             gear = equips[itm]
 
-            stats = fetch_itemStats(gear)
-            updateStats(stats[0], stats[1], stats[2], stats[3], stats[4], stats[5], False)
+            itemStats = fetch_itemStats(gear)
+            updateStats(itemStats[0], itemStats[1], itemStats[2], itemStats[3], itemStats[4], itemStats[5], False)
+            stats = fetch_stats()
+
             unEquipGear(itm)
 
             equips = fetch_equips()
@@ -474,7 +480,7 @@ def fetch_images(items):
     images = []
 
     for item in items:
-        image = c.execute("SELECT image FROM items WHERE name = ?", (item,)).fetchone()
+        image = c.execute("SELECT image FROM items WHERE name = ?", (item,)).fetchone()[0]
         images.append(image)
 
     return images
@@ -554,6 +560,13 @@ def unEquipGear(gearType):
         (session['username'],))
 
     db.commit()
+
+# fetches encounter background
+def fetch_bg(name):
+    c = db.cursor()
+
+    bg = c.execute("SELECT background FROM encounters WHERE type = ?", (name,)).fetchone()[0]
+    return bg
 
 # ------------------------------------------------------------------------- #
 

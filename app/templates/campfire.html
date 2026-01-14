@@ -256,7 +256,7 @@ P02: Makers Makin' It, Act I
   <div class="container mod" id="levelsOut">
     <div class="container" id="levelsIn">
       <h3 style="text-align: center; margin-top: 10px;"> {{ username }} </h3>
-      <text id='hp'> HP: {{ HP }}/{{ maxHP }} </text> <br>
+      <text id='hp'> HP: {{ HP }}/{{ maxHP + con }} </text> <br>
       <text> Level: {{ lvl }} ({{currXP}}/{{reqXP}}) </text> <br>
       <text id='gold'> Gold: {{ gold }} </text> <br>
       <br>
@@ -644,7 +644,8 @@ P02: Makers Makin' It, Act I
           stats = JSON.parse(this.response);
         }
 
-        document.getElementById('hp').innerHTML = `HP: ${stats[1]}/{{ maxHP }}`;
+        maxhp = {{ maxHP }} + stats[4];
+        document.getElementById('hp').innerHTML = `HP: ${stats[1]}/${ maxhp }`;
         document.getElementById('str').innerHTML = `STR: ${stats[2]}`;
         document.getElementById('dex').innerHTML = `DEX: ${stats[3]}`;
         document.getElementById('con').innerHTML = `CON: ${stats[4]}`;
