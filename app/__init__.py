@@ -16,8 +16,10 @@ app.secret_key = 'wahhhhhhhhhhhhhhhhh'
 # ------------------------ DATABASING  ------------------------ #
 
 # ITEMS
-items = ["honey", "cookie", "healing potion", "magical vial of water", "cloth robe", "cloth veil", "cloth leggings", "iron greaves", "iron chestplate", "iron helmet", "iron leggings", "rat hide boots",
-        "rat hide cloak", "rat hide hood", "stinger pendant", "ring of goblin ears", "simple sword", "excalibur", "crude club", "noble's sabre"]
+items = ["honey", "cookie", "healing potion", "magical vial of water", "cloth robe", "cloth veil", "cloth leggings", "iron greaves", 
+         "iron chestplate", "iron helmet", "iron leggings", "rat hide boots",
+        "rat hide cloak", "rat hide hood", "stinger pendant", "ring of goblin ears", 
+         "simple sword", "excalibur", "crude club", "noble's sabre"]
 img = ["", "", "", "", "/app/static/images/gear/chestplate/cloth.png", "/app/static/images/gear/helmet/cloth.png", "/app/static/images/gear/pants/cloth.png", "/app/static/images/gear/boots/iron.png",
        "/app/static/images/gear/chestplate/iron.png", "/app/static/images/gear/helmet/iron.png", "/app/static/images/gear/pants/iron.png", "/app/static/images/gear/boots/rathide.png",
        "/app/static/images/gear/chestplate/rathide.png", "/app/static/images/gear/helmet/rathide.png", "/app/static/images/gear/accessory/", "/app/static/images/gear/accessory/",
@@ -31,7 +33,7 @@ statLck = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 hpInc = [5, 3, 18, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 gold = [5, 5, 20, 10, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 20, 20, 5, 30, 30, 30]
 type = ["consumable", "consumable", "consumable", "consumable", "gear", "gear", "gear", "gear", "gear", "gear", "gear", "gear", "gear", "gear", "gear", "gear", "gear", "gear", "gear", "gear"]
-gearType = ["", "", "", "", "chestplate", "helmet", "pants", "shoes", "chestplate", "helmet", "pants", "shoes", "chestplate", "helmet", "accessory", "accessory", "weapon", "weapon", "weapon", "weapon"]
+gearType = ["", "", "", "", "chestplate", "helmet", "pants", "boots", "chestplate", "helmet", "pants", "boots", "chestplate", "helmet", "accessory", "accessory", "weapon", "weapon", "weapon", "weapon"]
 
 # ENEMIES
 species = ["bandit", "bee", "dwarf", "dwarfchief", "goblin", "grandma", "pebble", "pixie", "rat", "wizard"]
