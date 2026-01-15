@@ -16,9 +16,9 @@ app.secret_key = 'wahhhhhhhhhhhhhhhhh'
 # ------------------------ DATABASING  ------------------------ #
 
 # ITEMS
-items = ["honey", "cookie", "healing potion", "magical vial of water", "cloth robe", "cloth veil", "cloth leggings", "iron greaves",
+items = ["honey", "cookie", "healing potion", "magical vial of water", "cloth robe", "cloth veil", "cloth leggings", "iron greaves", 
          "iron chestplate", "iron helmet", "iron leggings", "rat hide boots",
-        "rat hide cloak", "rat hide hood", "stinger pendant", "ring of goblin ears",
+        "rat hide cloak", "rat hide hood", "stinger pendant", "ring of goblin ears", 
          "simple sword", "excalibur", "crude club", "noble's sabre"]
 img = ["", "", "", "", "/app/static/images/gear/chestplate/cloth.png", "/app/static/images/gear/helmet/cloth.png", "/app/static/images/gear/pants/cloth.png", "/app/static/images/gear/boots/iron.png",
        "/app/static/images/gear/chestplate/iron.png", "/app/static/images/gear/helmet/iron.png", "/app/static/images/gear/pants/iron.png", "/app/static/images/gear/boots/rathide.png",
@@ -48,8 +48,8 @@ species = ["bandit",
            "wizard"]
 attacks = ["fire bomb,quick slash,light stab",
            "sting,stinger burst",
-           "load,",
-           "",
+           "fire bomb,fire thunderbuss,",
+           "small shieldbreaker,",
            "tiny strike,jugg",
            "pie throw,granny kick,granny kick barrage",
            "boulder bump",
@@ -89,8 +89,17 @@ desc = ["A merchant with a well-worn wagon waves you down (shop)",
 diff = [1, 2, 1, 3, 2, 2, 1, 1]
 
 # ATTACKS
-attackName = ["pie throw", "granny kick", "granny kick barrage", "spell scroll: magic missile", "flame bolt", "fireball", "fire bomb", "quick slash", "light stab", "tiny strike", "jugg", "club smash", "beat down", "boulder bump", "sting", "stinger burst", "dust bolt", "wondrous light", "magic dust", "boop", "swipe", "bark", "nom", "gnaw", "rat flip"]
-hits = [1, 1, 4, 5, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3, 1, 1, 1, 3, 1, 1, 2]
+attackName = ["pie throw", "granny kick", "granny kick barrage",
+              "spell scroll: magic missile", "flame bolt", "fireball",
+              "fire bomb", "quick slash", "light stab", 
+              "tiny strike", "jugg", 
+              "club smash", "beat down",
+              "boulder bump",
+              "sting", "stinger burst",
+              "dust bolt", "wondrous light", "magic dust",
+              "boop", "swipe", "bark", "nom",
+              "gnaw", "rat flip"]
+hits = [1, 1, 4, 5, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3, 1, 1, 1, 3, 1, 1, 2, 1, 1]
 energy = [1, 0, 2, 1, 0, 2, 1, 0, 1, 0, 1, 0, 3, 0, 0, 2, 0, 2, 1, 1, 0, 2, 2, 0, 2]
 
 DB_FILE = "data.db"
@@ -148,11 +157,11 @@ c.execute("""
     CREATE TABLE IF NOT EXISTS dialogue (
     scene TEXT NOT NULL,
     type TEXT NOT NULL,
-    order INTEGER,
+    ord INTEGER,
     prevChoice TEXT,
     nextChoice TEXT,
     stat TEXT,
-    statReq INT
+    statReq INTEGER
 );
 """)
 
