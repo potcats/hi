@@ -22,8 +22,8 @@ items = ["honey", "cookie", "healing potion", "magical vial of water", "cloth ro
          "simple sword", "excalibur", "crude club", "noble's sabre"]
 img = ["", "", "", "", "/app/static/images/gear/chestplate/cloth.png", "/app/static/images/gear/helmet/cloth.png", "/app/static/images/gear/pants/cloth.png", "/app/static/images/gear/boots/iron.png",
        "/app/static/images/gear/chestplate/iron.png", "/app/static/images/gear/helmet/iron.png", "/app/static/images/gear/pants/iron.png", "/app/static/images/gear/boots/rathide.png",
-       "/app/static/images/gear/chestplate/rathide.png", "/app/static/images/gear/helmet/rathide.png", "/app/static/images/gear/accessory/", "/app/static/images/gear/accessory/",
-       "/app/static/images/gear/weapon/", "/app/static/images/gear/weapon/", "/app/static/images/gear/weapon/", "/app/static/images/gear/weapon/"]
+       "/app/static/images/gear/chestplate/rathide.png", "/app/static/images/gear/helmet/rathide.png", "/app/static/images/gear/accessory/stinger.png", "/app/static/images/gear/accessory/ears.png",
+       "/app/static/images/gear/weapon/simple.png", "/app/static/images/gear/weapon/excalibur.png", "/app/static/images/gear/weapon/club.png", "/app/static/images/gear/weapon/sabre.png"]
 statStr = [0, 0, 0, 0, 0, 0, 0, 3, 4, 2, 4, 0, 0, 0, 0, 5, 3, 16, 12, 10]
 statDex = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 5, 2, 0, 5, 0, 0, 0, 0]
 statCon = [0, 0, 0, 0, 0, 0, 0, 1, 6, 2, 3, 0, 0, 0, 0, 0, 0, 0, 6, 0]
@@ -79,6 +79,7 @@ name = ["Travelling Merchant",
         "Wizard Tower",
         "The Sword in the Stone",
         "Potion Seller",
+        "Mystic River",
         "Short Rest"]
 background = ["/static/images/bgs/caravanshop.jpg",
               "/static/images/bgs/dwarvencamp.jpg",
@@ -88,6 +89,7 @@ background = ["/static/images/bgs/caravanshop.jpg",
               "/static/images/bgs/insidetower.jpg",
               "/static/images/bgs/swordstone.jpg",
               "/static/images/bgs/witchhouse.jpg",
+              "/static/images/bgs/enchanted.jpg",
               "/static/images/bgs/campsite.jpg"]
 desc = ["A merchant with a well-worn wagon waves you down (shop)",
         "You see a bunch of sad, depressed elves in a sad, depressed camp",
@@ -97,8 +99,9 @@ desc = ["A merchant with a well-worn wagon waves you down (shop)",
         "You spot a wizard tower in the woods",
         "You spot a familiar sword plunged into a rock",
         "You spot a strange hut in the woods",
+        "Take a dip, maybe even a splurge in the mystic river",
         ""]
-diff = [1, 2, 1, 3, 2, 2, 1, 1, 1]
+diff = [1, 2, 1, 3, 2, 2, 1, 1, 1, 1]
 
 # ATTACKS
 attackName = ["pie throw", "granny kick", "granny kick barrage",
@@ -132,10 +135,17 @@ scene = ["Busted Caravan",
          "Busted Caravan",
          "Busted Caravan",
          "Busted Caravan",
-         "Busted Caravan"]
+         "Busted Caravan",
+
+         "Grandma's House",
+         "Grandma's House",
+         "Grandma's House",
+         "Grandma's House",]
 dialogueType = ["desc", "choice", "choice", "choice",
                 "desc", "choice", "choice",
-                "desc", "desc", "choice", "desc", "choice"]
+                "desc", "desc", "choice", "desc", "choice"
+
+                "desc", "choice", "choice", "choice"]
 dlg = ["You find yourselves peeking through the trees towards a caravan that seems to have been stranded in the middle of the forest. What will you do?",
        "Battle the goblins for their goods",
        "Approach the goblin caravan",
@@ -147,10 +157,18 @@ dlg = ["You find yourselves peeking through the trees towards a caravan that see
        "The goblins look at you impatiently. ‘You’re just here to hold us up, aren’t you?’",
        "Fight the goblins",
        "Fine! We'll make it work...",
-       "Move on from the scene"]
-ord = [1, 1, 1, 1, 2, 2, 2, 3, 3, 3, 3, 3]
-prevChoice = ["", "", "", "", "B", "B", "B", "A", "A", "A", "B", "B"]
-currChoice = ["", "A", "B", "C", "", "A", "B", "", "", "", "", ""]
+       "Move on from the scene",
+
+       "You encounter a little house up ahead. Upon investigating, a nice, elderly woman walks out and invites you inside for some sweets. What do you do?",
+       "Kindly reject the grandma's offer for sweets",
+       "Decide to beat up the old lady",
+       "Accept the grandma's invitation for sweets",]
+ord = [1, 1, 1, 1, 2, 2, 2, 3, 3, 3, 3, 3,
+       1, 1, 1, 1,]
+prevChoice = ["", "", "", "", "B", "B", "B", "A", "A", "A", "B", "B",
+              "", "", "", "",]
+currChoice = ["", "A", "B", "C", "", "A", "B", "", "", "", "", "",
+              "", "A", "B", "C",]
 stat = ["", "", "", "", "", "str", "", "pass", "fail", "", "", ""]
 statReq = [0, 0, 0, 0, 0, 10, 0, 0, 0, 0, 0, 0]
 reward = ["", "", "", "", "", "", "", "gold", "", "", "", 0]
