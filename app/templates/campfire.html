@@ -320,7 +320,7 @@ P02: Makers Makin' It, Act I
 
   <!-- MAIN INVENTORY -->
   <div class="container mod" id="inv">
-    <div class="container overflow-auto" id="invInner" style="height: 60%">
+    <div class="container overflow-auto" style="height: 60%">
       {% for item in inventory %}
         {% if inventory[item][1] == "consumable" %}
           <button class="center inv {{ item }}" onclick="clicked(this)"> {{ inventory[item][2] }}x {{ item }} </button>
@@ -553,7 +553,7 @@ P02: Makers Makin' It, Act I
       name = Array.from(itm.classList).slice(2).join(" ");
 
       aaa = name.split(" ");
-      if (aaa[aaa.length-1] == "sellable") { name = aaa.slice(0).join(" ") }
+      if (aaa[aaa.length-1] == "sellable") { name = aaa.slice(0,aaa.length-1).join(" ") }
       selectedItm = name;
 
       // console.log(name);

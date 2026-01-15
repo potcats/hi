@@ -536,6 +536,8 @@ def shop(type):
     equips = fetch_equips() # [gearType] {name}
     bg = fetch_bg(type)
 
+    shop = generateShopItems(5)
+
     if request.method == "POST":
         data = request.headers
 
@@ -605,7 +607,8 @@ def shop(type):
         con=stats[4],
         int=stats[5],
         fth=stats[6],
-        lck=stats[7],)
+        lck=stats[7],
+        shop=shop)
 
 @app.route('/dialogue', methods=['GET', 'POST'])
 def dialogue():
@@ -700,6 +703,22 @@ def addItemToInventory(name):
 
         inv[name] = [name, info[0], str(1), info[1]]
         session['inventory'] = inv
+
+def generateShopItems(num):
+    c = db.cursor()
+    shop = {}
+    stuff = ["honey", "cookie", "healing potion", "magical vial of water",
+                    "cloth robe", "cloth veil", "cloth leggings",
+                    "iron greaves", "iron chestplate", "iron helmet", "iron leggings",
+                    "rat hide boots", "rat hide cloak", "rat hide hood" ]
+
+    selected = random.sample(stuff, 5)
+    for item in selected:
+        info = c.execute("SELECT type, gold FROM items WHERE name = ?", (item,)).fetchone()
+
+        shop[item] = [item, info[0], str(1), info[1]]
+
+    return shop
 
 # sets player stats with new gear
 def updateStats(str, dex, con, int, fth, lck, increase=True):
