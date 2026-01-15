@@ -45,7 +45,7 @@ def randomEnemy(species):
     return {
         "species": species,
         "attacks": attacks,
-        "cds": [0, 0, 0],
+        "cds": [0] * len(base_info[1]),
         "init": init,
         "hp": hp,
         "max_hp": hp,
@@ -166,7 +166,7 @@ def createBattle(enemies):
     player = {
         "username": player_info[0],
         "attacks": attacks_info,
-        "cds": [0, 0, 0],
+        "cds": [0, 0],
         "init": random.randint(0, 100),
         "hp": player_info[3] + player_info[9],
         "max_hp": player_info[3] + player_info[9],
@@ -187,6 +187,7 @@ def createBattle(enemies):
 
     return {
         "turn": "player",
+        "turnNum": 1,
         "player": player,
         "enemies": enemies,
         "actions": [],
@@ -210,12 +211,12 @@ def player_startTurn(battle_id):
     return battle_id
 
 #enemy indexed by 0 pls
-def enemy_startTurn(battle_id, enemy):
-    en = battle_id["enemies"][enemy]
+def enemy_startTurn(battle_id, idx):
+    enemy = battle_id["enemies"][idx]
     #reduce all cd by 1
-    for i in range(0,3):
-        if en["cds"][i] > 0:
-            en["cds"][i] -= 1
+    for i in range(len(enemy["cds"])):
+        if enemy["cds"][i] > 0:
+            enemy["cds"][i] -= 1
 
     #increase energy by 1
     enemy["energy"] = min(enemy["energy"] + 1, enemy["max_energy"])
@@ -369,18 +370,19 @@ def advance_turn(battle):
     if battle["turn"] == "enemy":
         for i, enemy in enumerate(battle["enemies"]):
             if enemy["hp"] > 0:
+                battle = enemy_startTurn(battle, i)
                 result = enemy_attack(battle, i)
                 battle["actions"].append({
                     "source": "enemy",
                     "enemy_idx": i,
                     "result": result
                 })
-
                 if deathCheck(battle):
                     battle["ended"] = True
                     return battle
 
         battle["turn"] = "player"
+        battle["turnNum"] += 1
         return battle
 
     else:

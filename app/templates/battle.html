@@ -182,6 +182,7 @@ P02: Makers Makin' It, Act I
     .inactive {
       opacity: 0.4;
       transition: opacity 0.3 ease, filter 0.3 ease;
+      pointer-events: none;
     }
 
     .dmg-popup {
@@ -193,6 +194,26 @@ P02: Makers Makin' It, Act I
       transition: transform 1s ease, opacity 1s ease;
       opacity: 0;
       display: none;
+    }
+
+    @keyframes death {
+      0% {
+        transform: scale(1);
+        opacity: 1;
+        filter: none;
+      }
+      40% {
+        transform: scale(1.05);
+      }
+      100% {
+        transform: scale(0.6) translateY(40px);
+        opacity: 0;
+        filter: grayscale(1);
+      }
+    }
+
+    .dead {
+      animation: death 0.9s ease forwards;
     }
 
   </style>
@@ -207,7 +228,7 @@ P02: Makers Makin' It, Act I
     <div class = "row flex-grow-1 position-relative">
 
       <div class= "text-white" style = "position: absolute; top: 30%; left: 0; width: 200px;">
-        <h5 class = "fw-bold text-center"> Turn {{ battle.turn }} </h5>
+        <h5 id = "turn-num" class = "fw-bold text-center"> Turn {{ battle.turnNum }} </h5>
 
         <div class = "p-3 bg-dark">
 
@@ -350,11 +371,23 @@ P02: Makers Makin' It, Act I
     <div id = "attacks-panel" class = "panel" style = "display: none;">
       <div class = "d-flex gap-2 justify-content-center">
       {% for atk in battle.player.attacks %}
-      <div class = "atk-wrap flex-grow-1 bg-dark px-2 gap-2 mb-1 py-1" onclick = "selectAtk('{{ atk[0] }}')">
+      <div class = "atk-wrap flex-grow-1 bg-dark px-2 gap-2 mb-1 py-1
+          {% if battle.player.energy < atk[3] or battle.player.cds[loop.index0] > 0 %}
+          inactive
+          {% endif %}"
+          onclick = "selectAtk('{{ atk[0] }}')">
         <img src = "/static/images/icons/atk-icon.png" style = "width: 50px;">
         <div>
           <div class = "fw-bold"> {{ atk[0] }} </div>
-          <p style = "font-size: 10px;"> Cost: ? | Cooldown: ? </p>
+          <p style = "font-size: 10px;">
+             Cost: {{ atk[3] }} |
+             Cooldown:
+             {% if battle.player.cds[loop.index0] > 0 %}
+               {{ battle.player.cds[loop.index0] }}
+             {% else %}
+               {{ atk[4] }}
+             {% endif %}
+          </p>
         </div>
       </div>
       {% endfor %}
@@ -366,7 +399,8 @@ P02: Makers Makin' It, Act I
       <div class = "d-flex gap-2 justify-content-center">
 
         {% for enemy in battle.enemies %}
-        <div class = "atk-wrap flex-grow-1 bg-dark px-2 gap-2 mb-1 py-1"
+        <div class = "atk-wrap flex-grow-1 bg-dark px-2 gap-2 mb-1 py-1
+             target-btn target-{{ loop.index0 }}"
              onmouseenter = "highlight({{ loop.index0 }})"
              onmouseleave = "unhighlight({{ loop.index0 }})"
              onclick = "selectTarget({{ loop.index0 }})">
@@ -443,8 +477,13 @@ P02: Makers Makin' It, Act I
     xhttp.onload = function() {
       if (this.status == 200) {
         const battle = JSON.parse(this.responseText);
+        const prevBattle = currentBattle;
         currentBattle = battle;
         updateBattle(battle);
+
+        if (prevBattle) {
+          handleDeaths(prevBattle, battle);
+        }
 
         if (battle.actions && battle.actions.length > 0) {
           const act = battle.actions[0];
@@ -486,10 +525,15 @@ P02: Makers Makin' It, Act I
         if (this.status !== 200) return;
 
         const battle = JSON.parse(this.responseText);
+        const prevBattle = currentBattle;
         currentBattle = battle;
 
         turn = battle.turn
         updateBattle(battle);
+
+        if (prevBattle) {
+          handleDeaths(prevBattle, battle);
+        }
 
         if (battle.actions && battle.actions.length > 0) {
           enemyActions(battle.actions);
@@ -599,6 +643,41 @@ P02: Makers Makin' It, Act I
     });
   }
 
+  function handleDeaths(prevBat, newBat) {
+    const prevC = prevBat.enemies.length;
+    const newC = newBat.enemies.length;
+
+    if (newC >= prevC) return;
+
+    for (let i = newC; i < prevC; i++) {
+
+      // sprite
+      const sprite = document.querySelector(`.enemy-wrap.enemy-${i}`);
+      if (sprite) {
+        sprite.classList.add("dead");
+        setTimeout(() => {
+          sprite.remove();
+        }, 900);
+      }
+
+      // sidebar
+      const sidebar = document.querySelector(`.enemy-sidebar.enemy-${i}`);
+      if (sidebar) sidebar.remove();
+
+      // targets panel
+      const target = document.querySelector(`.target-${i}`);
+      if (target) target.remove();
+    }
+    fixIndex();
+  }
+
+  function fixIndex() {
+    document.querySelectorAll(".target-btn").forEach((btn, i) => {
+      btn.className = "atk-wrap flex-grow-1 bg-dark px-2 gap-2 mb-1 py-1 target-btn target-" + i;
+      btn.onclick = () => selectTarget(i);
+    });
+  }
+
   function highlight(i) {
     const enemies = document.querySelectorAll(".enemy-wrap");
     if (enemies[i]) {
@@ -619,6 +698,7 @@ P02: Makers Makin' It, Act I
   }
 
   function showActions() {
+    hide()
     document.getElementById("actions")
       .classList.remove("hidden");
   }
@@ -734,6 +814,13 @@ P02: Makers Makin' It, Act I
       });
 
     });
+
+    // Turn #
+    const turnNum = document.getElementById("turn-num");
+    if (turnNum && battle.turnNum !== undefined) {
+      turnNum.innerText = `Turn ${battle.turnNum}`;
+    }
+
   }
 
   turn = "player";
