@@ -38,7 +38,7 @@ P02: Makers Makin' It, Act I
 
     /* SHOP AREA */
     #shop {
-      width: 50%;
+      width: 31%;
       height: 90vh;
       padding: 20px;
       padding-bottom: 10px;
@@ -52,18 +52,58 @@ P02: Makers Makin' It, Act I
 
     /* INVENTORY AREA */
     #inv {
-      width: 50%;
+      width: 31%;
       height: 90vh;
       padding: 20px;
       padding-bottom: 10px;
 
+      margin-top: 1.4em;
+
       background-color: dimgrey;
+    }
+
+    .inv {
+      width: 100%;
+      height: 10vh;
+
+      margin-bottom: 1em;
+
+      font-size: 125%;
+
+      border-style: none;
+      background-color: grey;
+    }
+
+    .sellable {
+      background-color: firebrick;
+    }
+
+    .sellable:hover {
+      filter: brightness(120%);
+    }
+
+    .inspect {
+      position: relative;
+      bottom: 20px;
+      left: 68%;
+
+      width: 30%;
+      font-size: 140%;
+
+      border-style: none;
+      background-color: grey
+    }
+
+    #next:hover,
+    .inv:hover:not(.sellable),
+    .inspect:hover {
+      filter: brightness(120%);;
     }
 
     /* STATS/EQUIPS AREA */
     #extras {
-      width: 50%;
-      height: 70%;
+      width: 31%;
+      height: 80vh;
       padding: 20px;
       padding-bottom: 10px;
 
@@ -74,11 +114,39 @@ P02: Makers Makin' It, Act I
       background-color: dimgrey;
     }
 
+    #equipped {
+      width: 100%;
+      height: 50%;
+
+      background-color: dimgrey;
+    }
+
+    .row {
+      height: 23%;
+    }
+
+    .square {
+      margin-bottom: 10px;
+
+      text-align: center;
+      font-size: 110%;
+
+      background-color: grey;
+    }
+
+    .square:hover {
+      filter: brightness(110%);
+    }
+
+    .square:hover text {
+      filter: brightness(90%);
+    }
+
     /* PROCEED BUTTON */
     #next {
       position: absolute;
       bottom: 1.5em;
-      right : 20px;
+      right : 10px;
 
       width: 15%;
       height: 10%;
@@ -90,6 +158,20 @@ P02: Makers Makin' It, Act I
       background-color: grey
     }
 
+    #sell {
+      position: absolute;
+      bottom: 1.5em;
+      right : 240px;
+
+      width: 15%;
+      height: 10%;
+
+      border-style: solid;
+      border-width: thick;
+
+      background-color: firebrick;
+    }
+
     .item {
       width: 100%;
       height: 10vh;
@@ -98,6 +180,16 @@ P02: Makers Makin' It, Act I
 
       border-style: none;
       background-color: grey;
+    }
+
+    /* TURN INDICATOR */
+    #turn {
+      position: absolute;
+
+      top: 0;
+      right: 10px;
+
+      color: Gainsboro;
     }
 
   </style>
@@ -114,30 +206,102 @@ P02: Makers Makin' It, Act I
       src="/static/images/icons/mute.png">
   </label>
 
+  <!-- TURN INDICATOR -->
+  <h2 id="turn"> TURN {{ currTurn }}/4 </h2>
+
+  <!-- SELL BUTTON -->
+  <button onclick="toggleSellMode()" id="sell">
+    SELL
+  </button>
+
   <!-- NEXT ENCOUNTER BUTTON -->
   <button onclick="window.location.href='campfire'" id="next">
     CONTINUE
   </button>
 
-  <div id="shop">
+  <div class="container" id="shop">
     {% for item in shop %}
       <button class="center item" id="{{ item }}" onclick="clicked(this, 'shop')"> {{ item }} </button>
       <br>
     {% endfor %}
   </div>
 
-  <div id="inv">
-    {% for item in inventory %}
-      <button class="center item" id="{{ item }}" onclick="clicked(this, 'inv')"> {{ item }} </button>
-      <br>
-    {% endfor %}
+  <div class="container" id="inv">
+    <div class="container overflow-auto" id="invInner" style="height: 60%">
+      {% for item in inventory %}
+        {% if inventory[item][1] == "consumable" %}
+          <button class="center inv {{ item }}" onclick="clicked(this)"> {{ inventory[item][2] }}x {{ item }} </button>
+        {% else %}
+          {% for i in range(0, inventory[item][2]|int) %}
+            <button class="center inv {{ item }}" onclick="clicked(this)"> {{ item }} </button>
+          {% endfor %}
+        {% endif %}
+      {% endfor %}
+    </div>
+    <div class="container" id="inspect" style="height: 40%; border-top: solid medium; border-color: #545454">
+      <div class="container overflow-auto" style="height: 90%; padding: 15px; font-size: 130%">
+        <!-- IF NO ITEMS SELECTED -->
+        <h3 style="text-align: center;" id="noInspect">
+          SELECT AN ITEM TO INSPECT
+        </h3>
+
+        <!-- ITEMS SELECTED -->
+        <h3 id="itemName"> </h3>
+        <div id="extension"> </div>
+      </div>
+      <div class="container" style="height: 10%">
+        <!-- SELL BUTTON -->
+        <button class="inspect" id="inspectSell" onclick="sell()" style="display: none">
+          SELL
+        </button>
+
+        <!-- SELL BUTTON -->
+        <button class="inspect" id="inspectEquip" onclick="equip()" style="display: none">
+          EQUIP
+        </button>
+      </div>
+    </div>
   </div>
 
-  <div id="extras">
-    <div id="stats">
+  <div class="container overflow-auto" id="extras">
+    <div id="equipped">
+      {% set equipArr = [["accessory1", "accessory2"],
+                          ["accessory3", "helmet"],
+                          ["chestplate", "pants"],
+                          ["boots", "weapon"]] %}
+      {% for row in equipArr %}
+        <div class="row" style="gap:10px;">
+          {% for e in row %}
+            {% if "accessory" in e %}
+              <div class="col square" onclick="unequip(this.id)" id="{{ e }}">
+                <text style="color: #a1a1a1"> accessory </text>
+              </div>
+            {% else %}
+              <div class="col square" onclick="unequip(this.id)" id="{{ e }}">
+                <text style="color: #a1a1a1"> {{ e }} </text>
+              </div>
+            {% endif %}
+          {% endfor %}
+        </div>
+      {% endfor %}
     </div>
 
-    <div id="equipped">
+    <div id="stats" style="margin-top:-35px">
+      <h3 style="text-align: center; margin-top: 10px;"> {{ username }} </h3>
+      <text id='hp'> HP: {{ HP }}/{{ maxHP + con }} </text> <br>
+      <text> Level: {{ lvl }} </text> <br>
+      <text id='gold'> Gold: {{ gold }} </text> <br>
+      <br>
+      <text id='str'> STR: {{ str }} </text> <br>
+      <text id='dex'> DEX: {{ dex }} </text> <br>
+      <text id='con'> CON: {{ con }} </text> <br>
+      <text id='int'> INT: {{ int }} </text> <br>
+      <text id='fth'> FTH: {{ fth }} </text> <br>
+      <text id='lck'> LCK: {{ lck }} </text> <br>
+      <br>
+      <!-- temp range -->
+      <text> INITIATIVE: 4 -- 7 </text> <br>
+      <br>
     </div>
   </div>
 
@@ -148,9 +312,244 @@ P02: Makers Makin' It, Act I
 
   <!-- CUSTOM JS -->
   <script src="/static/js/audio.js"> </script>
-  
+
   <!-- PAGE-SPECIFIC JS -->
   <script>
+    var inv = {{ inventory | tojson }};
+    var selectedItm = "";
+    var sellMode = false;
+    var equipped = {{ equips | tojson }};
+
+    window.onload = function() {
+      document.getElementById('sell').style.borderColor = "darkred";
+
+      for (items in inv) {
+        if (Object.values(equipped).includes(items)) {
+          document.getElementsByClassName(items)[0].style.display = "none";
+        }
+      }
+
+      displayEquips();
+    }
+
+    /* SELL MODE */
+    function toggleSellMode() {
+      items = document.getElementsByClassName("inv");
+      sellBut = document.getElementById('sell')
+
+      if (sellMode) {
+        sellMode = false;
+        sellBut.style.backgroundColor = "firebrick"
+        sellBut.style.borderColor = "darkred"
+
+        for (item of items) {
+          item.classList.remove("sellable");
+        }
+
+        if (selectedItm != "") {
+          document.getElementById("inspectSell").style.display = "none"
+          if (inv[selectedItm][1] != "consumable") {
+            document.getElementById("inspectEquip").style.display = "block"
+          };
+        }
+      } else {
+        sellMode = true;
+        sellBut.style.backgroundColor = "forestgreen"
+        sellBut.style.borderColor = "darkgreen"
+
+        for (item of items) {
+          item.classList.add("sellable");
+        }
+
+        if (selectedItm != "") {
+          document.getElementById("inspectSell").style.display = "block"
+          document.getElementById("inspectEquip").style.display = "none";
+        }
+      }
+    }
+
+    /* ITEM INTERACTIONS */
+    function clicked(itm) {
+      let select = new XMLHttpRequest();
+      name = Array.from(itm.classList).slice(2).join(" ");
+
+      aaa = name.split(" ");
+      if (aaa[aaa.length-1] == "sellable") { name = aaa.slice(0).join(" ") }
+      selectedItm = name;
+
+      // console.log(name);
+
+      document.getElementById('noInspect').style.display = "none";
+      document.getElementById('itemName').innerHTML = inv[name][0];
+
+      document.getElementById("inspectSell").style.display = "none"
+      document.getElementById("inspectEquip").style.display = "none";
+
+      if (inv[name][1] == "consumable") {
+        let effects = "";
+
+        select.open('POST', window.location.href, true);
+        select.setRequestHeader("select", "consumable," + name);
+        select.send();
+
+        document.getElementById('itemName').innerHTML += " (CONSUMABLE)";
+        cont = document.getElementById("extension");
+        textExtension = "<h4> EFFECTS </h4><hr>";
+
+        select.onload = function() {
+          if (this.readyState == 4 && this.status == 200) {
+            effect = this.response;
+          }
+
+          textExtension += "<text> HP: " + effect + "</text><br><br>";
+          textExtension += "<text> COST: " + inv[selectedItm][3] + "</text><br>";
+          cont.innerHTML = textExtension;
+        };
+
+        if (sellMode) { document.getElementById("inspectSell").style.display = "block" }
+      } else {
+        let stats = "";
+
+        select.open('POST', window.location.href, true);
+        select.setRequestHeader("select", "gear," + name);
+        select.send();
+
+        document.getElementById('itemName').innerHTML += " (GEAR)";
+        cont = document.getElementById("extension");
+        textExtension = "<h4> STATS </h4><hr>";
+
+        select.onload = function() {
+          if (this.readyState == 4 && this.status == 200) {
+            stats = JSON.parse(this.response);
+          }
+
+          textExtension += "<text> STR: " + stats[0] + "</text><br>";
+          textExtension += "<text> DEX: " + stats[1] + "</text><br>";
+          textExtension += "<text> CON: " + stats[2] + "</text><br>";
+          textExtension += "<text> INT: " + stats[3] + "</text><br>";
+          textExtension += "<text> FTH: " + stats[4] + "</text><br>";
+          textExtension += "<text> LCK: " + stats[5] + "</text><br><br>";
+          textExtension += "<text> COST: " + inv[selectedItm][3] + "</text><br>";
+
+          cont.innerHTML = textExtension;
+        };
+
+        if (sellMode) { document.getElementById("inspectSell").style.display = "block" }
+        else { document.getElementById("inspectEquip").style.display = "block" };
+      }
+    }
+
+    function sell() {
+      let newGold = "";
+      let sell = new XMLHttpRequest();
+
+      sell.open('POST', window.location.href, true);
+      sell.setRequestHeader("sell", selectedItm);
+      sell.send();
+
+      sell.onload = function() {
+        if (this.readyState == 4 && this.status == 200) {
+          newGold = parseInt(this.response);
+        }
+
+        inv[selectedItm][2] = (parseInt(inv[selectedItm][2]) - 1).toString();
+
+        if (inv[selectedItm][1] == "consumable") {
+          if (parseInt(inv[selectedItm][2]) == 0) {
+            document.getElementsByClassName(selectedItm)[0].remove()
+          } else {
+            document.getElementsByClassName(selectedItm)[0].innerHTML = `${inv[selectedItm][2]}x ${selectedItm}`
+          }
+        } else {
+          document.getElementsByClassName(selectedItm)[0].remove()
+        }
+
+        document.getElementById('gold').innerHTML = `GOLD: ${newGold}`;
+      }
+    }
+
+    function equip() {
+      let equip = new XMLHttpRequest();
+      equip.open('POST', window.location.href, true);
+      equip.setRequestHeader("equip", selectedItm);
+      equip.send();
+
+      equip.onload = function() {
+        if (this.readyState == 4 && this.status == 200) {
+          equipped = JSON.parse(this.response);
+        }
+
+        document.getElementsByClassName(selectedItm)[0].style.display = "none";
+        displayEquips();
+        updateStats();
+      };
+    }
+
+    function unequip(itm) {
+      let g = equipped[itm];
+
+      if (g == "") {
+        return;
+      }
+
+      let unequip = new XMLHttpRequest();
+      unequip.open('POST', window.location.href, true);
+      unequip.setRequestHeader("unequip", itm);
+      unequip.send();
+
+      unequip.onload = function() {
+        if (this.readyState == 4 && this.status == 200) {
+          equipped = JSON.parse(this.response);
+        }
+
+        document.getElementsByClassName(g)[0].style.display = "block";
+        displayEquips();
+        updateStats();
+      };
+    }
+
+    function displayEquips() {
+      for (gear in equipped) {
+        if (equipped[gear] != "") {
+          if (document.getElementById(gear).innerHTML.includes("<br>")) {
+            if (!document.getElementById(gear).innerHTML.includes(equipped[gear])) {
+              let og = document.getElementById(gear).innerHTML.split("<br>");
+
+              document.getElementById(gear).innerHTML = og[0] + "<br>" + equipped[gear];
+              document.getElementsByClassName(og[1])[0].style.display = "block";
+            }
+          } else {
+            document.getElementById(gear).innerHTML += "<br>" + equipped[gear];
+          }
+        } else if (document.getElementById(gear).innerHTML.includes("<br>")) {
+          document.getElementById(gear).innerHTML = document.getElementById(gear).innerHTML.split("<br>")[0];
+        }
+      }
+    }
+
+    function updateStats() {
+      let stats = "";
+
+      let update = new XMLHttpRequest();
+      update.open('POST', window.location.href, true);
+      update.setRequestHeader("stats", 'aaaaaaaa');
+      update.send();
+
+      update.onload = function() {
+        if (this.readyState == 4 && this.status == 200) {
+          stats = JSON.parse(this.response);
+        }
+
+        maxhp = {{ maxHP }} + stats[4];
+        document.getElementById('hp').innerHTML = `HP: ${stats[1]}/${ maxhp }`;
+        document.getElementById('str').innerHTML = `STR: ${stats[2]}`;
+        document.getElementById('dex').innerHTML = `DEX: ${stats[3]}`;
+        document.getElementById('con').innerHTML = `CON: ${stats[4]}`;
+        document.getElementById('int').innerHTML = `INT: ${stats[5]}`;
+        document.getElementById('fth').innerHTML = `FTH: ${stats[6]}`;
+        document.getElementById('lck').innerHTML = `LCK: ${stats[7]}`;
+      }
+    }
 
   </script>
 
