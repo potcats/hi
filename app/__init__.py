@@ -308,9 +308,9 @@ def login():
                 result = rows.fetchone()
 
                 if result is None:
-                    return render_template("login.html", "Username does not exist")
+                    return render_template("login.html", invalid="Username does not exist")
                 elif (request.form['password'] != result[1]):
-                    return render_template("login.html", "Your password was incorrect")
+                    return render_template("login.html", invalid="Your password was incorrect")
 
                 session['username'] = request.form['username'].lower()
 

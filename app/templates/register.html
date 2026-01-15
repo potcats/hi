@@ -36,32 +36,37 @@ P02: Makers Makin' It, Act I
        font-family: "Silkscreen", sans-serif;
      }
 
-     .bg {
+     #bg {
     	 filter: blur(6px);
        width: 100%;
     	 height: 100%;
     	 background-image: url("/static/images/bgs/tavern.png");
        background-repeat: no-repeat;
        background-size: cover;
-       background-attachment: fixed;
-       position: absolute;
+    	 background-attachment: fixed;
+    	 position: absolute;
        top: 0;
-       left: 0;
-       z-index: -10000;
-       animation: 3s blurs;
+    	 left: 0;
+    	 z-index: -10000;
      }
 
-     .hold {
+    .kms{
+        animation: 3s blurs;
+    }
+
+     #hold {
        margin-top: 10vh;
        text-align: center;
        margin-left: 10vw;
        margin-right: 10vw;
        padding-top: 10vh;
        color: white;
-       animation: 3s slide;
      }
 
-     @keyframes slide {
+    .aaa{
+        animation: 3s slide;
+    }
+  	 @keyframes slide {
 	     from {
          translate: 0 150vh;
 	     }
@@ -71,7 +76,7 @@ P02: Makers Makin' It, Act I
   	 }
 
   	 @keyframes blurs {
-	     from {
+       from {
          filter: blur(0px);
 	     }
 	     to {
@@ -108,8 +113,8 @@ P02: Makers Makin' It, Act I
 </head>
 
 <body>
-    <div class="bg"></div>
-    <div class="hold">
+    <div id="bg" class="kms"></div>
+    <div id="hold" class="aaa">
          <h1>register</h1>
          <br>
          <form action="/register" method="POST">
@@ -143,7 +148,20 @@ P02: Makers Makin' It, Act I
 
   <!-- PAGE-SPECIFIC JS -->
   <script>
-
+    window.addEventListener('load', () => {
+        if(document.querySelector('#hold') !== null){
+            window.sessionStorage.setItem('Hold', 'displayed');
+        }
+        if(document.querySelector('#bg') !== null){
+            window.sessionStorage.setItem('Bg', 'displayed');
+        }
+    })
+    if (window.sessionStorage.getItem('Hold')) {
+        document.querySelector('#hold').classList.remove('aaa')
+    }
+    if (window.sessionStorage.getItem('Bg')) {
+        document.querySelector('#bg').classList.remove('kms')
+    }
   </script>
 
 </body>
