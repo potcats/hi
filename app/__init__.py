@@ -64,11 +64,7 @@ drops = ["cloth veil",
          "iron greaves,iron helmet",
          "iron chestplate,iron leggings,crude club",
          "cloth robe,cloth leggings,ring of goblin ears,noble's sabre",
-<<<<<<< HEAD
          "cookie",
-=======
-         "",
->>>>>>> b36e73c1f9e4e2be590d03ee503f28bbaa06cff4
          "iron greaves,iron helmet,iron chestplate,iron leggings",
          "healing potion,magical vial of water",
          "rat hide cloak,rat hide hood,rat hide boots",
