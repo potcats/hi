@@ -563,10 +563,81 @@ def encounters():
 
 @app.route('/shop/<string:type>', methods=['GET', 'POST'])
 def shop(type):
+    inv = session['inventory'] # [name] {name, type, quantity, gold}
+    stats = fetch_stats() # [level, HP, str, dex, con, int, fth, lck]
+    equips = fetch_equips() # [gearType] {name}
     bg = fetch_bg(type)
 
+    if request.method == "POST":
+        data = request.headers
+
+        if 'select' in data:
+            info = data['select'].split(",") # [type, name]
+
+            if info[0] == "consumable":
+                results = fetch_itemEffects(info[1])
+            elif info[0] == "gear":
+                results = fetch_itemStats(info[1])
+
+            return dumps(results)
+
+        if 'sell' in data:
+            item = data['sell']
+            session['gold'] = session['gold'] + inv[item][3]
+
+            inv[item][2] = str(int(inv[item][2]) - 1)
+
+            if int(inv[item][2]) == 0:
+                inv.pop(item)
+
+            newGold = session['gold']
+            return str(newGold)
+
+        if 'equip' in data:
+            itm = data['equip']
+
+            itemStats = fetch_itemStats(itm)
+            updateStats(itemStats[0], itemStats[1], itemStats[2], itemStats[3], itemStats[4], itemStats[5])
+
+            equipGear(itm)
+
+            equips = fetch_equips()
+            return dumps(equips)
+
+        if 'unequip' in data:
+            itm = data['unequip']
+            gear = equips[itm]
+
+            itemStats = fetch_itemStats(gear)
+            updateStats(itemStats[0], itemStats[1], itemStats[2], itemStats[3], itemStats[4], itemStats[5], False)
+
+            unEquipGear(itm)
+
+            equips = fetch_equips()
+            return dumps(equips)
+
+        if 'stats' in data:
+            currStats = list(fetch_stats())
+            currStats[1] = session['hp']
+
+            return dumps(currStats)
+
     return render_template("shop.html",
-        bg=bg,)
+        bg=bg,
+        currTurn=session['turn'],
+        username=session['username'],
+        inventory=inv,
+        equips=equips,
+        HP=session['hp'],
+        maxHP=stats[1],
+        lvl=stats[0],
+        gold=session['gold'],
+        str=stats[2],
+        dex=stats[3],
+        con=stats[4],
+        int=stats[5],
+        fth=stats[6],
+        lck=stats[7],)
 
 @app.route('/dialogue', methods=['GET', 'POST'])
 def dialogue():
