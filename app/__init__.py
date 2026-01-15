@@ -22,11 +22,11 @@ img = ["", "", "", "", "/app/static/images/gear/chestplate/cloth.png", "/app/sta
        "/app/static/images/gear/chestplate/iron.png", "/app/static/images/gear/helmet/iron.png", "/app/static/images/gear/pants/iron.png", "/app/static/images/gear/boots/rathide.png",
        "/app/static/images/gear/chestplate/rathide.png", "/app/static/images/gear/helmet/rathide.png", "/app/static/images/gear/accessory/", "/app/static/images/gear/accessory/",
        "/app/static/images/gear/weapon/", "/app/static/images/gear/weapon/", "/app/static/images/gear/weapon/", "/app/static/images/gear/weapon/"]
-statStr = [0, 0, 0, 0, 0, 0, 3, 4, 2, 4, 0, 0, 0, 0, 5, 3, 16, 12, 10, 0]
-statDex = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 5, 2, 0, 5, 0, 0, 0, 0, 0]
-statCon = [0, 0, 0, 0, 0, 0, 1, 6, 2, 3, 0, 0, 0, 0, 0, 0, 0, 6, 0, 0]
-statInt = [0, 0, 0, 6, 0, 3, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0]
-statFth = [0, 0, 0, 4, 4, 4, 0, 0, 0, 0, 0, 0, 0, 6, 0, 0, 0, 0, 0, 0]
+statStr = [0, 0, 0, 0, 0, 0, 0, 3, 4, 2, 4, 0, 0, 0, 0, 5, 3, 16, 12, 10]
+statDex = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 5, 2, 0, 5, 0, 0, 0, 0]
+statCon = [0, 0, 0, 0, 0, 0, 0, 1, 6, 2, 3, 0, 0, 0, 0, 0, 0, 0, 6, 0]
+statInt = [0, 0, 0, 0, 6, 0, 3, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0]
+statFth = [0, 0, 0, 0, 4, 4, 4, 0, 0, 0, 0, 0, 0, 0, 6, 0, 0, 0, 0, 0]
 statLck = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 hpInc = [5, 3, 18, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 gold = [5, 5, 20, 10, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 20, 20, 5, 30, 30, 30]
