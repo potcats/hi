@@ -113,3 +113,15 @@ COMBAT SYSTEM
 * TO BE DONE:
     - a lot of debugging
     - attack turn system
+
+christineC -- 2026-1-15 7:15
+BATTLE
+* NEW CHANGES:
+    - Implemented turns and modified combat system (dicts)
+    - Animations for dmg, atks, deaths, etc.
+    - Improved UI for battle.html and added proper inventory/gold/etc. display
+    - Synced frontend visuals with backend state via AJAX
+* TO BE DONE:
+    - Debugging
+    - Guard/focus
+    - Battle end
