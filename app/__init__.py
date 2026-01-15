@@ -110,9 +110,15 @@ attackName = ["pie throw", "granny kick", "granny kick barrage",
               "sting", "stinger burst",
               "dust bolt", "wondrous light", "magic dust",
               "boop", "swipe", "bark", "nom",
-              "gnaw", "rat flip"]
-hits =   [1, 1, 4, 5, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3, 1, 1, 1, 3, 1, 1, 2, 1, 1]
-energy = [1, 0, 2, 1, 0, 2, 1, 0, 1, 0, 1, 0, 0, 2, 0, 0, 2, 0, 2, 1, 1, 0, 2, 2, 0, 2]
+              "gnaw", "rat flip"
+              "strike", "cross slash", "rally", "heavy strike", "guard"]
+hits =   [1, 1, 4, 5, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3, 1, 1, 1, 3, 1, 1, 2, 1, 1, 1 ,2, 0, 1, 0]
+energy = [1, 0, 2, 1, 0, 2, 1, 0, 1, 0, 1, 0, 0, 2, 0, 0, 2, 0, 2, 1, 1, 0, 2, 2, 0, 2, 0, 2, 3, 1, 0]
+level =  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 5, 0]
+cd =     [2, 0, 3, 4, 0, 3, 0, 0, 2, 0, 0, 0, 0, 4, 0, 0, 3, 0, 2, 5, 3, 0, 2, 4, 0, 4, 0, 4, 6, 5, 0]
+scale = ["", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "str", "str", "str", "str", ""]
+statusEff = ["", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "dmgUP", "", "defUP"]
+baseDmg = [12, 8, 4, 3, 6, 8, 6, 4, 5, 4, 7, 8, 10, 14, 3, 3, 4, 6, 9, 0, 6, 14, 8, 17, 3, 6, 6, 9, 0, 15, 0]
 
 DB_FILE = "data.db"
 
@@ -210,6 +216,18 @@ c.execute("""
 for i in range(len(items)):
     q = "INSERT OR REPLACE INTO items(name, type, image, str, dex, con, inte, fth, lck, hpInc, gold, gearType) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
     d = (items[i], type[i], img[i], statStr[i], statDex[i], statCon[i], statInt[i], statFth[i], statLck[i], hpInc[i], gold[i], gearType[i])
+    c.execute(q, d)
+    db.commit()
+         
+for i in range(len(species)):
+    q = "INSERT OR REPLACE INTO enemies(species, attacks, hp, weakness, res, drops) VALUES (?, ?, ?, ?, ?, ?)"
+    d = (species[i], attacks[i], enemyHP[i], weakness[i], enemyRes[i], drops[i])
+    c.execute(q, d)
+    db.commit()
+
+for i in range(len(species)):
+    q = "INSERT OR REPLACE INTO attacks(name, hits, level, energy, cd, scale, statusEffects, baseDamage) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
+    d = (attackName[i], )
     c.execute(q, d)
     db.commit()
 
