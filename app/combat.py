@@ -6,6 +6,7 @@
 
 import random
 import sqlite3
+from flask import session
 
 DB_FILE = "data.db"
 
@@ -77,6 +78,8 @@ def randomEnemy(species):
         int
         fth
         lck
+        guard
+        focus
     ]
     [
         [
@@ -107,8 +110,11 @@ def randomEnemy(species):
         enemy2
         enemy3
     ]
+    True (True = player alive, False = player dead)
 ]
 '''
+def game_lost(battle_id):
+    return not battle_id[3]
 
 # forest_battle1 = createBattle( [randomEnemy('goblin'), randomEnemy('bee')] )
 def createBattle(enemies):
@@ -137,7 +143,7 @@ def createBattle(enemies):
     player = [player_info[0],
             [attacks_info, [0, 0, 0]],
             random.randint(0, 100),
-            player_info[3] + player_info[19],
+            player_info[3] + player_info[9],
             0,
             player_info[2], #level
             player_info[7],
@@ -145,39 +151,76 @@ def createBattle(enemies):
             player_info[9],
             player_info[10],
             player_info[11],
-            player_info[12]
+            player_info[12],
+            False,
+            False
         ]
 
     return [player, enemies]
 
+def player_startTurn(battle_id):
+    #guard and focus wear off
+    battle_id[0][12] = False
+    battle_id[0][13] = False
+
+    #reduce all cd by 1
+    for i in range(0,3):
+        if battle_id[0][1][1][i] > 0:
+            battle_id[0][1][1][i] -= 1
+
+    #increase energy by 1
+    battle_id[0][4] += 1
+    return battle_id
+
+#enemy indexed by 0 pls
+def enemy_startTurn(battle_id, enemy):
+    #reduce all cd by 1
+    for i in range(0,3):
+        if battle_id[1][enemy][1][1][i] > 0:
+            battle_id[1][enemy][1][1][i] -= 1
+
+    #increase energy by 1
+    battle_id[1][enemy][4] += 1
+    return battle_id
+
+def guard(battle_id):
+    battle_id[0][12] = True
+    return battle_id
+
+def focus(battle_id):
+    battle_id[0][13] = True
+    #increase energy by 1
+    battle_id[0][4] += 1
+    return battle_id
+
 # attack(forest_battle1, 2, 'attack1') means that in forest_battle1, the player is attacking enemy #2 (index from 0) with attack1
-def attack(battle_id, defender, move):
+def player_attack(battle_id, defender, move):
     attack_info = []
 
     #get thru array of player's attacks and find the correct one
     for i in range(0, 3):
         attack_info_temp = battle_id[0][1][0][i]
         if attack_info_temp[0] == move:
-            attack_info = attack_info_temp[0]
+            attack_info = attack_info_temp
 
     #remove energy used to cast
     battle_id[0][4] -= attack_info[2]
 
-    return dealDamage(battle_id, battle_id[0], defender, attack_info)
+    result = dealDamage(battle_id, battle_id[0], defender, attack_info)
+
+    #do the hp reduction calculation
+    battle_id[1][defender][3] -= result[1]
+
+    #check for kills
+    battle_id = killCheck(battle_id)
+
+    return result
 
 # attack(forest_battle1, 2) means that enemy #2 (index from 0) is attacking
-def attack(battle_id, attacker):
+def enemy_attack(battle_id, attacker):
     attacking_enemy_stats = battle_id[1][attacker]
     player_stats = battle_id[0]
-
-    #reduce all cd by 1
-    for i in range(0,3):
-        if attacking_enemy_stats[1][1][i] > 0:
-            attacking_enemy_stats[1][1][i] -= 1
-
-
-    #increase energy by 1
-    attacking_enemy_stats[4] += 1
+    result = []
 
     #check available attacks and respective cooldowns, use the highest available attack
     for i in range(2, -1, -1):
@@ -187,12 +230,19 @@ def attack(battle_id, attacker):
         attack_current_cd = attacking_enemy_stats[1][1][i]
         if enemy_energy >= attack_info[2] and attack_current_cd == 0:
             #set cd
-            attacking_enemy_stats[1][1][i] = attacking_enemy_stats[1][0][i][3]
+            battle_id[1][attacker][1][1][i] = attacking_enemy_stats[1][0][i][3]
             #remove energy used to cast
             battle_id[1][attacker][4] -= attack_info[2]
-            return dealDamage(attacker, battle_id[0], attack_info)
+            result = dealDamage(attacker, battle_id[0], attack_info)
+    print (result)
 
-    return "enemy attack calculations failed"
+    #do the hp reduction
+    battle_id[0][3] -= result[1]
+
+    #check for death
+    battle_id = deathCheck(battle_id)
+
+    return result
 
 # ['blocked', 50]
 # ['', 100]
@@ -200,6 +250,7 @@ def attack(battle_id, attacker):
 # ['dodged', 0]
 def dealDamage(battle_id, attacker, victim, attack_info):
     status = ''
+    #have yet to figure out what 'scale' is and how to use it
     dmg = attack_info[5]
 
     dodge = random.randint(0,100)
@@ -210,6 +261,7 @@ def dealDamage(battle_id, attacker, victim, attack_info):
     blockIncrease = 0
     critIncrease = 0
     critDmgIncrease = 0
+    percentDmgMultiplier = 0
 
     #if victim is the player
     if victim[0] not in ['bandit', 'bee', 'dwarf', 'dwarfchief', 'goblin', 'grandma', 'pebble', 'pixie', 'rat', 'wizard']:
@@ -218,6 +270,10 @@ def dealDamage(battle_id, attacker, victim, attack_info):
         constitution = victim[8]
         dodgeIncrease = 0.175*(dexterity)
         blockIncrease = 0.375*(strength + constitution)
+        if victim[12]:
+            percentDmgMultiplier = 0.5
+        elif victim[13]:
+            percentDmgMultiplier = 1.3
     #if victim is npc
     else:
         strength = attacker[6]
@@ -231,7 +287,23 @@ def dealDamage(battle_id, attacker, victim, attack_info):
         return ['dodged', 0]
     elif crit <= (5 + critIncrease):
         status = 'crit'
-        dmg = dmg*(1.5 + (critDmgIncrease/100))
+        dmg *= (1.5 + (critDmgIncrease/100))
     if block <= (5 + blockIncrease):
         status = 'blocked'
-        dmg = dmg/2
+        dmg /= 2
+    dmg *= dmgMultiplier
+    return [status, dmg]
+
+def killCheck(battle_id):
+    #for enemies
+    for i in range(len(battle_id[1]) - 1, -1, -1):
+        if battle_id[1][i][3] <= 0:
+            battle_id[1].pop(i)
+    return battle_id
+
+def deathCheck(battle_id):
+    #for player
+    if battle_id[0][3] <= 0:
+        battle_id[2] = False
+    return battle_id
+

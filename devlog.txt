@@ -76,7 +76,7 @@ DB
 cindyL -- 2026-1-14 00:52
 COMBAT SYSTEM
 * NEW CHANGES:
-    - created/completed prelin attack fxns and dealDamage
+    - created/completed prelim attack fxns and dealDamage
     - cleaned up data storage
 * TO BE DONE:
     - literally everything else in combat like wtf
@@ -101,3 +101,15 @@ ENCOUNTERS + BATTLE
     - Encounters based off DB
     - Everything!
 
+cindyL -- 2026-1-15 01:59
+COMBAT SYSTEM
+* NEW CHANGES:
+    - added kill checks, player death checks, and game over check
+    - fixed problem where energy was not used
+    - implemented actually taking damage
+    - made updates for beginning of turn
+    - focus and guard
+* TO BE DONE:
+    - a lot of debugging
+    - attack turn system
+    - different # of hits for skills, apparently
