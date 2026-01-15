@@ -7,7 +7,7 @@
 from flask import Flask, render_template, request, redirect, url_for, session, jsonify
 import sqlite3
 from combat import *
-from json import dumps
+from json import dumps, loads
 import random
 
 app = Flask(__name__)
@@ -454,8 +454,17 @@ def campfire():
             return dumps(currStats)
 
         if 'points' in data:
-            newStats = data['points'].split(",")
+            newStats = loads(data['points'])
+            newPts = 0;
+
             updateStats(newStats[0], newStats[1], newStats[2], newStats[3], newStats[4], newStats[5])
+
+            for stat in newStats:
+                newPts += stat;
+
+            session['statPoints'] -= newPts
+
+            return str(session['statPoints'])
 
     return render_template("campfire.html",
         currTurn=session['turn'],
