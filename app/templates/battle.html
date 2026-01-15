@@ -66,6 +66,21 @@ P02: Makers Makin' It, Act I
       transition: width 0.3s ease;
     }
 
+    .progress {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .bar-text {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      color: #161616;
+    }
+
     .atk-wrap {
       background: gray;
       color: white;
@@ -243,14 +258,14 @@ P02: Makers Makin' It, Act I
 
               <div class = "d-flex gap-1 mb-1">
                 <div class = "progress flex-grow-1" style = "height: 12px;">
-                  <div class = "progress-bar bg-danger player-hp" style = "width: {{ (battle.player.hp / 30) * 100 }}%">
-                    <small class = "player-hp-text">{{ battle.player.hp }} / {{ battle.player.max_hp }} </small>
+                  <div class = "progress-bar bg-danger player-hp" style = "width: {{ (battle.player.hp / battle.player.max_hp) * 100 }}%">
                   </div>
+                  <div class = "bar-text player-hp-text">{{ battle.player.hp }} / {{ battle.player.max_hp }} </div>
                 </div>
                 <div class = "progress flex-grow-1" style = "height: 12px;">
                   <div class = "progress-bar bg-info player-energy" style = "width: {{ (battle.player.energy / 6) * 100 }}%">
-                    <small class = "player-energy-text">{{ battle.player.energy }} / 6 </small>
                   </div>
+                  <div class = "bar-text player-energy-text">{{ battle.player.energy }} / 6 </div>
                 </div>
               </div>
 
@@ -274,13 +289,13 @@ P02: Makers Makin' It, Act I
               <div class = "d-flex gap-1 mb-1">
                 <div class = "progress flex-grow-1" style = "height: 12px;">
                   <div class = "progress-bar bg-danger enemy-hp" style = "width: {{ (enemy.hp / enemy.max_hp) * 100 }}%">
-                    <small class = "enemy-hp-text"> {{ enemy.hp }} / {{ enemy.max_hp }} </small>
                   </div>
+                  <div class = "bar-text enemy-hp-text"> {{ enemy.hp }} / {{ enemy.max_hp }} </div>
                 </div>
                 <div class = "progress flex-grow-1" style = "height: 12px;">
                   <div class = "progress-bar bg-info enemy-energy" style = "width: {{ (enemy.energy / 6) * 100 }}%">
-                    <small class = "enemy-energy-text"> {{ enemy.energy }} / 6 </small>
                   </div>
+                  <div class = "bar-text enemy-energy-text"> {{ enemy.energy }} / 6 </div>
                 </div>
               </div>
 
@@ -311,13 +326,13 @@ P02: Makers Makin' It, Act I
         <div class = "d-flex gap-2 mb-2 mx-3">
           <div class = "progress flex-grow-1" style = "height: 18px;">
             <div class = "progress-bar bg-danger player-hp" style = "width: {{ (battle.player.hp / 30) * 100 }}%">
-              <div class = "player-hp-text"> {{ battle.player.hp }} / {{ battle.player.max_hp }} </div>
             </div>
+            <div class = "bar-text player-hp-text"> {{ battle.player.hp }} / {{ battle.player.max_hp }} </div>
           </div>
           <div class = "progress flex-grow-1" style = "height: 18px;">
             <div class = "progress-bar bg-info player-energy" style = "width: {{ (battle.player.energy / 6) * 100 }}%">
-              <div class = "player-energy-text"> {{ battle.player.energy }} / 6 </div>
             </div>
+            <div class = "bar-text player-energy-text"> {{ battle.player.energy }} / {{ battle.player.max_energy }} </div>
           </div>
         </div>
 
