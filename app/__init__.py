@@ -110,7 +110,7 @@ attackName = ["pie throw", "granny kick", "granny kick barrage",
               "sting", "stinger burst",
               "dust bolt", "wondrous light", "magic dust",
               "boop", "swipe", "bark", "nom",
-              "gnaw", "rat flip"
+              "gnaw", "rat flip",
               "strike", "cross slash", "rally", "heavy strike", "guard"]
 hits =   [1, 1, 4, 5, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3, 1, 1, 1, 3, 1, 1, 2, 1, 1, 1 ,2, 0, 1, 0]
 energy = [1, 0, 2, 1, 0, 2, 1, 0, 1, 0, 1, 0, 0, 2, 0, 0, 2, 0, 2, 1, 1, 0, 2, 2, 0, 2, 0, 2, 3, 1, 0]
@@ -273,35 +273,6 @@ for i in range(len(name)):
     d = (name[i], background[i], desc[i], diff[i])
     c.execute(q, d)
     db.commit()
-
-# test test test!!!!!!!!!!!!!!!!!!)
-# c.execute("""
-# INSERT or REPLACE INTO enemies
-# (species, attacks, hp, weakness, res, drops)
-# VALUES (?, ?, ?, ?, ?, ?)
-# """, (
-#     "goblin",
-#     "slash,stab",
-#     12,
-#     "help",
-#     "help",
-#     "gold"
-# ))
-# db.commit()
-#
-# c.execute("""
-# INSERT or REPLACE INTO player
-# (username, password, level, hp, attacks, weapon)
-# VALUES (?, ?, ?, ?, ?, ?)
-# """, (
-#     "tester",
-#     "pass",
-#     1,
-#     12,
-#     "slash, hit",
-#     "help",
-# ))
-# db.commit()
 
 #  ------------------------------------------------------------ #
 
@@ -481,49 +452,45 @@ def battle():
         session['username'] = 'tester'
     #     return redirect(url_for('login'))
 
-    if 'battle' not in session:
-        session['battle'] = createBattle([randomEnemy('goblin'), randomEnemy('goblin')])
-    #     # placeholder battle state just for rendering
-    #     session['battle'] = {
-    #         "player": {
-    #             "name": "tester",
-    #             "hp": 30,
-    #             "max_hp": 30, # changes with equipment/stats?
-    #             "level": 1,
-    #             "energy": 2,
-    #             "attacks": ["Atk1", "Atk2", "Atk3"],
-    #             "inventory": []
-    #         },
-    #         "enemies": [
-    #             {"species": "goblin", "hp": 10, "max_hp": 10, "energy": 2},
-    #             {"species": "bandit", "hp": 10, "max_hp": 10, "energy": 2},
-    #             {"species": "pebble", "hp": 10, "max_hp": 10, "energy": 2},
-    #         ],
-    #         "turn": 1
-    #     }
+    # if 'battle' not in session:
+    #     session['battle'] = createBattle([randomEnemy('goblin'), randomEnemy('goblin')])
+
+    if request.method == "GET":
+        session.pop('battle', None)
+        session['battle'] = createBattle([
+            randomEnemy('goblin'),
+            randomEnemy('bee')
+        ])
+        return render_template("battle.html", battle=session['battle'])
 
     if request.method == 'POST':
         data = request.get_json()
         action = data.get('action')
-        turn_over = False
 
         if action == 'attack':
             move = data.get('move')
             target = data.get('target')
-            session['battle'] = playerAttack(session['battle'], target, move)
-            turn_over = True
+            session['battle']['action'] = {
+                "source": "player",
+                "target": target,
+                "result": playerAttack(session['battle'], target, move)
+            }
+
         elif action == 'item':
             item = data.get('item')
             # session['battle'] = useItem(session['battle'], item)
-            # turn_over = True
         elif action == 'focus':
             # session['battle'] = focus(session['battle'])
-            # turn_over = True
             pass
 
-        # Enemy Turn
-        if turn_over and session['battle']['enemies']:
-            session['battle'] = enemyTurn(session['battle'])
+        elif action == 'enemy':
+            for i, enemy in enumerate(session['battle']['enemies']):
+                if enemy['hp'] > 0:
+                    session['battle']['action'] = {
+                        "source": "enemy",
+                        "enemy_idx": i,
+                        "result": enemyAttack(session['battle'], i)
+                    }
 
         # Player Death Check
         if session['battle']['player']['hp'] <= 0:

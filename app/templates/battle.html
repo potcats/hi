@@ -105,7 +105,7 @@ P02: Makers Makin' It, Act I
         transform: translateX(0);
       }
       50% {
-        transform: translateX(120px);
+        transform: translateX(500px);
       }
       100% {
         transform: translateX(0);
@@ -117,7 +117,7 @@ P02: Makers Makin' It, Act I
         transform: translateX(0);
       }
       50% {
-        transform: translateX(-120px);
+        transform: translateX(-500px);
       }
       100% {
         transform: translateX(0);
@@ -143,25 +143,41 @@ P02: Makers Makin' It, Act I
     }
 
     .player-atk {
-      animation: player-atk 0.4s ease;
+      animation: player-atk 0.8s ease;
     }
 
     .enemy-atk {
-      animation: enemy-atk 0.4s ease;
+      animation: enemy-atk 0.8s ease;
     }
 
     .shake {
-      animation: shake 0.3s ease;
+      animation: shake 0.6s ease;
     }
 
     #actions {
       transition: transform 0.4s ease, opacity 0.4s ease;
     }
 
-    #action.hidden {
+    #actions.hidden {
       transform: translateY(80px);
       opacity: 0;
       pointer-events: none;
+    }
+
+    .inactive {
+      opacity: 0.4;
+      transition: opacity 0.3 ease, filter 0.3 ease;
+    }
+
+    #dmg-popup {
+      position: fixed;
+      font-size: 22px;
+      font-weight: bold;
+      pointer-events: none;
+      text-shadow: 0 0 6px black;
+      transition: transform 1s ease, opacity 1s ease;
+      opacity: 0;
+      display: none;
     }
 
   </style>
@@ -179,7 +195,8 @@ P02: Makers Makin' It, Act I
         <h5 class = "fw-bold text-center"> Turn {{ battle.turn }} </h5>
 
         <div class = "p-3 bg-dark">
-          <div class = "mb-3">
+
+          <div class = "mb-3 player-sidebar">
             <h5 class = "fw-bold"> {{ battle.player.username }} </h5>
             <div class = "progress">
               <div class = "progress-bar bg-danger player-hp" style = "width: {{ (battle.player.hp / 30) * 100 }}%">
@@ -194,7 +211,7 @@ P02: Makers Makin' It, Act I
           </div>
 
           {% for enemy in battle.enemies %}
-          <div class = "mb-3">
+          <div class = "mb-3 enemy-sidebar enemy-{{ loop.index0 }}">
             <h5 class = "fw-bold"> {{ enemy.species }} </h5>
             <div class = "progress">
               <div class = "progress-bar bg-danger enemy-hp" style = "width: {{ (enemy.hp / enemy.max_hp) * 100 }}%">
@@ -244,7 +261,7 @@ P02: Makers Makin' It, Act I
 
         <!-- Enemy Display -->
         {% for enemy in battle.enemies %}
-        <div class = "enemy-wrap"
+        <div class = "enemy-wrap enemy-{{ loop.index0 }}"
              style = "right: {{ 15 + loop.index0 * 8 }}%; bottom: {{ 140 + loop.index0 * 60 }}px;">
 
           <img class = "enemy-sprite" src = "/static/images/enemies/{{ enemy.species }}.png" style = "width: 200px;">
@@ -318,10 +335,10 @@ P02: Makers Makin' It, Act I
     <div id = "attacks-panel" class = "panel" style = "display: none;">
       <div class = "d-flex gap-2 justify-content-center">
       {% for atk in battle.player.attacks %}
-      <div class = "atk-wrap flex-grow-1 bg-dark px-2 gap-2 mb-1 py-1" onclick = "selectAtk('{{ atk }}')">
+      <div class = "atk-wrap flex-grow-1 bg-dark px-2 gap-2 mb-1 py-1" onclick = "selectAtk('{{ atk[0] }}')">
         <img src = "/static/images/icons/atk-icon.png" style = "width: 50px;">
         <div>
-          <div class = "fw-bold"> {{ atk }} </div>
+          <div class = "fw-bold"> {{ atk[0] }} </div>
           <p style = "font-size: 10px;"> Cost: ? | Cooldown: ? </p>
         </div>
       </div>
@@ -339,11 +356,6 @@ P02: Makers Makin' It, Act I
              onmouseleave = "unhighlight({{ loop.index0 }})"
              onclick = "selectTarget({{ loop.index0 }})">
           <div class = "fw-bold">{{ enemy.species }}</div>
-          <div class = "progress flex-grow-1" style = "height: 15px;">
-            <div class = "progress-bar bg-danger enemy-hp" style = "width: {{ (enemy.hp / enemy.max_hp) * 100 }}%">
-              {{ enemy.hp }} / {{ enemy.max_hp }}
-            </div>
-          </div>
         </div>
         {% endfor %}
 
@@ -355,10 +367,10 @@ P02: Makers Makin' It, Act I
     <!-- Items Panel -->
     <div id = "items-panel" class = "panel" style = "display: none;">
       <div class = "items-grid" style = "grid-template-columns: repeat(8, 1fr);">
-        {% for item in battle.player.inventory %}
+        {% for item in inventory %}
         <div class = "slot bg-dark d-flex flex-column align-items-center justify-content-center"
              onclick = "useItem(item)">
-          <img src = "/static/images/gear/boots/cloth.png" style = "width: 32px; height: 32px;">
+             Help
         </div>
         {% endfor %}
         {% for i in range(8 - battle.player.inventory|length) %}
@@ -377,7 +389,15 @@ P02: Makers Makin' It, Act I
 
   <!-- PAGE-SPECIFIC JS -->
   <script>
+  let turn = "player";
   let selected = null;
+
+  // TIMINGGGGGG
+  const ATK_MS = 800;
+  const HIT_MS = 600;
+  const HIT_DELAY_MS = 400;
+  const POPUP_MS = 1200;
+  const PAUSE_MS = 200;
 
   function hide() {
     document.querySelectorAll('.panel')
@@ -395,20 +415,28 @@ P02: Makers Makin' It, Act I
   }
 
   function selectTarget(i) {
-    document.querySelectorAll(".enemy-wrap")
-      .forEach(e => e.classList.remove("targeted"));
-
+    hide()
     hideActions();
     playerAtkAnim(i);
 
+    // Player Turn
     let xhttp = new XMLHttpRequest();
     xhttp.open("POST", "/battle", true);
     xhttp.setRequestHeader("Content-Type", "application/json");
 
     xhttp.onload = function() {
       if (this.status == 200) {
-        updateBattle(JSON.parse(this.responseText));
+        const battle = JSON.parse(this.responseText);
+        updateBattle(battle);
+
+        if (battle.action && battle.action.source === "player") {
+          showDmg("enemy", battle.action.result[1], battle.action.result[0] === "crit", i);
+        }
       }
+
+      setTimeout(() => {
+        enemyTurn();
+      }, POPUP_MS + PAUSE_MS);
     };
 
     xhttp.send(JSON.stringify({
@@ -420,10 +448,91 @@ P02: Makers Makin' It, Act I
 
   function gainEnergy() {
     hide();
+    enemyTurn();
   }
 
   function guard() {
     hide();
+    enemyTurn();
+  }
+
+  function enemyTurn() {
+    turn = "enemy";
+    updateTurnUI();
+
+    setTimeout(() => {
+      let xhttp = new XMLHttpRequest();
+      xhttp.open("POST", "/battle", true);
+      xhttp.setRequestHeader("Content-Type", "application/json");
+
+      xhttp.onload = function () {
+        if (this.status !== 200) return;
+
+        const battle = JSON.parse(this.responseText);
+        updateBattle(battle);
+
+        if (battle.action && battle.action.source === "enemy") {
+          enemyAct(battle.action.enemy_idx, battle.action.result);
+        } else {
+          turn = "player";
+          updateTurnUI();
+          showActions();
+        }
+      };
+
+      xhttp.send(JSON.stringify({ action: "enemy" }));
+    }, PAUSE_MS);
+  }
+
+  function enemyAct(i, result) {
+    turn = "enemy";
+    updateTurnUI(i);
+    enemyAtkAnim(i);
+
+    if (result[1] > 0) {
+      showDmg("player", result[1], result[0] == "crit");
+    }
+
+    setTimeout(() => {
+      turn = "player";
+      updateTurnUI();
+      showActions();
+    }, POPUP_MS + PAUSE_MS);
+  }
+
+  function showDmg(target, dmg, crit = false, enemyIdx = null) {
+    const popup = document.getElementById("dmg-popup");
+
+    if (crit) {
+      popup.innerText = `CRIT ${dmg}!`;
+      popup.style.color = "gold";
+    } else {
+      popup.innerText = `-${dmg}`;
+      popup.style.color = "white";
+    }
+
+    let element = null;
+    if (target == "player") {
+      element = document.querySelector(".player-wrap");
+    } else if (target == "enemy" && enemyIdx != null) {
+      element = document.querySelectorAll(".enemy-wrap")[enemyIdx];
+    }
+
+    const rect = element.getBoundingClientRect(); // returns element pos/size
+    popup.style.left = rect.left + rect.width / 2 + "px";
+    popup.style.top = rect.top + "px";
+    popup.style.display = "block";
+    popup.style.opacity = 1;
+    popup.style.transform = "translateY(0px)";
+
+    setTimeout(() => {
+      popup.style.transform = "translateY(-30px)";
+      popup.style.opacity = 0;
+    }, 200);
+
+    setTimeout(() => {
+      popup.style.display = "none";
+    }, POPUP_MS);
   }
 
   function highlight(i) {
@@ -460,11 +569,31 @@ P02: Makers Makin' It, Act I
 
     setTimeout(() => {
       enemy[i].classList.add("shake");
-    }, 200);
+    }, HIT_DELAY_MS);
     setTimeout(() => {
       player.classList.remove("player-atk");
       enemy[i].classList.remove("shake");
-    }, 600);
+    }, HIT_DELAY_MS + HIT_MS);
+  }
+
+  function updateTurnUI(idx = null) {
+    const player = document.querySelector(".player-sidebar");
+    const enemies = document.querySelectorAll(".enemy-sidebar");
+
+    if (turn === "player") {
+      player.classList.remove("inactive");
+      enemies.forEach(e => e.classList.add("inactive"));
+    }
+    else {
+      player.classList.add("inactive");
+      enemies.forEach((e, i) => {
+        if (i === idx) {
+          e.classList.remove("inactive");
+        } else {
+          e.classList.add("inactive");
+        }
+      });
+    }
   }
 
   function enemyAtkAnim(i) {
@@ -477,37 +606,78 @@ P02: Makers Makin' It, Act I
 
     setTimeout(() => {
       player.classList.add("shake");
-    }, 200);
+    }, HIT_DELAY_MS);
     setTimeout(() => {
       enemy[i].classList.remove("enemy-atk");
       player.classList.remove("shake");
-    }, 600);
+    }, HIT_DELAY_MS + HIT_MS);
   }
 
   function updateBattle(battle) {
-    // Player Bars
-    let p_hp = (battle.player.hp / battle.player.max_hp) * 100;
+    // PLAYER BARS
+    // hp
+    const p_hp = (battle.player.hp / battle.player.max_hp) * 100;
     document.querySelectorAll(".player-hp").forEach(bar => {
       bar.style.width = p_hp + "%";
      });
      document.querySelectorAll("#player-hp-text, .player-hp-text").forEach(txt => {
        txt.innerText = `${battle.player.hp} / ${battle.player.max_hp}`;
      });
-
-    // Enemy Bars
-    let enemy_hp_bars = document.querySelectorAll(".enemy-hp");
-    enemy_hp_bars.forEach((bar, i) => {
-      let enemy = battle.enemies[i];
-      let e_hp = (enemy.hp / enemy.max_hp) * 100;
-      bar.style.width = e_hp + "%";
-      bar.innerText = `${enemy.hp} / ${enemy.max_hp}`;
+    // energy
+    const p_energy = (battle.player.energy / 6) * 100;
+    document.querySelectorAll(".player-energy").forEach(bar => {
+      bar.style.width = p_energy + "%";
+    });
+    document.querySelectorAll(".player-energy-text").forEach(txt => {
+      txt.innerText = `${battle.player.energy} / ${battle.player.max_energy}`;
     });
 
-    showActions();
+    // ENEMY BARS
+    battle.enemies.forEach((enemy, i) => {
+      const e_hp = (enemy.hp / enemy.max_hp) * 100;
+      const e_energy = (enemy.energy / 6) * 100;
 
+      // Sidebar HP
+      const sidebar_e = document.querySelector(`.enemy-sidebar.enemy-${i}`);
+      sidebar_e.querySelectorAll(".enemy-hp").forEach(bar => {
+        bar.style.width = e_hp + "%";
+      });
+      sidebar_e.querySelectorAll(".enemy-hp-text").forEach(txt => {
+        txt.innerText = `${enemy.hp} / ${enemy.max_hp}`;
+      });
+      // Sidebar Energy
+      sidebar_e.querySelectorAll(".enemy-energy").forEach(bar => {
+        bar.style.width = e_energy + "%";
+      });
+      sidebar_e.querySelectorAll(".enemy-energy-text").forEach(txt => {
+        txt.innerText = `${enemy.energy} / ${enemy.max_energy}`;
+      });
+
+      // Battlefield HP
+      const field_e = document.querySelector(`.enemy-wrap.enemy-${i}`);
+      field_e.querySelectorAll(".enemy-hp").forEach(bar => {
+        bar.style.width = e_hp + "%";
+      });
+      field_e.querySelectorAll(".enemy-hp-text").forEach(txt => {
+        txt.innerText = `${enemy.hp} / ${enemy.max_hp}`;
+      });
+      // Battlefield Energy
+      field_e.querySelectorAll(".enemy-energy").forEach(bar => {
+        bar.style.width = e_energy + "%";
+      });
+      field_e.querySelectorAll(".enemy-energy-text").forEach(txt => {
+        txt.innerText = `${enemy.energy} / ${enemy.max_energy}`;
+      });
+
+    });
   }
 
+  turn = "player";
+  updateTurnUI();
+
   </script>
+
+  <div id = "dmg-popup"></div>
 
 </body>
 
