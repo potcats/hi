@@ -36,13 +36,38 @@ type = ["consumable", "consumable", "consumable", "consumable", "gear", "gear", 
 gearType = ["", "", "", "", "chestplate", "helmet", "pants", "boots", "chestplate", "helmet", "pants", "boots", "chestplate", "helmet", "accessory", "accessory", "weapon", "weapon", "weapon", "weapon"]
 
 # ENEMIES
-species = ["bandit", "bee", "dwarf", "dwarfchief", "goblin", "grandma", "pebble", "pixie", "rat", "wizard"]
-attacks = ["fire bomb,quick slash,light stab", "sting,stinger burst", "load,", "", "tiny strike,jugg", "pie throw,granny kick,granny kick barrage", "boulder bump", "dust bolt,wondrous light,magic dust", "gnaw,rat flip", "spell scroll:magic missile,flame bolt,fireball"]
+species = ["bandit", 
+           "bee",
+           "dwarf",
+           "dwarfchief",
+           "goblin",
+           "grandma",
+           "pebble",
+           "pixie",
+           "rat",
+           "wizard"]
+attacks = ["fire bomb,quick slash,light stab",
+           "sting,stinger burst",
+           "load,",
+           "",
+           "tiny strike,jugg",
+           "pie throw,granny kick,granny kick barrage",
+           "boulder bump",
+           "dust bolt,wondrous light,magic dust",
+           "gnaw,rat flip",
+           "spell scroll:magic missile,flame bolt,fireball"]
 
 # ENCOUNTERS
-name = ["Travelling Merchant", "Elven Camp", "Wanderer's Wares", "Busted Caravan", "Grandma's house", "Wizard Tower",
-       "The Sword in the Stone", "Potion Seller"]
-dialogue = []
+name = ["Travelling Merchant",
+        "Elven Camp",
+        "Wanderer's Wares",
+        "Busted Caravan",
+        "Grandma's house",
+        "Wizard Tower",
+        "The Sword in the Stone",
+        "Potion Seller",
+        "Short Rest",
+        "Scavenge"]
 background = ["/static/images/bgs/caravanshop.jpg",
               "/static/images/bgs/dwarvencamp.jpg",
               "/static/images/bgs/forestshop.jpg",
@@ -50,7 +75,9 @@ background = ["/static/images/bgs/caravanshop.jpg",
               "/static/images/bgs/grandmahouse.jpg",
               "/static/images/bgs/insidetower.jpg",
               "/static/images/bgs/swordstone.jpg",
-              "/static/images/bgs/witchhouse.jpg"]
+              "/static/images/bgs/witchhouse.jpg",
+              "",
+              ""]
 desc = ["A merchant with a well-worn wagon waves you down (shop)",
         "You see a bunch of sad, depressed elves in a sad, depressed camp",
         "You spot a friendly person with a strange stand in the middle of the woods (shop)",
@@ -111,10 +138,21 @@ c.execute("""
 c.execute("""
     CREATE TABLE IF NOT EXISTS encounters (
     type TEXT PRIMARY KEY NOT NULL,
-    dialogue TEXT NOT NULL,
     background TEXT NOT NULL,
     desc TEXT NOT NULL,
     diff INTEGER NOT NULL
+);
+""")
+
+c.execute("""
+    CREATE TABLE IF NOT EXISTS dialogue (
+    scene TEXT NOT NULL,
+    type TEXT NOT NULL,
+    order INTEGER,
+    prevChoice TEXT,
+    nextChoice TEXT,
+    stat TEXT,
+    statReq INT
 );
 """)
 
