@@ -62,7 +62,7 @@ P02: Makers Makin' It, Act I
       background-color: dimgrey;
     }
 
-    .inv {
+    .inv, .shop {
       width: 100%;
       height: 10vh;
 
@@ -172,16 +172,6 @@ P02: Makers Makin' It, Act I
       background-color: firebrick;
     }
 
-    .item {
-      width: 100%;
-      height: 10vh;
-
-      font-size: 125%;
-
-      border-style: none;
-      background-color: grey;
-    }
-
     /* TURN INDICATOR */
     #turn {
       position: absolute;
@@ -220,14 +210,33 @@ P02: Makers Makin' It, Act I
   </button>
 
   <div class="container" id="shop">
-    {% for item in shop %}
-      <button class="center item" id="{{ item }}" onclick="clicked(this, 'shop')"> {{ item }} </button>
-      <br>
-    {% endfor %}
+    <div class="container overflow-auto" style="height: 60%">
+      {% for item in shop %}
+        <button class="center shop {{ item }}" onclick="clickedS(this)"> {{ item }} </button>
+      {% endfor %}
+    </div>
+    <div class="container" id="inspect" style="height: 40%; border-top: solid medium; border-color: #545454">
+      <div class="container overflow-auto" style="height: 90%; padding: 15px; font-size: 130%">
+        <!-- IF NO ITEMS SELECTED -->
+        <h3 style="text-align: center;" id="noInspectS">
+          SELECT AN ITEM TO INSPECT
+        </h3>
+
+        <!-- ITEMS SELECTED -->
+        <h3 id="itemNameS"> </h3>
+        <div id="extensionS"> </div>
+      </div>
+      <div class="container" style="height: 10%">
+        <!-- SELL BUTTON -->
+        <button class="inspect" id="inspectBuy" onclick="buy()" style="display: none">
+          BUY
+        </button>
+      </div>
+    </div>
   </div>
 
   <div class="container" id="inv">
-    <div class="container overflow-auto" id="invInner" style="height: 60%">
+    <div class="container overflow-auto" style="height: 60%">
       {% for item in inventory %}
         {% if inventory[item][1] == "consumable" %}
           <button class="center inv {{ item }}" onclick="clicked(this)"> {{ inventory[item][2] }}x {{ item }} </button>
@@ -316,7 +325,10 @@ P02: Makers Makin' It, Act I
   <!-- PAGE-SPECIFIC JS -->
   <script>
     var inv = {{ inventory | tojson }};
+    var shop = {{ shop | tojson }};
+    console.log(shop);
     var selectedItm = "";
+    var selectedProd = "";
     var sellMode = false;
     var equipped = {{ equips | tojson }};
 
@@ -374,7 +386,7 @@ P02: Makers Makin' It, Act I
       name = Array.from(itm.classList).slice(2).join(" ");
 
       aaa = name.split(" ");
-      if (aaa[aaa.length-1] == "sellable") { name = aaa.slice(0).join(" ") }
+      if (aaa[aaa.length-1] == "sellable") { name = aaa.slice(0,aaa.length-1).join(" ") }
       selectedItm = name;
 
       // console.log(name);
@@ -436,6 +448,67 @@ P02: Makers Makin' It, Act I
 
         if (sellMode) { document.getElementById("inspectSell").style.display = "block" }
         else { document.getElementById("inspectEquip").style.display = "block" };
+      }
+    }
+
+    function clickedS(itm) {
+      let select = new XMLHttpRequest();
+      name = Array.from(itm.classList).slice(2).join(" ");
+      selectedProd = name;
+
+      console.log(name);
+
+      document.getElementById('noInspectS').style.display = "none";
+      document.getElementById('itemNameS').innerHTML = shop[name][0];
+
+      document.getElementById("inspectBuy").style.display = "block"
+
+      if (shop[name][1] == "consumable") {
+        let effects = "";
+
+        select.open('POST', window.location.href, true);
+        select.setRequestHeader("select", "consumable," + name);
+        select.send();
+
+        document.getElementById('itemNameS').innerHTML += " (CONSUMABLE)";
+        cont = document.getElementById("extensionS");
+        textExtension = "<h4> EFFECTS </h4><hr>";
+
+        select.onload = function() {
+          if (this.readyState == 4 && this.status == 200) {
+            effect = this.response;
+          }
+
+          textExtension += "<text> HP: " + effect + "</text><br><br>";
+          textExtension += "<text> COST: " + shop[selectedProd][3] + "</text><br>";
+          cont.innerHTML = textExtension;
+        };
+      } else {
+        let stats = "";
+
+        select.open('POST', window.location.href, true);
+        select.setRequestHeader("select", "gear," + name);
+        select.send();
+
+        document.getElementById('itemNameS').innerHTML += " (GEAR)";
+        cont = document.getElementById("extensionS");
+        textExtension = "<h4> STATS </h4><hr>";
+
+        select.onload = function() {
+          if (this.readyState == 4 && this.status == 200) {
+            stats = JSON.parse(this.response);
+          }
+
+          textExtension += "<text> STR: " + stats[0] + "</text><br>";
+          textExtension += "<text> DEX: " + stats[1] + "</text><br>";
+          textExtension += "<text> CON: " + stats[2] + "</text><br>";
+          textExtension += "<text> INT: " + stats[3] + "</text><br>";
+          textExtension += "<text> FTH: " + stats[4] + "</text><br>";
+          textExtension += "<text> LCK: " + stats[5] + "</text><br><br>";
+          textExtension += "<text> COST: " + shop[selectedProd][3] + "</text><br>";
+
+          cont.innerHTML = textExtension;
+        };
       }
     }
 
