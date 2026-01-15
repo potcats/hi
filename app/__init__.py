@@ -16,9 +16,9 @@ app.secret_key = 'wahhhhhhhhhhhhhhhhh'
 # ------------------------ DATABASING  ------------------------ #
 
 # ITEMS
-items = ["honey", "cookie", "healing potion", "magical vial of water", "cloth robe", "cloth veil", "cloth leggings", "iron greaves", 
+items = ["honey", "cookie", "healing potion", "magical vial of water", "cloth robe", "cloth veil", "cloth leggings", "iron greaves",
          "iron chestplate", "iron helmet", "iron leggings", "rat hide boots",
-        "rat hide cloak", "rat hide hood", "stinger pendant", "ring of goblin ears", 
+        "rat hide cloak", "rat hide hood", "stinger pendant", "ring of goblin ears",
          "simple sword", "excalibur", "crude club", "noble's sabre"]
 img = ["", "", "", "", "/app/static/images/gear/chestplate/cloth.png", "/app/static/images/gear/helmet/cloth.png", "/app/static/images/gear/pants/cloth.png", "/app/static/images/gear/boots/iron.png",
        "/app/static/images/gear/chestplate/iron.png", "/app/static/images/gear/helmet/iron.png", "/app/static/images/gear/pants/iron.png", "/app/static/images/gear/boots/rathide.png",
@@ -221,7 +221,7 @@ def register():
                 rows = c.execute("SELECT username FROM player WHERE username = ?", (request.form['username'].lower(),))
                 result = rows.fetchone()
                 if result:
-                    return render_template("register.html", "Duplicate username")
+                    return render_template("register.html", invalid="Duplicate username")
                 session.permanent = True
 
                 # for invalid requests / empty form responses
@@ -571,6 +571,7 @@ def unEquipGear(gearType):
 # fetches encounter background
 def fetch_bg(name):
     c = db.cursor()
+    name = " ".join(name.split("%20"))
 
     bg = c.execute("SELECT background FROM encounters WHERE type = ?", (name,)).fetchone()[0]
     return bg

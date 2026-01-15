@@ -65,7 +65,7 @@ P02: Makers Makin' It, Act I
     .progress-bar {
       transition: width 0.3s ease;
     }
-    
+
     .atk-wrap {
       background: gray;
       color: white;
@@ -99,7 +99,7 @@ P02: Makers Makin' It, Act I
     .slot:hover {
       outline: 2px solid white;
     }
-    
+
     @keyframes player-atk {
       0% {
         transform: translateX(0);
@@ -366,11 +366,14 @@ P02: Makers Makin' It, Act I
         {% endfor %}
       </div>
     </div>
- 
+
   <!-- BOOTSTRAP JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
     integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
     crossorigin="anonymous"> </script>
+
+  <!-- CUSTOM JS -->
+  <script src="/static/js/audio.js"> </script>
 
   <!-- PAGE-SPECIFIC JS -->
   <script>
@@ -397,7 +400,7 @@ P02: Makers Makin' It, Act I
 
     hideActions();
     playerAtkAnim(i);
-    
+
     let xhttp = new XMLHttpRequest();
     xhttp.open("POST", "/battle", true);
     xhttp.setRequestHeader("Content-Type", "application/json");
@@ -429,7 +432,7 @@ P02: Makers Makin' It, Act I
       enemies[i].classList.add("targeted");
     }
   }
-    
+
   function unhighlight(i) {
     const enemies = document.querySelectorAll(".enemy-wrap");
     if (enemies[i]) {
@@ -446,15 +449,15 @@ P02: Makers Makin' It, Act I
     document.getElementById("actions")
       .classList.remove("hidden");
   }
-    
+
   function playerAtkAnim(i) {
     const player = document.querySelector(".player-wrap");
     const enemy = document.querySelectorAll(".enemy-wrap");
-    
+
     if (!player || !enemy[i]) return;
-    
+
     player.classList.add("player-atk");
-    
+
     setTimeout(() => {
       enemy[i].classList.add("shake");
     }, 200);

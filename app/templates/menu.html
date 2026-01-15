@@ -86,24 +86,11 @@ P02: Makers Makin' It, Act I
     integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
     crossorigin="anonymous"> </script>
 
+  <!-- CUSTOM JS -->
+  <script src="/static/js/audio.js"> </script>
+  
   <!-- PAGE-SPECIFIC JS -->
   <script>
-    /* EVENTS THAT WILL OCCUR ON LOAD */
-    window.onload = function() {
-      document.getElementById('audio').checked = false;
-    };
-
-    /* AUDIO BUTTON INTERACTIONS */
-    var Aud = function() {
-      let bgm = document.getElementById('bgm');
-      if (bgm.paused) {
-        bgm.play();
-      }
-      else {
-        bgm.pause();
-      }
-    };
-
   </script>
 
 </body>

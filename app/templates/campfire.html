@@ -347,6 +347,9 @@ P02: Makers Makin' It, Act I
     integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
     crossorigin="anonymous"> </script>
 
+  <!-- CUSTOM JS -->
+  <script src="/static/js/audio.js"> </script>
+
   <!-- PAGE-SPECIFIC JS -->
   <script>
     var inv = {{ inventory | tojson }};
@@ -356,24 +359,12 @@ P02: Makers Makin' It, Act I
 
     /* EVENTS THAT WILL OCCUR ON LOAD */
     window.onload = function() {
-      document.getElementById('audio').checked = false;
       document.getElementById('sell').style.borderColor = "darkred";
 
       for (items in inv) {
         if (Object.values(equipped).includes(items)) {
           document.getElementById(items).style.display = "none";
         }
-      }
-    };
-
-    /* AUDIO BUTTON INTERACTIONS */
-    var Aud = function() {
-      let bgm = document.getElementById('bgm');
-      if (bgm.paused) {
-        bgm.play();
-      }
-      else {
-        bgm.pause();
       }
     };
 
