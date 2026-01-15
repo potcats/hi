@@ -4,6 +4,7 @@
 # P02: Makers Makin' It, Act I
 # 01/16/2026
 
+from flask import session
 import random
 import sqlite3
 from flask import session
@@ -36,12 +37,24 @@ def randomEnemy(species):
     species = species
     attacks = [base_info[1], [0, 0, 0]]
     init = random.randint(0,9)
-    hp = base_info[3] + random.randint(-3, 3)
+    hp = base_info[2] + random.randint(-3, 3)
     weakness = base_info[3]
     res = base_info[4]
     drops = base_info[5]
 
-    return [species, attacks, init, hp, 0, weakness, res, drops]
+    return {
+        "species": species,
+        "attacks": attacks,
+        "cds": [0, 0, 0],
+        "init": init,
+        "hp": hp,
+        "max_hp": hp,
+        "energy": 1,
+        "max_energy": 6,
+        "weakness": weakness,
+        "res": res,
+        "drops": drops
+    }
 
 '''
 [ player, [enemies] ]
@@ -122,7 +135,7 @@ def turn_order(battle_id):
     for i in range(0, len(battle_id[1])):
         enemy_init.append([i, battle_id[1][i][2]])
     #uh oh now what
-    
+
 def game_lost(battle_id):
     return not battle_id[3]
 
@@ -150,36 +163,44 @@ def createBattle(enemies):
     db.close()
     attacks_info = attack_info_array
 
-    player = [player_info[0],
-            [attacks_info, [0, 0, 0, 0, 0, 0]],
-            random.randint(4,8),
-            player_info[3] + player_info[9],
-            0,
-            player_info[2], #level
-            player_info[7],
-            player_info[8],
-            player_info[9],
-            player_info[10],
-            player_info[11],
-            player_info[12],
-            False,
-            False
-        ]
+    player = {
+        "username": player_info[0],
+        "attacks": attacks_info,
+        "cds": [0, 0, 0],
+        "init": random.randint(0, 100),
+        "hp": player_info[3] + player_info[9],
+        "max_hp": player_info[3] + player_info[9],
+        "energy": 0,
+        "max_energy": 6,
+        "level": player_info[2],
+        "stats": {
+            "str": player_info[7],
+            "dex": player_info[8],
+            "con": player_info[9],
+            "int": player_info[10],
+            "fth": player_info[11],
+            "lck": player_info[12]
+        },
+        "guarding": False,
+        "focused": False
+    }
 
-    return [player, enemies]
+    return {"player": player, "enemies": enemies}
 
 def player_startTurn(battle_id):
+    player = battle_id["player"]
+
     #guard and focus wear off
-    battle_id[0][12] = False
-    battle_id[0][13] = False
+    player["guarding"] = False
+    player["focused"] = False
 
     #reduce all cd by 1
-    for i in range(0,3):
-        if battle_id[0][1][1][i] > 0:
-            battle_id[0][1][1][i] -= 1
+    for i in range(3):
+        if player["cds"][i] > 0:
+            player["cds"][i] -= 1
 
     #increase energy by 1
-    battle_id[0][4] += 1
+    player["energy"] = min(player["energy"] + 1, player["max_energy"])
     return battle_id
 
 #enemy indexed by 0 pls
@@ -194,13 +215,14 @@ def enemy_startTurn(battle_id, enemy):
     return battle_id
 
 def guard(battle_id):
-    battle_id[0][12] = True
+    battle_id["player"]["guarding"] = True
     return battle_id
 
 def focus(battle_id):
-    battle_id[0][13] = True
+    player = battle_id["player"]
+    player["focused"] = True
     #increase energy by 1
-    battle_id[0][4] += 1
+    player["energy"] = min(player["energy"] + 1, player["max_energy"])
     return battle_id
 
 # attack(forest_battle1, 2, 'attack1') means that in forest_battle1, the player is attacking enemy #2 (index from 0) with attack1
@@ -208,19 +230,18 @@ def player_attack(battle_id, defender, move):
     attack_info = []
 
     #get thru array of player's attacks and find the correct one
-    for i in range(0, 3):
-        attack_info_temp = battle_id[0][1][0][i]
+    for attack_info_temp in battle_id["player"]["attacks"]:
         if attack_info_temp[0] == move:
             attack_info = attack_info_temp
 
     #remove energy used to cast
-    battle_id[0][4] -= attack_info[2]
+    battle_id["player"]["energy"] -= attack_info[3]
 
-    result = dealDamage(battle_id, battle_id[0], defender, attack_info)
+    result = dealDamage(battle_id, battle_id["player"], battle_id["enemies"][defender], attack_info)
 
     #do the hp reduction
     for i in result:
-        battle_id[1][defender][3] -= i[1]
+        battle_id["enemies"][defender]["hp"] -= i[1]
 
     #check for kills
     battle_id = killCheck(battle_id)
@@ -229,26 +250,26 @@ def player_attack(battle_id, defender, move):
 
 # attack(forest_battle1, 2) means that enemy #2 (index from 0) is attacking
 def enemy_attack(battle_id, attacker):
-    attacking_enemy_stats = battle_id[1][attacker]
-    player_stats = battle_id[0]
+    attacking_enemy_stats = battle_id["enemies"][attacker]
+    player_stats = battle_id["player"]
     result = []
 
     #check available attacks and respective cooldowns, use the highest available attack
-    for i in range(2, -1, -1):
+    for i in range(len(attacking_enemy_stats["attacks"][0]) - 1, -1, -1):
         #get array containing info for each attack
-        attack_info = attacking_enemy_stats[1][0][i]
-        enemy_energy = attacking_enemy_stats[4]
-        attack_current_cd = attacking_enemy_stats[1][1][i]
+        attack_info = attacking_enemy_stats["attacks"][0][i]
+        enemy_energy = attacking_enemy_stats["energy"]
+        attack_current_cd = attacking_enemy_stats["cds"][i]
         if enemy_energy >= attack_info[3] and attack_current_cd == 0:
             #set cd
-            battle_id[1][attacker][1][1][i] = attacking_enemy_stats[1][0][i][4]
+            attacking_enemy_stats["cds"][i] = attack_info[4]
             #remove energy used to cast
-            battle_id[1][attacker][4] -= attack_info[3]
-            result = dealDamage(battle_id, attacker, battle_id[0], attack_info)
+            attacking_enemy_stats["energy"] -= attack_info[3]
+            result = dealDamage(battle_id, attacking_enemy_stats, battle_id["player"], attack_info)
 
     #do the hp reduction
     for i in result:
-        battle_id[0][3] -= i[1]
+        battle_id["player"]["hp"] -= i[1]
 
     #check for death
     battle_id = deathCheck(battle_id)
@@ -281,25 +302,25 @@ def hit(battle_id, attacker, victim, attack_info):
     blockIncrease = 0
     critIncrease = 0
     critDmgIncrease = 0
-    dmgMultiplier = 0
+    dmgMultiplier = 1
 
     #if victim is the player
-    if victim[0] not in ['bandit', 'bee', 'dwarf', 'dwarfchief', 'goblin', 'grandma', 'pebble', 'pixie', 'rat', 'wizard']:
-        strength = victim[6]
-        dexterity = victim[7]
-        constitution = victim[8]
+    if "species" not in victim:
+        strength = victim["stats"]["str"]
+        dexterity = victim["stats"]["dex"]
+        constitution = victim["stats"]["con"]
         dodgeIncrease = 0.175*(dexterity)
         blockIncrease = 0.375*(strength + constitution)
-        if victim[12]:
+        if victim["guarding"]:
             dmgMultiplier = 0.5
-        elif victim[13]:
+        elif victim["focused"]:
             dmgMultiplier = 1.3
     #if victim is npc
     else:
-        strength = attacker[6]
-        dexterity = attacker[7]
-        intelligence = attacker[9]
-        luck = attacker[11]
+        strength = attacker["stats"]["str"]
+        dexterity = attacker["stats"]["dex"]
+        intelligence = attacker["stats"]["int"]
+        luck = attacker["stats"]["lck"]
         critIncrease = 0.125*(strength) + 0.15*(dexterity) + 0.075*(intelligence) + 0.3*(luck)
         critDmgIncrease = 0.2*(strength) + 0.25*(dexterity) + 0.15*(intelligence) + 0.5*(luck)
 
@@ -316,14 +337,13 @@ def hit(battle_id, attacker, victim, attack_info):
 
 def killCheck(battle_id):
     #for enemies
-    for i in range(len(battle_id[1]) - 1, -1, -1):
-        if battle_id[1][i][3] <= 0:
-            battle_id[1].pop(i)
+    for i in range(len(battle_id["enemies"]) - 1, -1, -1):
+        if battle_id["enemies"][i]["hp"] <= 0:
+            battle_id["enemies"].pop(i)
     return battle_id
 
 def deathCheck(battle_id):
     #for player
-    if battle_id[0][3] <= 0:
-        battle_id[2] = False
-    return battle_id
-
+    if battle_id["player"]["hp"] <= 0:
+        return True
+    return False
