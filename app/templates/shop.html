@@ -463,7 +463,7 @@ P02: Makers Makin' It, Act I
 
       document.getElementById("inspectBuy").style.display = "block"
       if (gold < shop[selectedProd][3]) { document.getElementById("inspectBuy").disabled = true }
-      else { ddocument.getElementById("inspectBuy").disabled = false }
+      else { document.getElementById("inspectBuy").disabled = false }
 
       if (shop[name][1] == "consumable") {
         let effects = "";
@@ -515,7 +515,7 @@ P02: Makers Makin' It, Act I
     }
 
     function buy() {
-      let status = inv.includes(selectedProd);
+      let status = selectedProd in inv;
       let buy = new XMLHttpRequest();
 
       buy.open('POST', window.location.href, true);
@@ -524,14 +524,14 @@ P02: Makers Makin' It, Act I
 
       buy.onload = function() {
         if (this.readyState == 4 && this.status == 200) {
-          inv = this.response;
+          inv = JSON.parse(this.response);
         }
 
         if (!status || shop[selectedProd][1] == "gear") {
-          let newBtn = `<button class="center inv ${ selectedProd }" onclick="clicked(this)"> ${ selectedProd }selectedProd </button>`;
+          let newBtn = `<button class="center inv ${ selectedProd }" onclick="clicked(this)"> ${ selectedProd } </button>`;
           document.getElementById("invInner").innerHTML += newBtn;
         } else {
-          document.getElementsByClassName(selectedProd)[0].innerHTML = `${inv[selectedProd][2]}x ${selectedItm}`
+          document.getElementsByClassName(selectedProd)[0].innerHTML = `${inv[selectedProd][2]}x ${selectedProd}`
         }
 
         gold -= shop[selectedProd][3];
@@ -584,7 +584,7 @@ P02: Makers Makin' It, Act I
           equipped = JSON.parse(this.response);
         }
 
-        document.getElementsByClassName(selectedItm)[0].style.display = "none";
+        document.getElementById('inv').getElementsByClassName(selectedItm)[0].style.display = "none";
         displayEquips();
         updateStats();
       };
@@ -607,7 +607,7 @@ P02: Makers Makin' It, Act I
           equipped = JSON.parse(this.response);
         }
 
-        document.getElementsByClassName(g)[0].style.display = "block";
+        document.getElementById('inv').getElementsByClassName(g)[0].style.display = "block";
         displayEquips();
         updateStats();
       };
