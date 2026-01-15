@@ -391,6 +391,7 @@ P02: Makers Makin' It, Act I
   <script>
   let turn = "player";
   let selected = null;
+  let currentBattle = null;
 
   // TIMINGGGGGG
   const ATK_MS = 800;
@@ -427,10 +428,11 @@ P02: Makers Makin' It, Act I
     xhttp.onload = function() {
       if (this.status == 200) {
         const battle = JSON.parse(this.responseText);
+        currentBattle = battle;
         updateBattle(battle);
 
         if (battle.action && battle.action.source === "player") {
-          showDmg("enemy", battle.action.result[1], battle.action.result[0] === "crit", i);
+          showHits("enemy", battle.action.result, i);
         }
       }
 
@@ -469,10 +471,11 @@ P02: Makers Makin' It, Act I
         if (this.status !== 200) return;
 
         const battle = JSON.parse(this.responseText);
+        currentBattle = battle;
         updateBattle(battle);
 
-        if (battle.action && battle.action.source === "enemy") {
-          enemyAct(battle.action.enemy_idx, battle.action.result);
+        if (battle.actions && battle.actions.length > 0) {
+          enemyActions(battle.actions);
         } else {
           turn = "player";
           updateTurnUI();
@@ -489,8 +492,8 @@ P02: Makers Makin' It, Act I
     updateTurnUI(i);
     enemyAtkAnim(i);
 
-    if (result[1] > 0) {
-      showDmg("player", result[1], result[0] == "crit");
+    if (result.length > 0) {
+      showHits("player", result);
     }
 
     setTimeout(() => {
@@ -500,12 +503,35 @@ P02: Makers Makin' It, Act I
     }, POPUP_MS + PAUSE_MS);
   }
 
-  function showDmg(target, dmg, crit = false, enemyIdx = null) {
+  function enemyActions(actions, i = 0) {
+    if (i >= actions.length) {
+      turn = "player";
+      updateTurnUI();
+      showActions();
+      return;
+    }
+
+    const act = actions[i];
+    enemyAct(act.enemy_idx, act.result);
+
+    setTimeout(() => {
+      enemyActions(actions, i + 1);
+    }, POPUP_MS + PAUSE_MS);
+  }
+
+  function showDmg(target, dmg, status = "", enemyIdx = null, offset = 0) {
     const popup = document.getElementById("dmg-popup");
 
-    if (crit) {
+    if (status == "crit") {
       popup.innerText = `CRIT ${dmg}!`;
       popup.style.color = "gold";
+    } else if (status == "dodged") {
+      popup.innerText = "DODGE";
+      popup.style.color = "blue";
+    }
+    else if (status == "blocked") {
+      popup.innerText = "BLOCK";
+      popup.style.color = "blue";
     } else {
       popup.innerText = `-${dmg}`;
       popup.style.color = "white";
@@ -520,7 +546,7 @@ P02: Makers Makin' It, Act I
 
     const rect = element.getBoundingClientRect(); // returns element pos/size
     popup.style.left = rect.left + rect.width / 2 + "px";
-    popup.style.top = rect.top + "px";
+    popup.style.top = (rect.top - offset * 15) + "px";
     popup.style.display = "block";
     popup.style.opacity = 1;
     popup.style.transform = "translateY(0px)";
@@ -533,6 +559,31 @@ P02: Makers Makin' It, Act I
     setTimeout(() => {
       popup.style.display = "none";
     }, POPUP_MS);
+  }
+
+  function showHits(target, hits, enemyIdx = null) {
+    let offset = 0;
+
+    hits.forEach(hit => {
+      const st = hit[0];
+      const dmg = hit[1];
+
+      setTimeout(() => {
+
+        // stop combo if dead
+        if (target === "enemy" && enemyIdx !== null) {
+          const enemy = currentBattle.enemies[enemyIdx];
+          if (!enemy || enemy.hp <= 0) return;
+        }
+        if (target === "player") {
+          if (currentBattle.player.hp <= 0) return;
+        }
+
+        showDmg(target, dmg, st, enemyIdx, offset);
+      }, offset * 350)
+      offset++;
+
+    });
   }
 
   function highlight(i) {
