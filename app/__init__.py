@@ -259,11 +259,6 @@ def menu():
 
 @app.route('/campfire', methods=['GET', 'POST'])
 def campfire():
-    # for testing purposes
-    # session['hp'] = 5
-    session['currXP'] = 13
-    session['maxXP'] = 27
-
     inv = session['inventory'] # [name] {name, type, quantity, gold}
     stats = fetch_stats() # [level, HP, str, dex, con, int, fth, lck]
     equips = fetch_equips() # [gearType] {name}
@@ -345,8 +340,6 @@ def campfire():
         maxHP=stats[1],
         lvl=stats[0],
         gold=session['gold'],
-        currXP=session['currXP'],
-        maxXP=session['maxXP'],
         str=stats[2],
         dex=stats[3],
         con=stats[4],
@@ -446,9 +439,20 @@ def dialogue():
 
 @app.route('/scavenge', methods=['GET', 'POST'])
 def scavenge():
+    consumables = ["honey", "cookie", "healing potion", "magical vial of water"]
+    gear = [ "cloth robe", "cloth veil", "cloth leggings",
+            "iron greaves", "iron chestplate", "iron helmet", "iron leggings",
+            "rat hide boots", "rat hide cloak", "rat hide hood" ]
+    number = random.randint(1, 100)
+
     if request.method == "POST":
-        addItemToInventory(random.choice(items))
-        return redirect(url_for('campfire'))
+        if number < 96:
+            item = random.choice(consumables)
+        else:
+            item = random.choice(gear)
+
+        addItemToInventory(item)
+        return item
 
     return render_template("scavenge.html")
 
@@ -567,6 +571,19 @@ def fetch_bg(name):
 
     bg = c.execute("SELECT background FROM encounters WHERE type = ?", (name,)).fetchone()[0]
     return bg
+
+# leveling up!!!!!!!!!!!!!!!!!!!!
+def lvlup(battle, currlvl):
+    c = db.cursor()
+
+    diffMultiplier = c.execute("SELECT diff FROM encounters WHERE type = ?", (battle,)).fetchone()
+    if diffMultiplier is not None:
+        diffMultiplier = diffMultiplier[0]
+    else:
+        diffMultiplier = 1
+
+    c.execute("UPDATE player SET level = ? WHERE username = ?",
+        (currlvl + diffMultiplier, session['username']))
 
 # ------------------------------------------------------------------------- #
 

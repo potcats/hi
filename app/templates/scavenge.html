@@ -36,10 +36,10 @@ P02: Makers Makin' It, Act I
 
   /* MAIN TEXT*/
   #scavengeText {
-    font-size: 150%;
-    color: #595959;
+    font-size: 200%;
 
     text-align: center;
+    margin-top: 25%;
   }
   </style>
 
@@ -61,7 +61,7 @@ P02: Makers Makin' It, Act I
   var textIndex = 0;
 
   function displayText() {
-    document.getElementById("scavengeText".innerHTML = scavText[textIndex]);
+    document.getElementById("scavengeText").innerHTML = scavText[textIndex];
 
     if (textIndex == 3) { textIndex = 0 }
     else { textIndex += 1 };
@@ -71,10 +71,24 @@ P02: Makers Makin' It, Act I
     let post = new XMLHttpRequest();
     post.open("POST", window.location.href, true);
     post.send();
+
+    post.onload = function() {
+      if (this.readyState == 4 && this.status == 200) {
+        item = this.response;
+
+        clearInterval(time);
+        document.getElementById("scavengeText").innerHTML = `You found ${item}!`;
+
+        setTimeout(function() {
+            window.location.href = "/campfire"
+          }, 2000
+        )
+      }
+    }
   }
 
-  setInterval(displayText(), 400);
-  setTimeout(postReq(), 2500)
+  let time = setInterval(displayText, 400);
+  setTimeout(postReq, 3500)
   </script>
 
 </body>
