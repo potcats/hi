@@ -35,7 +35,7 @@ def randomEnemy(species):
 
     species = species
     attacks = [base_info[1], [0, 0, 0]]
-    init = random.randint(0, 100)
+    init = random.randint(0,9)
     hp = base_info[3] + random.randint(-3, 3)
     weakness = base_info[3]
     res = base_info[4]
@@ -88,12 +88,13 @@ def randomEnemy(species):
                 [
                     [
                         name
+                        hits
                         level
                         energy
                         cd
                         scale
+                        statusEffects
                         baseDamage
-                        effect
                     ]
                     attack2
                     attack3
@@ -113,6 +114,15 @@ def randomEnemy(species):
     True (True = player alive, False = player dead)
 ]
 '''
+def turn_order(battle_id):
+    player_init = battle_id[0][2]
+    enemy_init = []
+    order = ['player']
+
+    for i in range(0, len(battle_id[1])):
+        enemy_init.append([i, battle_id[1][i][2]])
+    #uh oh now what
+    
 def game_lost(battle_id):
     return not battle_id[3]
 
@@ -131,18 +141,18 @@ def createBattle(enemies):
 
     #process attack names to get array with attack information
     attack_info_array = []
+    db = sqlite3.connect(DB_FILE)
+    c = db.cursor()
     for i in attacks_info:
-        db = sqlite3.connect(DB_FILE)
-        c = db.cursor()
         cmd = "SELECT * FROM attacks WHERE name=?"
         c.execute(cmd, (i,))
         attack_info_array.append(c.fetchone())
-        db.close()
+    db.close()
     attacks_info = attack_info_array
 
     player = [player_info[0],
-            [attacks_info, [0, 0, 0]],
-            random.randint(0, 100),
+            [attacks_info, [0, 0, 0, 0, 0, 0]],
+            random.randint(4,8),
             player_info[3] + player_info[9],
             0,
             player_info[2], #level
@@ -208,8 +218,9 @@ def player_attack(battle_id, defender, move):
 
     result = dealDamage(battle_id, battle_id[0], defender, attack_info)
 
-    #do the hp reduction calculation
-    battle_id[1][defender][3] -= result[1]
+    #do the hp reduction
+    for i in result:
+        battle_id[1][defender][3] -= i[1]
 
     #check for kills
     battle_id = killCheck(battle_id)
@@ -228,30 +239,39 @@ def enemy_attack(battle_id, attacker):
         attack_info = attacking_enemy_stats[1][0][i]
         enemy_energy = attacking_enemy_stats[4]
         attack_current_cd = attacking_enemy_stats[1][1][i]
-        if enemy_energy >= attack_info[2] and attack_current_cd == 0:
+        if enemy_energy >= attack_info[3] and attack_current_cd == 0:
             #set cd
-            battle_id[1][attacker][1][1][i] = attacking_enemy_stats[1][0][i][3]
+            battle_id[1][attacker][1][1][i] = attacking_enemy_stats[1][0][i][4]
             #remove energy used to cast
-            battle_id[1][attacker][4] -= attack_info[2]
-            result = dealDamage(attacker, battle_id[0], attack_info)
-    print (result)
+            battle_id[1][attacker][4] -= attack_info[3]
+            result = dealDamage(battle_id, attacker, battle_id[0], attack_info)
 
     #do the hp reduction
-    battle_id[0][3] -= result[1]
+    for i in result:
+        battle_id[0][3] -= i[1]
 
     #check for death
     battle_id = deathCheck(battle_id)
 
     return result
 
+# [['blocked', 50], ['', 100], ['crit', 200], ['dodged', 0]]
+# [['', 400]]
+def dealDamage(battle_id, attacker, victim, attack_info):
+    num_of_hits = attack_info[1]
+    all_hits =[]
+    for i in range(0,num_of_hits):
+        all_hits.append(hit(battle_id, attacker, victim, attack_info))
+    return all_hits
+
 # ['blocked', 50]
 # ['', 100]
 # ['crit', 200]
 # ['dodged', 0]
-def dealDamage(battle_id, attacker, victim, attack_info):
+def hit(battle_id, attacker, victim, attack_info):
     status = ''
     #have yet to figure out what 'scale' is and how to use it
-    dmg = attack_info[5]
+    dmg = attack_info[7]/attack_info[1]
 
     dodge = random.randint(0,100)
     crit = random.randint(0,100)
@@ -261,7 +281,7 @@ def dealDamage(battle_id, attacker, victim, attack_info):
     blockIncrease = 0
     critIncrease = 0
     critDmgIncrease = 0
-    percentDmgMultiplier = 0
+    dmgMultiplier = 0
 
     #if victim is the player
     if victim[0] not in ['bandit', 'bee', 'dwarf', 'dwarfchief', 'goblin', 'grandma', 'pebble', 'pixie', 'rat', 'wizard']:
@@ -271,9 +291,9 @@ def dealDamage(battle_id, attacker, victim, attack_info):
         dodgeIncrease = 0.175*(dexterity)
         blockIncrease = 0.375*(strength + constitution)
         if victim[12]:
-            percentDmgMultiplier = 0.5
+            dmgMultiplier = 0.5
         elif victim[13]:
-            percentDmgMultiplier = 1.3
+            dmgMultiplier = 1.3
     #if victim is npc
     else:
         strength = attacker[6]
