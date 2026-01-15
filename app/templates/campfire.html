@@ -505,9 +505,10 @@ P02: Makers Makin' It, Act I
     /* ITEM INTERACTIONS */
     function clicked(itm) {
       let select = new XMLHttpRequest();
-      name = Array.from(itm.classList).slice(2,4).join(" ");
+      name = Array.from(itm.classList).slice(2).join(" ");
 
-      if (name.split(" ")[1] == "sellable") { name = name.split(" ")[0] }
+      aaa = name.split(" ");
+      if (aaa[aaa.length-1] == "sellable") { name = aaa.slice(0).join(" ") }
       selectedItm = name;
 
       // console.log(name);

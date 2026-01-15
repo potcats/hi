@@ -16,9 +16,9 @@ app.secret_key = 'wahhhhhhhhhhhhhhhhh'
 # ------------------------ DATABASING  ------------------------ #
 
 # ITEMS
-items = ["honey", "cookie", "healing potion", "magical vial of water", "cloth robe", "cloth veil", "cloth leggings", "iron greaves", 
+items = ["honey", "cookie", "healing potion", "magical vial of water", "cloth robe", "cloth veil", "cloth leggings", "iron greaves",
          "iron chestplate", "iron helmet", "iron leggings", "rat hide boots",
-        "rat hide cloak", "rat hide hood", "stinger pendant", "ring of goblin ears", 
+        "rat hide cloak", "rat hide hood", "stinger pendant", "ring of goblin ears",
          "simple sword", "excalibur", "crude club", "noble's sabre"]
 img = ["", "", "", "", "/app/static/images/gear/chestplate/cloth.png", "/app/static/images/gear/helmet/cloth.png", "/app/static/images/gear/pants/cloth.png", "/app/static/images/gear/boots/iron.png",
        "/app/static/images/gear/chestplate/iron.png", "/app/static/images/gear/helmet/iron.png", "/app/static/images/gear/pants/iron.png", "/app/static/images/gear/boots/rathide.png",
@@ -36,7 +36,7 @@ type = ["consumable", "consumable", "consumable", "consumable", "gear", "gear", 
 gearType = ["", "", "", "", "chestplate", "helmet", "pants", "boots", "chestplate", "helmet", "pants", "boots", "chestplate", "helmet", "accessory", "accessory", "weapon", "weapon", "weapon", "weapon"]
 
 # ENEMIES
-species = ["bandit", 
+species = ["bandit",
            "bee",
            "dwarf",
            "dwarfchief",
@@ -64,7 +64,7 @@ drops = ["cloth veil",
          "iron greaves,iron helmet",
          "iron chestplate,iron leggings,crude club",
          "cloth robe,cloth leggings,ring of goblin ears,noble's sabre",
-         "",
+         "cookie",
          "iron greaves,iron helmet,iron chestplate,iron leggings",
          "healing potion,magical vial of water",
          "rat hide cloak,rat hide hood,rat hide boots",
@@ -78,7 +78,8 @@ name = ["Travelling Merchant",
         "Grandma's house",
         "Wizard Tower",
         "The Sword in the Stone",
-        "Potion Seller"]
+        "Potion Seller",
+        "Short Rest"]
 background = ["/static/images/bgs/caravanshop.jpg",
               "/static/images/bgs/dwarvencamp.jpg",
               "/static/images/bgs/forestshop.jpg",
@@ -86,7 +87,8 @@ background = ["/static/images/bgs/caravanshop.jpg",
               "/static/images/bgs/grandmahouse.jpg",
               "/static/images/bgs/insidetower.jpg",
               "/static/images/bgs/swordstone.jpg",
-              "/static/images/bgs/witchhouse.jpg"]
+              "/static/images/bgs/witchhouse.jpg",
+              "/static/images/bgs/campsite.jpg"]
 desc = ["A merchant with a well-worn wagon waves you down (shop)",
         "You see a bunch of sad, depressed elves in a sad, depressed camp",
         "You spot a friendly person with a strange stand in the middle of the woods (shop)",
@@ -94,14 +96,15 @@ desc = ["A merchant with a well-worn wagon waves you down (shop)",
         "You spot the home of an old woman",
         "You spot a wizard tower in the woods",
         "You spot a familiar sword plunged into a rock",
-        "You spot a strange hut in the woods"]
-diff = [1, 2, 1, 3, 2, 2, 1, 1]
+        "You spot a strange hut in the woods",
+        ""]
+diff = [1, 2, 1, 3, 2, 2, 1, 1, 1]
 
 # ATTACKS
 attackName = ["pie throw", "granny kick", "granny kick barrage",
               "spell scroll: magic missile", "flame bolt", "fireball",
-              "fire bomb", "quick slash", "light stab", 
-              "tiny strike", "jugg", 
+              "fire bomb", "quick slash", "light stab",
+              "tiny strike", "jugg",
               "fire thunderbuss", "hook slash", "small shieldbreaker",
               "boulder bump",
               "sting", "stinger burst",
@@ -130,7 +133,7 @@ scene = ["Busted Caravan",
          "Busted Caravan",
          "Busted Caravan",
          "Busted Caravan"]
-dialogueType = ["desc", "choice", "choice", "choice", 
+dialogueType = ["desc", "choice", "choice", "choice",
                 "desc", "choice", "choice",
                 "desc", "desc", "choice", "desc", "choice"]
 dlg = ["You find yourselves peeking through the trees towards a caravan that seems to have been stranded in the middle of the forest. What will you do?",
@@ -139,7 +142,7 @@ dlg = ["You find yourselves peeking through the trees towards a caravan that see
        "Walk away from the scene",
        "A goblin walks up to stand between you and the caravan. ‘Hello, traveler. Our caravan tipped over, but we have to deliver these goods by nightfall. We would be grateful for your help.’",
        "Help the goblins repair the caravan (STR)",
-       "Nah, they got it", 
+       "Nah, they got it",
        "The goblins cheer and get ready to go. ‘You have our gratitude. Here, have this.’",
        "The goblins look at you impatiently. ‘You’re just here to hold us up, aren’t you?’",
        "Fight the goblins",
@@ -252,7 +255,7 @@ for i in range(len(items)):
     d = (items[i], type[i], img[i], statStr[i], statDex[i], statCon[i], statInt[i], statFth[i], statLck[i], hpInc[i], gold[i], gearType[i])
     c.execute(q, d)
     db.commit()
-         
+
 for i in range(len(species)):
     q = "INSERT OR REPLACE INTO enemies(species, attacks, hp, weakness, res, drops) VALUES (?, ?, ?, ?, ?, ?)"
     d = (species[i], attacks[i], enemyHP[i], weakness[i], enemyRes[i], drops[i])
@@ -270,7 +273,7 @@ for i in range(len(name)):
     d = (name[i], background[i], desc[i], diff[i])
     c.execute(q, d)
     db.commit()
-         
+
 # test test test!!!!!!!!!!!!!!!!!!)
 # c.execute("""
 # INSERT or REPLACE INTO enemies
@@ -676,9 +679,22 @@ def equipGear(gear):
     currEquips = fetch_equips()
 
     type = c.execute("SELECT gearType FROM items WHERE name = ?", (gear,)).fetchone()[0]
+
+    if type == "accessory":
+        accessories = c.execute('''SELECT accessory1, accessory2, accessory3
+                                    FROM player WHERE username = ?''', (session['username'],)).fetchone()
+        for a in accessories:
+            if a == "":
+                type = f"accessory{accessories.index(a)+1}"
+                break
+
+        if type == "accessory":
+            type = 'accessory1'
+
     if currEquips[type] != "":
         itemStats = fetch_itemStats(currEquips[type])
         updateStats(itemStats[0], itemStats[1], itemStats[2], itemStats[3], itemStats[4], itemStats[5], False)
+
 
     c.execute(f"UPDATE player SET {type} = ? WHERE username = ?",
         (gear, session['username'],))
