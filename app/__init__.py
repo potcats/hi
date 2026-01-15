@@ -110,9 +110,50 @@ attackName = ["pie throw", "granny kick", "granny kick barrage",
               "sting", "stinger burst",
               "dust bolt", "wondrous light", "magic dust",
               "boop", "swipe", "bark", "nom",
-              "gnaw", "rat flip"]
-hits =   [1, 1, 4, 5, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3, 1, 1, 1, 3, 1, 1, 2, 1, 1]
-energy = [1, 0, 2, 1, 0, 2, 1, 0, 1, 0, 1, 0, 0, 2, 0, 0, 2, 0, 2, 1, 1, 0, 2, 2, 0, 2]
+              "gnaw", "rat flip"
+              "strike", "cross slash", "rally", "heavy strike", "guard"]
+hits =   [1, 1, 4, 5, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3, 1, 1, 1, 3, 1, 1, 2, 1, 1, 1 ,2, 0, 1, 0]
+energy = [1, 0, 2, 1, 0, 2, 1, 0, 1, 0, 1, 0, 0, 2, 0, 0, 2, 0, 2, 1, 1, 0, 2, 2, 0, 2, 0, 2, 3, 1, 0]
+level =  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 5, 0]
+cd =     [2, 0, 3, 4, 0, 3, 0, 0, 2, 0, 0, 0, 0, 4, 0, 0, 3, 0, 2, 5, 3, 0, 2, 4, 0, 4, 0, 4, 6, 5, 0]
+scale = ["", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "str", "str", "str", "str", ""]
+statusEff = ["", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "dmgUP", "", "defUP"]
+baseDmg = [12, 8, 4, 3, 6, 8, 6, 4, 5, 4, 7, 8, 10, 14, 3, 3, 4, 6, 9, 0, 6, 14, 8, 17, 3, 6, 6, 9, 0, 15, 0]
+
+# DIALOGUE
+scene = ["Busted Caravan",
+         "Busted Caravan",
+         "Busted Caravan",
+         "Busted Caravan",
+         "Busted Caravan",
+         "Busted Caravan",
+         "Busted Caravan",
+         "Busted Caravan",
+         "Busted Caravan",
+         "Busted Caravan",
+         "Busted Caravan",
+         "Busted Caravan"]
+dialogueType = ["desc", "choice", "choice", "choice", 
+                "desc", "choice", "choice",
+                "desc", "desc", "choice", "desc", "choice"]
+dlg = ["You find yourselves peeking through the trees towards a caravan that seems to have been stranded in the middle of the forest. What will you do?",
+       "Battle the goblins for their goods",
+       "Approach the goblin caravan",
+       "Walk away from the scene",
+       "A goblin walks up to stand between you and the caravan. ‘Hello, traveler. Our caravan tipped over, but we have to deliver these goods by nightfall. We would be grateful for your help.’",
+       "Help the goblins repair the caravan (STR)",
+       "Nah, they got it", 
+       "The goblins cheer and get ready to go. ‘You have our gratitude. Here, have this.’",
+       "The goblins look at you impatiently. ‘You’re just here to hold us up, aren’t you?’",
+       "Fight the goblins",
+       "Fine! We'll make it work...",
+       "Move on from the scene"]
+ord = [1, 1, 1, 1, 2, 2, 2, 3, 3, 3, 3, 3]
+prevChoice = ["", "", "", "", "B", "B", "B", "A", "A", "A", "B", "B"]
+currChoice = ["", "A", "B", "C", "", "A", "B", "", "", "", "", ""]
+stat = ["", "", "", "", "", "str", "", "pass", "fail", "", "", ""]
+statReq = [0, 0, 0, 0, 0, 10, 0, 0, 0, 0, 0, 0]
+reward = ["", "", "", "", "", "", "", "gold", "", "", "", 0]
 
 DB_FILE = "data.db"
 
@@ -169,11 +210,13 @@ c.execute("""
     CREATE TABLE IF NOT EXISTS dialogue (
     scene TEXT NOT NULL,
     type TEXT NOT NULL,
+    dlg TEXT NOT NULL,
     ord INTEGER,
     prevChoice TEXT,
-    nextChoice TEXT,
+    currChoice TEXT,
     stat TEXT,
-    statReq INTEGER
+    statReq INTEGER,
+    reward TEXT
 );
 """)
 
@@ -212,7 +255,25 @@ for i in range(len(items)):
     d = (items[i], type[i], img[i], statStr[i], statDex[i], statCon[i], statInt[i], statFth[i], statLck[i], hpInc[i], gold[i], gearType[i])
     c.execute(q, d)
     db.commit()
+         
+for i in range(len(species)):
+    q = "INSERT OR REPLACE INTO enemies(species, attacks, hp, weakness, res, drops) VALUES (?, ?, ?, ?, ?, ?)"
+    d = (species[i], attacks[i], enemyHP[i], weakness[i], enemyRes[i], drops[i])
+    c.execute(q, d)
+    db.commit()
 
+for i in range(len(attackName)):
+    q = "INSERT OR REPLACE INTO attacks(name, hits, level, energy, cd, scale, statusEffects, baseDamage) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
+    d = (attackName[i], hits[i], level[i], energy[i], cd[i], scale[i], statusEff[i], baseDmg[i])
+    c.execute(q, d)
+    db.commit()
+
+for i in range(len(name)):
+    q = "INSERT OR REPLACE INTO encounters(type, background, desc, diff) VALUES (?, ?, ?, ?)"
+    d = (name[i], background[i], desc[i], diff[i])
+    c.execute(q, d)
+    db.commit()
+         
 # test test test!!!!!!!!!!!!!!!!!!)
 # c.execute("""
 # INSERT or REPLACE INTO enemies
