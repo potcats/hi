@@ -536,16 +536,19 @@ def encounters():
     # testttttt
     encounters = []
     for i in range(len(name)):
-        encounters.append({
-            "id": i,
-            "name": name[i],
-            "background": background[i],
-            "desc": desc[i],
-            "diff": diff[i]
-        })
+        if name[i] != "Short Rest":
+            encounters.append({
+                "id": i,
+                "name": name[i],
+                "background": background[i],
+                "desc": desc[i],
+                "diff": diff[i]
+            })
     rd = random.sample(encounters, 3)
 
-    return render_template("encounters.html", encounters=rd, turn=session.get("turn", 1))
+    return render_template("encounters.html",
+        encounters=rd,
+        turn=session.get("turn", 1))
 
 @app.route('/shop/<string:type>', methods=['GET', 'POST'])
 def shop(type):
@@ -636,8 +639,8 @@ def shop(type):
         lck=stats[7],
         shop=shop)
 
-@app.route('/dialogue', methods=['GET', 'POST'])
-def dialogue():
+@app.route('/dialogue/<string:encounter>', methods=['GET', 'POST'])
+def dialogue(encounter):
 
     return render_template("dialogue.html", )
 
