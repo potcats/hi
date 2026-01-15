@@ -96,8 +96,8 @@ P02: Makers Makin' It, Act I
 
     #next:hover,
     .inv:hover:not(.sellable),
-    .inspect:hover {
-      filter: brightness(120%);;
+    .inspect:hover:not(:disabled) {
+      filter: brightness(120%);
     }
 
     /* STATS/EQUIPS AREA */
@@ -236,7 +236,7 @@ P02: Makers Makin' It, Act I
   </div>
 
   <div class="container" id="inv">
-    <div class="container overflow-auto" style="height: 60%">
+    <div class="container overflow-auto" id="invInner" style="height: 60%">
       {% for item in inventory %}
         {% if inventory[item][1] == "consumable" %}
           <button class="center inv {{ item }}" onclick="clicked(this)"> {{ inventory[item][2] }}x {{ item }} </button>
@@ -326,11 +326,11 @@ P02: Makers Makin' It, Act I
   <script>
     var inv = {{ inventory | tojson }};
     var shop = {{ shop | tojson }};
-    console.log(shop);
     var selectedItm = "";
     var selectedProd = "";
     var sellMode = false;
     var equipped = {{ equips | tojson }};
+    var gold = {{ gold }};
 
     window.onload = function() {
       document.getElementById('sell').style.borderColor = "darkred";
@@ -462,6 +462,8 @@ P02: Makers Makin' It, Act I
       document.getElementById('itemNameS').innerHTML = shop[name][0];
 
       document.getElementById("inspectBuy").style.display = "block"
+      if (gold < shop[selectedProd][3]) { document.getElementById("inspectBuy").disabled = true }
+      else { ddocument.getElementById("inspectBuy").disabled = false }
 
       if (shop[name][1] == "consumable") {
         let effects = "";
@@ -512,6 +514,35 @@ P02: Makers Makin' It, Act I
       }
     }
 
+    function buy() {
+      let status = inv.includes(selectedProd);
+      let buy = new XMLHttpRequest();
+
+      buy.open('POST', window.location.href, true);
+      buy.setRequestHeader("buy", selectedProd);
+      buy.send();
+
+      buy.onload = function() {
+        if (this.readyState == 4 && this.status == 200) {
+          inv = this.response;
+        }
+
+        if (!status || shop[selectedProd][1] == "gear") {
+          let newBtn = `<button class="center inv ${ selectedProd }" onclick="clicked(this)"> ${ selectedProd }selectedProd </button>`;
+          document.getElementById("invInner").innerHTML += newBtn;
+        } else {
+          document.getElementsByClassName(selectedProd)[0].innerHTML = `${inv[selectedProd][2]}x ${selectedItm}`
+        }
+
+        gold -= shop[selectedProd][3];
+        document.getElementById('gold').innerHTML = `GOLD: ${gold}`;
+
+        if (gold < shop[selectedProd][3]) {
+          document.getElementById('inspectBuy').disabled = true;
+        }
+      }
+    }
+
     function sell() {
       let newGold = "";
       let sell = new XMLHttpRequest();
@@ -538,6 +569,7 @@ P02: Makers Makin' It, Act I
         }
 
         document.getElementById('gold').innerHTML = `GOLD: ${newGold}`;
+        gold = newGold;
       }
     }
 

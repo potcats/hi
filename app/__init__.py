@@ -624,6 +624,14 @@ def shop(type):
 
             return dumps(currStats)
 
+        if 'buy' in data:
+            itm = data['buy']
+
+            addItemToInventory(itm)
+            inv = session['inventory']
+
+            return dumps(inv)
+
     return render_template("shop.html",
         bg=bg,
         currTurn=session['turn'],
