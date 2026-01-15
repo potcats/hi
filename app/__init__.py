@@ -48,14 +48,26 @@ species = ["bandit",
            "wizard"]
 attacks = ["fire bomb,quick slash,light stab",
            "sting,stinger burst",
-           "fire bomb,fire thunderbuss,",
-           "small shieldbreaker,",
+           "fire bomb,fire thunderbuss",
+           "small shieldbreaker,club bash",
            "tiny strike,jugg",
            "pie throw,granny kick,granny kick barrage",
            "boulder bump",
            "dust bolt,wondrous light,magic dust",
            "gnaw,rat flip",
            "spell scroll:magic missile,flame bolt,fireball"]
+enemyHP = [16, 17, 25, 35, 15, 55, 12, 17, 7, 60]
+weakness = ["str", "", "", "", "str", "str", "", "", "str", "str"]
+enemyRes = ["", "", "", "str", "", "", "str", "str", "", ""]
+drops = ["cloth veil",
+         "honey,stinger pendant",
+         "iron greaves,iron helmet",
+         "iron chestplate,iron leggings,crude club",
+         "cloth robe,cloth leggings,ring of goblin ears,noble's sabre",
+         "iron greaves,iron helmet,iron chestplate,iron leggings",
+         "healing potion,magical vial of water",
+         "rat hide cloak,rat hide hood,rat hide boots",
+         "healing potion,magical vial of water,cloth veil,cloth robe,cloth leggings"]
 
 # ENCOUNTERS
 name = ["Travelling Merchant",
@@ -93,14 +105,14 @@ attackName = ["pie throw", "granny kick", "granny kick barrage",
               "spell scroll: magic missile", "flame bolt", "fireball",
               "fire bomb", "quick slash", "light stab", 
               "tiny strike", "jugg", 
-              "club smash", "beat down",
+              "fire thunderbuss", "hook slash", "small shieldbreaker",
               "boulder bump",
               "sting", "stinger burst",
               "dust bolt", "wondrous light", "magic dust",
               "boop", "swipe", "bark", "nom",
               "gnaw", "rat flip"]
-hits = [1, 1, 4, 5, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3, 1, 1, 1, 3, 1, 1, 2, 1, 1]
-energy = [1, 0, 2, 1, 0, 2, 1, 0, 1, 0, 1, 0, 3, 0, 0, 2, 0, 2, 1, 1, 0, 2, 2, 0, 2]
+hits =   [1, 1, 4, 5, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3, 1, 1, 1, 3, 1, 1, 2, 1, 1]
+energy = [1, 0, 2, 1, 0, 2, 1, 0, 1, 0, 1, 0, 0, 2, 0, 0, 2, 0, 2, 1, 1, 0, 2, 2, 0, 2]
 
 DB_FILE = "data.db"
 
