@@ -231,6 +231,12 @@ for i in range(len(attackName)):
     c.execute(q, d)
     db.commit()
 
+for i in range(len(name)):
+    q = "INSERT OR REPLACE INTO encounters(type, background, desc, diff) VALUES (?, ?, ?, ?)"
+    d = (name[i], background[i], desc[i], diff[i])
+    c.execute(q, d)
+    db.commit()
+         
 # test test test!!!!!!!!!!!!!!!!!!)
 # c.execute("""
 # INSERT or REPLACE INTO enemies
