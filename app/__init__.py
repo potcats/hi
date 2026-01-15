@@ -488,7 +488,7 @@ def battle():
             randomEnemy('goblin'),
             randomEnemy('bee')
         ])
-        return render_template("battle.html", battle=session['battle'])
+        return render_template("battle.html", battle = session['battle'], inventory = session.get('inventory'))
 
     if request.method == 'POST':
         data = request.get_json()
@@ -521,7 +521,7 @@ def battle():
 
         return jsonify(session["battle"])
 
-    return render_template("battle.html", battle = session['battle'])
+    return render_template("battle.html", battle = session['battle'], inventory = session.get('inventory'))
 
 @app.route('/encounters', methods=['GET', 'POST'])
 def encounters():

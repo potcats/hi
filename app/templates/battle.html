@@ -416,11 +416,14 @@ P02: Makers Makin' It, Act I
     <!-- Items Panel -->
     <div id = "items-panel" class = "panel" style = "display: none;">
       <div class = "items-grid" style = "grid-template-columns: repeat(8, 1fr);">
-        {% for item in inventory %}
-        <div class = "slot bg-dark d-flex flex-column align-items-center justify-content-center"
-             onclick = "useItem(item)">
-             Help
-        </div>
+        {% for name, item in inventory.items() %}
+          {% if item[1] == "consumable" %}
+          <div class = "slot bg-dark d-flex flex-column align-items-center justify-content-center"
+               onclick = "useItem('{{ name }}')">
+            <div class = "small text-center"> {{ name }} </div>
+            <div class = "small">x{{ item[2] }}</div>
+          </div>
+          {% endif %}
         {% endfor %}
         {% for i in range(8 - battle.player.inventory|length) %}
         <div class = "slot empty"></div>
