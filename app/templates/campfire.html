@@ -88,16 +88,6 @@ P02: Makers Makin' It, Act I
       background-color: grey;
     }
 
-    #confirm {
-      width: 50%;
-
-      font-size: 120%;
-
-      border-style: solid;
-      border-width: thick;
-      background-color: grey;
-    }
-
     #close:hover, #next:hover,
     .inv:hover:not(.sellable),
     .inspect:hover, #pts:hover,
@@ -232,6 +222,31 @@ P02: Makers Makin' It, Act I
       background-color: grey
     }
 
+    /* POINT ALLOCATION */
+    #allocate {
+      position: absolute;
+      z-index: 1;
+
+      left: 50%;
+      top: 40%;
+      transform: translate(-50%, -50%);
+
+      background-color: dimgrey;
+    }
+
+    .hiding {
+      display: none;
+    }
+
+    #confirm {
+      width: 30%;
+
+      font-size: 140%;
+
+      border-style: none;
+      background-color: grey;
+    }
+
   </style>
 
 </head>
@@ -360,8 +375,17 @@ P02: Makers Makin' It, Act I
   </div>
 
   <!-- ALLOCATE POINTS DISPLAY -->
-  <div class="container allocate" id="allocate">
-    <div class="row" id="allHeading"> POINTS: {{ statPoints }} <hr> </div>
+  <div class="hiding" id="blackout" style="position: absolute; z-index: 0;
+                            top: 0; background-color:black; height:100vh;
+                            width: 100vw; filter: opacity(50%)">
+  </div>
+
+  <div class="container allocate hiding" style="padding: 20px;" id="allocate">
+    <div class="row" id="allHeading">
+      <h3 style="text-align: center" > POINTS: {{ statPoints }} </h3>
+      <br><br>
+      <hr>
+    </div>
     <div class="row" id="up">
       {% for i in range(0,6) %}
         <div class="col">
@@ -369,12 +393,12 @@ P02: Makers Makin' It, Act I
       {% endfor %}
     </div>
     <div class="row" id="stats">
-      <div class="col" id='STR'> STR <br> ({{ str }}) </div>
-      <div class="col" id='DEX'> DEX <br> ({{ dex }}) </div>
-      <div class="col" id='CON'> CON <br> ({{ con }}) </div>
-      <div class="col" id='INT'> INT <br> ({{ int }}) </div>
-      <div class="col" id='FTH'> FTH <br> ({{ fth }}) </div>
-      <div class="col" id='LCK'> LCK <br> ({{ lck }}) </div>
+      <div class="col" style="text-align: center" id='STR'> STR <br> ({{ str }}) </div>
+      <div class="col" style="text-align: center" id='DEX'> DEX <br> ({{ dex }}) </div>
+      <div class="col" style="text-align: center" id='CON'> CON <br> ({{ con }}) </div>
+      <div class="col" style="text-align: center" id='INT'> INT <br> ({{ int }}) </div>
+      <div class="col" style="text-align: center" id='FTH'> FTH <br> ({{ fth }}) </div>
+      <div class="col" style="text-align: center" id='LCK'> LCK <br> ({{ lck }}) </div>
     </div>
     <div class="row" id="down">
       {% for i in range(0,6) %}
@@ -382,8 +406,8 @@ P02: Makers Makin' It, Act I
         </div>
       {% endfor %}
     </div>
-    <div class="row" id="closeAll">
-      <button onclick="closeAllo()" id="confirm"> CONFIRM </button>
+    <div class="row" id="closeAll" style="margin-top:20px">
+      <button class="center" onclick="closeAllo()" id="confirm"> CONFIRM </button>
     </div>
   </div>
 
@@ -405,7 +429,6 @@ P02: Makers Makin' It, Act I
     /* EVENTS THAT WILL OCCUR ON LOAD */
     window.onload = function() {
       document.getElementById('sell').style.borderColor = "darkred";
-      document.getElementById('allocate').style.display = 'none';
 
       for (items in inv) {
         if (Object.values(equipped).includes(items)) {
@@ -703,6 +726,17 @@ P02: Makers Makin' It, Act I
         document.getElementById('fth').innerHTML = `FTH: ${stats[6]}`;
         document.getElementById('lck').innerHTML = `LCK: ${stats[7]}`;
       }
+    }
+
+    /* POINT ALLOCATION */
+    function openAllo() {
+      document.getElementById("allocate").classList.remove("hiding")
+      document.getElementById("blackout").classList.remove("hiding")
+    }
+
+    function closeAllo() {
+      document.getElementById("allocate").classList.add("hiding")
+      document.getElementById("blackout").classList.add("hiding")
     }
 
   </script>
