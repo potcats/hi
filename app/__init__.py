@@ -314,6 +314,7 @@ def menu():
     session['inventory'] = {} # [name] {name, type, quantity, gold}
     session['gold'] = 0
     session['hp'] = fetch_stats()[1]
+    session['statPoints'] = 0
 
     addItemToInventory("simple sword")
 
@@ -367,7 +368,6 @@ def campfire():
 
             itemStats = fetch_itemStats(itm)
             updateStats(itemStats[0], itemStats[1], itemStats[2], itemStats[3], itemStats[4], itemStats[5])
-            stats = fetch_stats()
 
             equipGear(itm)
 
@@ -380,7 +380,6 @@ def campfire():
 
             itemStats = fetch_itemStats(gear)
             updateStats(itemStats[0], itemStats[1], itemStats[2], itemStats[3], itemStats[4], itemStats[5], False)
-            stats = fetch_stats()
 
             unEquipGear(itm)
 
@@ -392,6 +391,10 @@ def campfire():
             currStats[1] = session['hp']
 
             return dumps(currStats)
+
+        if 'points' in data:
+            newStats = data['points'].split(",")
+            updateStats(newStats[0], newStats[1], newStats[2], newStats[3], newStats[4], newStats[5])
 
     return render_template("campfire.html",
         currTurn=session['turn'],
@@ -408,6 +411,7 @@ def campfire():
         int=stats[5],
         fth=stats[6],
         lck=stats[7],
+        statPoints = session['statPoints'],
         )
 
 @app.route('/battle', methods=['GET', 'POST'])
@@ -611,8 +615,13 @@ def updateStats(str, dex, con, int, fth, lck, increase=True):
 # sets new piece of gear in player db
 def equipGear(gear):
     c = db.cursor()
+    currEquips = fetch_equips()
 
     type = c.execute("SELECT gearType FROM items WHERE name = ?", (gear,)).fetchone()[0]
+    if currEquips[type] != "":
+        itemStats = fetch_itemStats(currEquips[type])
+        updateStats(itemStats[0], itemStats[1], itemStats[2], itemStats[3], itemStats[4], itemStats[5], False)
+
     c.execute(f"UPDATE player SET {type} = ? WHERE username = ?",
         (gear, session['username'],))
 
@@ -644,6 +653,8 @@ def lvlup(battle, currlvl):
         diffMultiplier = diffMultiplier[0]
     else:
         diffMultiplier = 1
+
+    session['statPoints'] = session['statPoints'] + (3 * diffMultiplier)
 
     c.execute("UPDATE player SET level = ? WHERE username = ?",
         (currlvl + diffMultiplier, session['username']))

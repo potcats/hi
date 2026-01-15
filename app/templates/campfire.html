@@ -83,11 +83,26 @@ P02: Makers Makin' It, Act I
     }
 
     #pts {
+      width: 10em;
+      height: 2.5em;
       background-color: grey;
     }
 
-    #close:hover, #next:hover, .inv:hover:not(.sellable), .inspect:hover, #pts:hover {
-      background-color: darkgrey;
+    #confirm {
+      width: 50%;
+
+      font-size: 120%;
+
+      border-style: solid;
+      border-width: thick;
+      background-color: grey;
+    }
+
+    #close:hover, #next:hover,
+    .inv:hover:not(.sellable),
+    .inspect:hover, #pts:hover,
+    #confirm:hover {
+      filter: brightness(120%);;
     }
 
     /* INVENTORY STUFF */
@@ -272,7 +287,7 @@ P02: Makers Makin' It, Act I
       <!-- temp range -->
       <text> INITIATIVE: 4 -- 7 </text> <br>
       <br>
-      <button id="pts"> POINTS </button>
+      <button id="pts" onclick="openAllo()"> POINTS ({{ statPoints }}) </button>
       <br><br>
     </div>
     <br>
@@ -344,6 +359,34 @@ P02: Makers Makin' It, Act I
     {% endfor %}
   </div>
 
+  <!-- ALLOCATE POINTS DISPLAY -->
+  <div class="container allocate" id="allocate">
+    <div class="row" id="allHeading"> POINTS: {{ statPoints }} <hr> </div>
+    <div class="row" id="up">
+      {% for i in range(0,6) %}
+        <div class="col">
+        </div>
+      {% endfor %}
+    </div>
+    <div class="row" id="stats">
+      <div class="col" id='STR'> STR <br> ({{ str }}) </div>
+      <div class="col" id='DEX'> DEX <br> ({{ dex }}) </div>
+      <div class="col" id='CON'> CON <br> ({{ con }}) </div>
+      <div class="col" id='INT'> INT <br> ({{ int }}) </div>
+      <div class="col" id='FTH'> FTH <br> ({{ fth }}) </div>
+      <div class="col" id='LCK'> LCK <br> ({{ lck }}) </div>
+    </div>
+    <div class="row" id="down">
+      {% for i in range(0,6) %}
+        <div class="col">
+        </div>
+      {% endfor %}
+    </div>
+    <div class="row" id="closeAll">
+      <button onclick="closeAllo()" id="confirm"> CONFIRM </button>
+    </div>
+  </div>
+
   <!-- BOOTSTRAP JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
     integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
@@ -362,6 +405,7 @@ P02: Makers Makin' It, Act I
     /* EVENTS THAT WILL OCCUR ON LOAD */
     window.onload = function() {
       document.getElementById('sell').style.borderColor = "darkred";
+      document.getElementById('allocate').style.display = 'none';
 
       for (items in inv) {
         if (Object.values(equipped).includes(items)) {
@@ -466,7 +510,7 @@ P02: Makers Makin' It, Act I
       if (name.split(" ")[1] == "sellable") { name = name.split(" ")[0] }
       selectedItm = name;
 
-      console.log(name);
+      // console.log(name);
 
       document.getElementById('noInspect').style.display = "none";
       document.getElementById('itemName').innerHTML = inv[name][0];
@@ -622,7 +666,10 @@ P02: Makers Makin' It, Act I
         if (equipped[gear] != "") {
           if (document.getElementById(gear).innerHTML.includes("<br>")) {
             if (!document.getElementById(gear).innerHTML.includes(equipped[gear])) {
-              document.getElementById(gear).innerHTML = document.getElementById(gear).innerHTML.split("<br><br>")[0] + "<br><br>" + equipped[gear];
+              let og = document.getElementById(gear).innerHTML.split("<br><br>");
+
+              document.getElementById(gear).innerHTML = og[0] + "<br><br>" + equipped[gear];
+              document.getElementsByClassName(og[1])[0].style.display = "block";
             }
           } else {
             document.getElementById(gear).innerHTML += "<br><br>" + equipped[gear];
