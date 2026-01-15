@@ -494,14 +494,14 @@ def battle():
         data = request.get_json()
         action = data.get('action')
 
-        if action == 'attack':
-            move = data.get('move')
-            target = data.get('target')
-            session['battle']['action'] = {
-                "source": "player",
-                "target": target,
-                "result": player_attack(session['battle'], target, move)
-            }
+        if action == "attack":
+            battle = player_attack(
+                session["battle"],
+                data["target"],
+                data["move"]
+            )
+            session["battle"] = battle
+            return jsonify(battle)
 
         elif action == 'item':
             item = data.get('item')
@@ -509,16 +509,10 @@ def battle():
         elif action == 'focus':
             session['battle'] = focus(session['battle'])
 
-        elif action == 'enemy':
-            enemy_actions = []
-            for i, enemy in enumerate(session['battle']['enemies']):
-                if enemy['hp'] > 0:
-                    enemy_actions.append({
-                        "source": "enemy",
-                        "enemy_idx": i,
-                        "result": enemy_attack(session['battle'], i)
-                    })
-            session['battle']['actions'] = enemy_actions
+        elif action == "advance":
+            battle = advance_turn(session["battle"])
+            session["battle"] = battle
+            return jsonify(battle)
 
         # Player Death Check
         if deathCheck(session['battle']):

@@ -184,7 +184,7 @@ P02: Makers Makin' It, Act I
       transition: opacity 0.3 ease, filter 0.3 ease;
     }
 
-    #dmg-popup {
+    .dmg-popup {
       position: fixed;
       font-size: 22px;
       font-weight: bold;
@@ -446,8 +446,11 @@ P02: Makers Makin' It, Act I
         currentBattle = battle;
         updateBattle(battle);
 
-        if (battle.action && battle.action.source === "player") {
-          showHits("enemy", battle.action.result, i);
+        if (battle.actions && battle.actions.length > 0) {
+          const act = battle.actions[0];
+          if (act.source === "player") {
+            showHits("enemy", act.result, i);
+          }
         }
       }
 
@@ -474,9 +477,6 @@ P02: Makers Makin' It, Act I
   }
 
   function enemyTurn() {
-    turn = "enemy";
-    updateTurnUI();
-
     setTimeout(() => {
       let xhttp = new XMLHttpRequest();
       xhttp.open("POST", "/battle", true);
@@ -487,6 +487,8 @@ P02: Makers Makin' It, Act I
 
         const battle = JSON.parse(this.responseText);
         currentBattle = battle;
+
+        turn = battle.turn
         updateBattle(battle);
 
         if (battle.actions && battle.actions.length > 0) {
@@ -498,24 +500,17 @@ P02: Makers Makin' It, Act I
         }
       };
 
-      xhttp.send(JSON.stringify({ action: "enemy" }));
+      xhttp.send(JSON.stringify({ action: "advance" }));
     }, PAUSE_MS);
   }
 
   function enemyAct(i, result) {
-    turn = "enemy";
     updateTurnUI(i);
     enemyAtkAnim(i);
 
     if (result.length > 0) {
       showHits("player", result);
     }
-
-    setTimeout(() => {
-      turn = "player";
-      updateTurnUI();
-      showActions();
-    }, POPUP_MS + PAUSE_MS);
   }
 
   function enemyActions(actions, i = 0) {
@@ -535,7 +530,8 @@ P02: Makers Makin' It, Act I
   }
 
   function showDmg(target, dmg, status = "", enemyIdx = null, offset = 0) {
-    const popup = document.getElementById("dmg-popup");
+    const popup = document.createElement("div");
+    popup.className = "dmg-popup";
 
     if (status == "crit") {
       popup.innerText = `CRIT ${dmg}!`;
@@ -561,7 +557,10 @@ P02: Makers Makin' It, Act I
 
     const rect = element.getBoundingClientRect(); // returns element pos/size
     popup.style.left = rect.left + rect.width / 2 + "px";
-    popup.style.top = (rect.top - offset * 15) + "px";
+    popup.style.top = (rect.top - offset * 12) + "px";
+
+    document.body.appendChild(popup);
+
     popup.style.display = "block";
     popup.style.opacity = 1;
     popup.style.transform = "translateY(0px)";
@@ -580,22 +579,21 @@ P02: Makers Makin' It, Act I
     let offset = 0;
 
     hits.forEach(hit => {
-      const st = hit[0];
-      const dmg = hit[1];
+      const [st, dmg] = hit;
 
       setTimeout(() => {
 
-        // stop combo if dead
-        if (target === "enemy" && enemyIdx !== null) {
-          const enemy = currentBattle.enemies[enemyIdx];
-          if (!enemy || enemy.hp <= 0) return;
-        }
-        if (target === "player") {
-          if (currentBattle.player.hp <= 0) return;
-        }
+        // // stop combo if dead
+        // if (target === "enemy" && enemyIdx !== null) {
+        //   const enemy = currentBattle.enemies[enemyIdx];
+        //   if (!enemy || enemy.hp <= 0) return;
+        // }
+        // if (target === "player") {
+        //   if (currentBattle.player.hp <= 0) return;
+        // }
 
         showDmg(target, dmg, st, enemyIdx, offset);
-      }, offset * 350)
+      }, offset * 150);
       offset++;
 
     });
@@ -742,8 +740,6 @@ P02: Makers Makin' It, Act I
   updateTurnUI();
 
   </script>
-
-  <div id = "dmg-popup"></div>
 
 </body>
 

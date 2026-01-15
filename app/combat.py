@@ -185,7 +185,13 @@ def createBattle(enemies):
         "focused": False
     }
 
-    return {"player": player, "enemies": enemies}
+    return {
+        "turn": "player",
+        "player": player,
+        "enemies": enemies,
+        "actions": [],
+        "ended": False
+    }
 
 def player_startTurn(battle_id):
     player = battle_id["player"]
@@ -205,13 +211,14 @@ def player_startTurn(battle_id):
 
 #enemy indexed by 0 pls
 def enemy_startTurn(battle_id, enemy):
+    en = battle_id["enemies"][enemy]
     #reduce all cd by 1
     for i in range(0,3):
-        if battle_id[1][enemy][1][1][i] > 0:
-            battle_id[1][enemy][1][1][i] -= 1
+        if en["cds"][i] > 0:
+            en["cds"][i] -= 1
 
     #increase energy by 1
-    battle_id[1][enemy][4] += 1
+    enemy["energy"] = min(enemy["energy"] + 1, enemy["max_energy"])
     return battle_id
 
 def guard(battle_id):
@@ -246,7 +253,13 @@ def player_attack(battle_id, defender, move):
     #check for kills
     battle_id = killCheck(battle_id)
 
-    return result
+    battle_id["actions"] = [{
+        "source": "player",
+        "target": defender,
+        "result": result
+    }]
+    battle_id["turn"] = "enemy"
+    return battle_id
 
 # attack(forest_battle1, 2) means that enemy #2 (index from 0) is attacking
 def enemy_attack(battle_id, attacker):
@@ -272,7 +285,8 @@ def enemy_attack(battle_id, attacker):
         battle_id["player"]["hp"] -= i[1]
 
     #check for death
-    battle_id = deathCheck(battle_id)
+    if deathCheck(battle_id):
+        battle_id["ended"] = True
 
     return result
 
@@ -347,3 +361,30 @@ def deathCheck(battle_id):
     if battle_id["player"]["hp"] <= 0:
         return True
     return False
+
+def advance_turn(battle):
+    battle["actions"] = []
+
+    # Enemy Turn
+    if battle["turn"] == "enemy":
+        for i, enemy in enumerate(battle["enemies"]):
+            if enemy["hp"] > 0:
+                result = enemy_attack(battle, i)
+                battle["actions"].append({
+                    "source": "enemy",
+                    "enemy_idx": i,
+                    "result": result
+                })
+
+                if deathCheck(battle):
+                    battle["ended"] = True
+                    return battle
+
+        battle["turn"] = "player"
+        return battle
+
+    else:
+        # start of player turn
+        battle = player_startTurn(battle)
+        battle["turn"] = "player"
+        return battle
