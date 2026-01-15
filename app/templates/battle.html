@@ -92,8 +92,8 @@ P02: Makers Makin' It, Act I
 
     .target-ind {
       position: absolute;
-      top: -35px;
-      left: 53%;
+      top: -50px;
+      left: 48%;
       transform: translateX(-50%);
       font-size: 28px;
       font-weight: bold;
@@ -105,8 +105,28 @@ P02: Makers Makin' It, Act I
 
     .enemy-wrap.targeted .target-ind {
       opacity: 1;
-      transform: translateX(-50%) translateY(-6px);
+      animation: float 2s ease;
+      animation-iteration-count: infinite; 
     }
+
+    @keyframes float {
+      0% {
+        transform: translateY(0);
+      }
+      25% {
+        transform: translateY(8px);
+      }
+      50% {
+        transform: translateY(-8px);
+      }
+      75% {
+        transform: translateY(8px);
+      }
+      100% {
+        transform: translateY(0);
+      }
+    }
+      
 
     .items-grid {
       display: grid;
@@ -196,7 +216,6 @@ P02: Makers Makin' It, Act I
     .inactive {
       opacity: 0.4;
       transition: opacity 0.3 ease, filter 0.3 ease;
-      pointer-events: none;
     }
 
     .dmg-popup {
@@ -232,7 +251,7 @@ P02: Makers Makin' It, Act I
 
     .action-banner {
       position: fixed;
-      top: 70%;
+      top: 77%;
       left: -100%;
       width: 100%;
       height: 50px;
@@ -284,13 +303,13 @@ P02: Makers Makin' It, Act I
             <h5 class = "fw-bold"> {{ battle.player.username }} </h5>
             <div class = "progress">
               <div class = "progress-bar bg-danger player-hp" style = "width: {{ (battle.player.hp / 30) * 100 }}%">
-                <div id = "player-hp-text">{{ battle.player.hp }} / {{ battle.player.max_hp }}</div>
               </div>
+              <div id = "player-hp-text" class = "bar-text" style = "font-size: 13px;">{{ battle.player.hp }} / {{ battle.player.max_hp }}</div>
             </div>
             <div class = "progress">
               <div class = "progress-bar bg-info player-energy" style = "width: {{ (battle.player.energy / 6) * 100 }}%">
-                {{ battle.player.energy }} / 6
               </div>
+              <div class = "bar-text player-energy-text" style = "font-size: 13px;">{{ battle.player.energy }} / {{ battle.player.max_energy }} </div>
             </div>
           </div>
 
@@ -299,12 +318,12 @@ P02: Makers Makin' It, Act I
             <h5 class = "fw-bold"> {{ enemy.species }} </h5>
             <div class = "progress">
               <div class = "progress-bar bg-danger enemy-hp" style = "width: {{ (enemy.hp / enemy.max_hp) * 100 }}%">
-                {{ enemy.hp }} / {{ enemy.max_hp }}
+                  <div class = "bar-text enemy-hp-text" style = "font-size: 13px;"> {{ enemy.hp }} / {{ enemy.max_hp }} </div>
               </div>
             </div>
             <div class = "progress">
               <div class = "progress-bar bg-info enemy-energy" style = "width: {{ (enemy.energy / 6) * 100 }}%">
-                {{ enemy.energy }} / 6
+                  <div class = "bar-text enemy-energy-text" style = "font-size: 13px;"> {{ enemy.energy }} / 6 </div>
               </div>
             </div>
           </div>
@@ -320,7 +339,7 @@ P02: Makers Makin' It, Act I
 
           <img class = "player-sprite" src = "/static/images/warrior.png" style = "width: 200px;">
 
-          <div class = "d-flex justify-content-center" style = "position: absolute; bottom: -20px; left: -60px;">
+          <div class = "d-flex justify-content-center" style = "position: absolute; bottom: -20px;">
             <div class = "bg-dark text-white px-1" style = "border-radius: 8px; width: 200px;">
 
               <span class = "fw-bold small"> {{ battle.player.username }} </span>
@@ -397,12 +416,12 @@ P02: Makers Makin' It, Act I
           <div class = "progress flex-grow-1" style = "height: 18px;">
             <div class = "progress-bar bg-danger player-hp" style = "width: {{ (battle.player.hp / 30) * 100 }}%">
             </div>
-            <div class = "bar-text player-hp-text"> {{ battle.player.hp }} / {{ battle.player.max_hp }} </div>
+            <div class = "bar-text player-hp-text" style = "font-size: 13px;"> {{ battle.player.hp }} / {{ battle.player.max_hp }} </div>
           </div>
           <div class = "progress flex-grow-1" style = "height: 18px;">
             <div class = "progress-bar bg-info player-energy" style = "width: {{ (battle.player.energy / 6) * 100 }}%">
             </div>
-            <div class = "bar-text player-energy-text"> {{ battle.player.energy }} / {{ battle.player.max_energy }} </div>
+            <div class = "bar-text player-energy-text" style = "font-size: 13px;'"> {{ battle.player.energy }} / {{ battle.player.max_energy }} </div>
           </div>
         </div>
 
