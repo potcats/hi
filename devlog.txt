@@ -101,7 +101,7 @@ ENCOUNTERS + BATTLE
     - Encounters based off DB
     - Everything!
 
-cindyL -- 2026-1-15 01:59
+cindyL -- 2026-1-15 02:47
 COMBAT SYSTEM
 * NEW CHANGES:
     - added kill checks, player death checks, and game over check
@@ -109,7 +109,7 @@ COMBAT SYSTEM
     - implemented actually taking damage
     - made updates for beginning of turn
     - focus and guard
+    - different # of hits for skills
 * TO BE DONE:
     - a lot of debugging
     - attack turn system
-    - different # of hits for skills, apparently
