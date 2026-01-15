@@ -225,9 +225,9 @@ for i in range(len(species)):
     c.execute(q, d)
     db.commit()
 
-for i in range(len(species)):
+for i in range(len(attackName)):
     q = "INSERT OR REPLACE INTO attacks(name, hits, level, energy, cd, scale, statusEffects, baseDamage) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
-    d = (attackName[i], )
+    d = (attackName[i], hits[i], level[i], energy[i], cd[i], scale[i], statusEff[i], baseDmg[i])
     c.execute(q, d)
     db.commit()
 
