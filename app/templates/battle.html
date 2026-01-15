@@ -216,6 +216,40 @@ P02: Makers Makin' It, Act I
       animation: death 0.9s ease forwards;
     }
 
+    .action-banner {
+      position: fixed;
+      top: 70%;
+      left: -100%;
+      width: 100%;
+      height: 50px;
+      background: rgba(120, 120, 120, 0.95);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 22px;
+      font-weight: bold;
+    }
+
+    .action-banner.show {
+      animation: banner-slide 1.2s ease forwards;
+    }
+
+    @keyframes banner-slide {
+      0% {
+        left: -100%;
+      }
+      40% {
+        left: 0;
+      }
+      60% {
+        left: 0;
+      }
+      100% {
+        left: 100%;
+      }
+    }
+
   </style>
 
 </head>
@@ -339,7 +373,7 @@ P02: Makers Makin' It, Act I
             <h5 class = "fw-bold"> Warrior &nbsp Lvl {{ battle.player.level }} </h5>
           </div>
           <div class = "d-flex align-items-center gap-1">
-            <h5 class = "fw-bold"> 0 </h5>
+            <h5 class = "fw-bold"> {{ gold }} </h5>
             <img class = "mb-2" src = "/static/images/icons/coin.png" style = "width: 20px;">
           </div>
         </div>
@@ -470,6 +504,7 @@ P02: Makers Makin' It, Act I
   function selectTarget(i) {
     hide()
     hideActions();
+    showActionBanner(selected.toUpperCase());
     playerAtkAnim(i);
 
     // Player Turn
@@ -644,6 +679,18 @@ P02: Makers Makin' It, Act I
       offset++;
 
     });
+  }
+
+  function showActionBanner(text) {
+    const banner = document.getElementById("action-banner");
+    const txt = document.getElementById("action-text");
+
+    banner.classList.remove("show");
+
+    setTimeout(() => {
+      txt.innerText = text;
+      banner.classList.add("show");
+    }, 20);
   }
 
   function handleDeaths(prevBat, newBat) {
@@ -830,6 +877,10 @@ P02: Makers Makin' It, Act I
   updateTurnUI();
 
   </script>
+
+  <div id="action-banner" class="action-banner">
+    <span id="action-text"></span>
+  </div>
 
 </body>
 
