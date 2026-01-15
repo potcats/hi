@@ -5,6 +5,9 @@
 # 01/16/2026
 
 import random
+import sqlite3
+
+DB_FILE = "data.db"
 
 # party = player
 # enemies = [ [species, attacks, init, hp, energy, weakness, res, drop], [], [] ]
@@ -48,8 +51,8 @@ def randomEnemy(species):
 [
     [
         username
-        [ 
-            [ 
+        [
+            [
                 [
                     name
                     level
@@ -62,7 +65,7 @@ def randomEnemy(species):
                 attack2
                 attack3
             ]
-            [0, 0, 0] 
+            [0, 0, 0]
         ]
         init
         hp
@@ -223,7 +226,7 @@ def dealDamage(battle_id, attacker, victim, attack_info):
         luck = attacker[11]
         critIncrease = 0.125*(strength) + 0.15*(dexterity) + 0.075*(intelligence) + 0.3*(luck)
         critDmgIncrease = 0.2*(strength) + 0.25*(dexterity) + 0.15*(intelligence) + 0.5*(luck)
-    
+
     if dodge <= (5 + dodgeIncrease):
         return ['dodged', 0]
     elif crit <= (5 + critIncrease):

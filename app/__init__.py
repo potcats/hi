@@ -252,6 +252,7 @@ def menu():
     session['turn'] = 1
     session['inventory'] = {} # [name] {name, type, quantity, gold}
     session['gold'] = 0
+    session['hp'] = fetch_stats()[1]
 
     addItemToInventory("simple sword")
 
