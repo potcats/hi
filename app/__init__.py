@@ -236,7 +236,7 @@ def register():
                     (request.form['username'].lower(),
                         request.form['password'],
                         0, 30, "strike,cross slash", "",
-                        "", 0, 3, 0, 0,
+                        "", 3, 0, 0, 0,
                         0, 0, "", "",
                         "", "", "simple sword", "", "", ""))
                 db.commit()
