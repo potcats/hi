@@ -120,6 +120,41 @@ scale = ["", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "",
 statusEff = ["", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "dmgUP", "", "defUP"]
 baseDmg = [12, 8, 4, 3, 6, 8, 6, 4, 5, 4, 7, 8, 10, 14, 3, 3, 4, 6, 9, 0, 6, 14, 8, 17, 3, 6, 6, 9, 0, 15, 0]
 
+# DIALOGUE
+scene = ["Busted Caravan",
+         "Busted Caravan",
+         "Busted Caravan",
+         "Busted Caravan",
+         "Busted Caravan",
+         "Busted Caravan",
+         "Busted Caravan",
+         "Busted Caravan",
+         "Busted Caravan",
+         "Busted Caravan",
+         "Busted Caravan",
+         "Busted Caravan"]
+dialogueType = ["desc", "choice", "choice", "choice", 
+                "desc", "choice", "choice",
+                "desc", "desc", "choice", "desc", "choice"]
+dlg = ["You find yourselves peeking through the trees towards a caravan that seems to have been stranded in the middle of the forest. What will you do?",
+       "Battle the goblins for their goods",
+       "Approach the goblin caravan",
+       "Walk away from the scene",
+       "A goblin walks up to stand between you and the caravan. ‘Hello, traveler. Our caravan tipped over, but we have to deliver these goods by nightfall. We would be grateful for your help.’",
+       "Help the goblins repair the caravan (STR)",
+       "Nah, they got it", 
+       "The goblins cheer and get ready to go. ‘You have our gratitude. Here, have this.’",
+       "The goblins look at you impatiently. ‘You’re just here to hold us up, aren’t you?’",
+       "Fight the goblins",
+       "Fine! We'll make it work...",
+       "Move on from the scene"]
+ord = [1, 1, 1, 1, 2, 2, 2, 3, 3, 3, 3, 3]
+prevChoice = ["", "", "", "", "B", "B", "B", "A", "A", "A", "B", "B"]
+currChoice = ["", "A", "B", "C", "", "A", "B", "", "", "", "", ""]
+stat = ["", "", "", "", "", "str", "", "pass", "fail", "", "", ""]
+statReq = [0, 0, 0, 0, 0, 10, 0, 0, 0, 0, 0, 0]
+reward = ["", "", "", "", "", "", "", "gold", "", "", "", 0]
+
 DB_FILE = "data.db"
 
 db = sqlite3.connect(DB_FILE, check_same_thread=False)
@@ -175,11 +210,13 @@ c.execute("""
     CREATE TABLE IF NOT EXISTS dialogue (
     scene TEXT NOT NULL,
     type TEXT NOT NULL,
+    dlg TEXT NOT NULL,
     ord INTEGER,
     prevChoice TEXT,
-    nextChoice TEXT,
+    currChoice TEXT,
     stat TEXT,
-    statReq INTEGER
+    statReq INTEGER,
+    reward TEXT
 );
 """)
 
