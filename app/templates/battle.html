@@ -184,7 +184,7 @@ P02: Makers Makin' It, Act I
       transition: opacity 0.3 ease, filter 0.3 ease;
     }
 
-    #dmg-popup {
+    .dmg-popup {
       position: fixed;
       font-size: 22px;
       font-weight: bold;
@@ -530,7 +530,8 @@ P02: Makers Makin' It, Act I
   }
 
   function showDmg(target, dmg, status = "", enemyIdx = null, offset = 0) {
-    const popup = document.getElementById("dmg-popup");
+    const popup = document.createElement("div");
+    popup.className = "dmg-popup";
 
     if (status == "crit") {
       popup.innerText = `CRIT ${dmg}!`;
@@ -556,7 +557,10 @@ P02: Makers Makin' It, Act I
 
     const rect = element.getBoundingClientRect(); // returns element pos/size
     popup.style.left = rect.left + rect.width / 2 + "px";
-    popup.style.top = (rect.top - offset * 15) + "px";
+    popup.style.top = (rect.top - offset * 12) + "px";
+
+    document.body.appendChild(popup);
+
     popup.style.display = "block";
     popup.style.opacity = 1;
     popup.style.transform = "translateY(0px)";
@@ -589,7 +593,7 @@ P02: Makers Makin' It, Act I
         // }
 
         showDmg(target, dmg, st, enemyIdx, offset);
-      }, offset * (POPUP_MS + 50))
+      }, offset * 150);
       offset++;
 
     });
@@ -736,8 +740,6 @@ P02: Makers Makin' It, Act I
   updateTurnUI();
 
   </script>
-
-  <div id = "dmg-popup"></div>
 
 </body>
 
