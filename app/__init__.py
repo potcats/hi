@@ -82,12 +82,8 @@ name = ["Travelling Merchant",
         "Grandma's house",
         "Wizard Tower",
         "The Sword in the Stone",
-<<<<<<< HEAD
         "Potion Seller",
         "Short Rest"]
-=======
-        "Potion Seller"]
->>>>>>> b36e73c1f9e4e2be590d03ee503f28bbaa06cff4
 background = ["/static/images/bgs/caravanshop.jpg",
               "/static/images/bgs/dwarvencamp.jpg",
               "/static/images/bgs/forestshop.jpg",
@@ -95,12 +91,8 @@ background = ["/static/images/bgs/caravanshop.jpg",
               "/static/images/bgs/grandmahouse.jpg",
               "/static/images/bgs/insidetower.jpg",
               "/static/images/bgs/swordstone.jpg",
-<<<<<<< HEAD
               "/static/images/bgs/witchhouse.jpg",
               "/static/images/bgs/campsite.jpg"]
-=======
-              "/static/images/bgs/witchhouse.jpg"]
->>>>>>> b36e73c1f9e4e2be590d03ee503f28bbaa06cff4
 desc = ["A merchant with a well-worn wagon waves you down (shop)",
         "You see a bunch of sad, depressed elves in a sad, depressed camp",
         "You spot a friendly person with a strange stand in the middle of the woods (shop)",
