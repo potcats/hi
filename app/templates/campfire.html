@@ -24,6 +24,7 @@ P02: Makers Makin' It, Act I
     rel="stylesheet"
     integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB"
     crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
 
   <!-- PAGE SPECIFIC CSS -->
   <style>
@@ -247,6 +248,15 @@ P02: Makers Makin' It, Act I
       background-color: grey;
     }
 
+    .arrows {
+      background: none;
+      font-size: 120%;
+    }
+
+    #stats {
+      font-size: 130%;
+    }
+
   </style>
 
 </head>
@@ -381,17 +391,22 @@ P02: Makers Makin' It, Act I
   </div>
 
   <div class="container allocate hiding" style="padding: 20px;" id="allocate">
-    <div class="row" id="allHeading">
-      <h3 style="text-align: center" > POINTS: {{ statPoints }} </h3>
+    <div class="row">
+      <h3 style="text-align: center" id="allHeading"> POINTS: {{ statPoints }} </h3>
       <br><br>
       <hr>
     </div>
+    <br>
     <div class="row" id="up">
       {% for i in range(0,6) %}
         <div class="col">
+          <button type="button" id ='u{{ loop.index0 }}'
+                  onclick="increment(this.id)" class="bi bi-chevron-up arrows center" disabled>
+          </button>
         </div>
       {% endfor %}
     </div>
+    <br>
     <div class="row" id="stats">
       <div class="col" style="text-align: center" id='STR'> STR <br> ({{ str }}) </div>
       <div class="col" style="text-align: center" id='DEX'> DEX <br> ({{ dex }}) </div>
@@ -400,12 +415,17 @@ P02: Makers Makin' It, Act I
       <div class="col" style="text-align: center" id='FTH'> FTH <br> ({{ fth }}) </div>
       <div class="col" style="text-align: center" id='LCK'> LCK <br> ({{ lck }}) </div>
     </div>
+    <br>
     <div class="row" id="down">
       {% for i in range(0,6) %}
         <div class="col">
+          <button type="button" id ='d{{ loop.index0 }}'
+                  onclick="increment(this.id)" class="bi bi-chevron-down arrows center" disabled>
+          </button>
         </div>
       {% endfor %}
     </div>
+    <br>
     <div class="row" id="closeAll" style="margin-top:20px">
       <button class="center" onclick="closeAllo()" id="confirm"> CONFIRM </button>
     </div>
@@ -424,7 +444,9 @@ P02: Makers Makin' It, Act I
     var inv = {{ inventory | tojson }};
     var selectedItm = "";
     var sellMode = false;
-    var equipped = {{ equips | tojson }}
+    var equipped = {{ equips | tojson }};
+    var points = {{ statPoints }};
+    var statChanges = [0,0,0,0,0,0];
 
     /* EVENTS THAT WILL OCCUR ON LOAD */
     window.onload = function() {
@@ -433,6 +455,12 @@ P02: Makers Makin' It, Act I
       for (items in inv) {
         if (Object.values(equipped).includes(items)) {
           document.getElementsByClassName(items)[0].style.display = "none";
+        }
+      }
+
+      if (points > 0) {
+        for (button of document.getElementsByClassName("bi-chevron-up")) {
+          button.disabled = false;
         }
       }
     };
@@ -730,13 +758,74 @@ P02: Makers Makin' It, Act I
 
     /* POINT ALLOCATION */
     function openAllo() {
-      document.getElementById("allocate").classList.remove("hiding")
-      document.getElementById("blackout").classList.remove("hiding")
+      document.getElementById("allocate").classList.remove("hiding");
+      document.getElementById("blackout").classList.remove("hiding");
     }
 
     function closeAllo() {
-      document.getElementById("allocate").classList.add("hiding")
-      document.getElementById("blackout").classList.add("hiding")
+      let close = new XMLHttpRequest();
+      close.open("POST", window.location.href, true);
+      close.setRequestHeader("points", JSON.stringify(statChanges));
+      close.send();
+
+      close.onload = function() {
+        if (this.readyState == 4 && this.status == 200) {
+          newPts = parseInt(this.response);
+        }
+
+        document.getElementById('pts').innerHTML = `POINTS (${newPts})`;
+        updateStats();
+        statChanges = [0,0,0,0,0,0];
+
+        document.getElementById("allocate").classList.add("hiding");
+        document.getElementById("blackout").classList.add("hiding");
+
+        for (button of document.getElementsByClassName("bi-chevron-down")) {
+          button.disabled = true;
+        }
+      }
+    }
+
+    function increment(id) {
+      console.log(points);
+      statTypes = ['STR', 'DEX', 'CON', 'INT', 'FTH', 'LCK']
+      let dir = id[0];
+      let index = parseInt(id[1])
+      let stat = statTypes[index];
+
+      cont = document.getElementById(stat);
+      values = cont.innerHTML.split("<br>");
+      og = parseInt(values[1].trim().slice(1,values[1].length-1));
+
+      incr = 1;
+      if (dir == 'd') { incr = -1 };
+
+      cont.innerHTML = `${values[0]} <br> (${og + incr})`;
+      points -= incr;
+      statChanges[index] += incr;
+
+      document.getElementById('allHeading').innerHTML = `POINTS: ${points}`;
+
+      if (dir == 'u') {
+        if (document.getElementById(`d${index}`).disabled) {
+          document.getElementById(`d${index}`).disabled = false;
+        }
+        if (points == 0) {
+          for (button of document.getElementsByClassName("bi-chevron-up")) {
+            button.disabled = true;
+          }
+        }
+      }
+      else if (dir == 'd') {
+        if (statChanges[index] == 0) {
+          document.getElementById(`d${index}`).disabled = true;
+        }
+        if (document.getElementById(`u${index}`).disabled) {
+          for (button of document.getElementsByClassName("bi-chevron-up")) {
+            button.disabled = false;
+          }
+        }
+      }
     }
 
   </script>
