@@ -351,6 +351,9 @@ P02: Makers Makin' It, Act I
         <div class = "player-wrap" style = "left: 20%; bottom: 150px;">
 
           <img class = "player-sprite" src = "/static/images/warrior.png" style = "width: 200px;">
+          {% for gear in equips %}
+            <img src="{{ gear.image }}" style="position: absolute; left: 20%; bottom: 150px; z-index: 999;">
+          {% endfor %}
 
           <div class = "d-flex justify-content-center" style = "position: absolute; bottom: -20px;">
             <div class = "bg-dark text-white px-1" style = "border-radius: 8px; width: 200px;">

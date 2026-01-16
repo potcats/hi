@@ -419,6 +419,14 @@ def deathCheck(battle_id):
 def advance_turn(battle):
     battle["actions"] = []
 
+    if battle["turnIndex"] >= len(battle["turnOrder"]):
+        battle["turnIndex"] = 0
+        battle["turnNum"] += 1
+
+        for i in range(len(battle["player"]["cds"])):
+            if battle["player"]["cds"][i] > 0:
+                battle["player"]["cds"][i] -= 1
+
     turn = battle["turnOrder"][battle["turnIndex"]]
 
     if turn["type"] == "player":
@@ -427,14 +435,16 @@ def advance_turn(battle):
 
     eid = turn["eid"]
     enemy = enemy_by_eid(battle, eid)
+
     if enemy is None:
         battle["turnIndex"] += 1
-        return advance_turn(battle)
+        return battle
 
     i = battle["enemies"].index(enemy)
 
     battle = enemy_startTurn(battle, i)
     result = enemy_attack(battle, i)
+
     battle["actions"].append({
         "source": "enemy",
         "enemy_eid": enemy["eid"],
@@ -446,10 +456,5 @@ def advance_turn(battle):
         return battle
 
     battle["turnIndex"] += 1
-
-    if battle["turnIndex"] >= len(battle["turnOrder"]):
-        battle["turnIndex"] = 0
-        battle["turnNum"] += 1
-        battle = turn_order(battle)
 
     return battle
