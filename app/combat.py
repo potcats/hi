@@ -49,7 +49,7 @@ def randomEnemy(species):
         "init": init,
         "hp": hp,
         "max_hp": hp,
-        "energy": 1,
+        "energy": 0,
         "max_energy": 6,
         "weakness": weakness,
         "res": res,
@@ -270,6 +270,7 @@ def player_attack(battle_id, defender, move):
     #do the hp reduction
     for i in result:
         enemy["hp"] -= i[1]
+        enemy["hp"] = max(0, enemy["hp"])
 
     #check for kills
     battle_id = killCheck(battle_id)
@@ -305,6 +306,7 @@ def enemy_attack(battle_id, attacker):
     #do the hp reduction
     for i in result:
         battle_id["player"]["hp"] -= i[1]
+        battle_id["player"]["hp"] = max(0, battle_id["player"]["hp"])
 
     #check for death
     if deathCheck(battle_id):
