@@ -80,7 +80,8 @@ name = ["Travelling Merchant",
         "The Sword in the Stone",
         "Potion Seller",
         "Mystic River",
-        "Short Rest"]
+        "Short Rest",
+        "boss"]
 background = ["/static/images/bgs/caravanshop.jpg",
               "/static/images/bgs/dwarvencamp.jpg",
               "/static/images/bgs/forestshop.jpg",
@@ -90,7 +91,8 @@ background = ["/static/images/bgs/caravanshop.jpg",
               "/static/images/bgs/swordstone.jpg",
               "/static/images/bgs/witchhouse.jpg",
               "/static/images/bgs/enchanted.jpg",
-              "/static/images/bgs/campsite.jpg"]
+              "/static/images/bgs/campsite.jpg",
+              "/static/images/bossfight.jpg"]
 desc = ["A merchant with a well-worn wagon waves you down (shop)",
         "You see a bunch of sad, depressed elves in a sad, depressed camp",
         "You spot a friendly person with a strange stand in the middle of the woods (shop)",
@@ -100,8 +102,8 @@ desc = ["A merchant with a well-worn wagon waves you down (shop)",
         "You spot a familiar sword plunged into a rock",
         "You spot a strange hut in the woods",
         "Take a dip, maybe even a splurge in the mystic river",
-        ""]
-diff = [1, 2, 1, 3, 2, 2, 1, 1, 1, 1]
+        "", ""]
+diff = [1, 2, 1, 3, 2, 2, 1, 1, 1, 1, 3]
 
 # ATTACKS
 attackName = ["pie throw", "granny kick", "granny kick barrage",
@@ -747,10 +749,14 @@ def encounters():
 
     session['turn'] = session['turn'] + 1
 
+    if session['turn'] == 4:
+        session['encounter'] = 'boss'
+        return redirect(url_for('battle'))
+
     # testttttt
     encounters = []
     for i in range(len(name)):
-        if name[i] != "Short Rest":
+        if name[i] != "Short Rest" && name[i] != 'boss':
             encounters.append({
                 "id": i,
                 "name": name[i],
@@ -798,29 +804,28 @@ def dialogue(encounter):
             # stat TEXT, 7
             # statReq INTEGER, 8
             # reward TEXT 9
-            print(selected)
 
         wah = selected[9]
         print(wah)
         if wah != "":
             if wah == "leave":
-                return [];
+                return []
             elif wah == "fight":
                 session['encounter'] = encounter;
-                return [];
+                return []
             elif wah == "statPoint":
                 session['statPoints'] = session['statPoints'] + 3
-                return [];
+                return []
             elif wah == "hp":
                 session['hp'] = info[1];
-                return [];
+                return []
             elif wah == "gold":
                 session['gold'] = session['gold'] + 10;
-                return [];
+                return []
             else:
                 addItemToInventory(wah)
                 print("ghiowhioesghioegshioegshiogeshio")
-                return [];
+                return []
 
         if selected[7] != "":
             if 'pass' not in session:
