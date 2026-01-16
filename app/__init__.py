@@ -755,17 +755,18 @@ def battle():
         if item[1] == "consumable":
             consumable_c += 1
 
+    fight_bgs = {
+        "Elven Camp" : "/static/images/bgs/dwarvencamp.jpg",
+        "Busted Caravan" : "/static/images/bgs/goblinfight.jpg",
+        "Grandma's house" : "/static/images/bgs/grandmafight.jpg",
+        "Wizard Tower" : "/static/images/bgs/wizardfight.jpg",
+        "boss" : "/static/images/bgs/bossfight.jpg"
+    }
     encounter = session.get("encounter", "")
-    if encounter != "":
-        fight_bgs = {
-            "Elven Camp" : "/static/images/bgs/dwarvencamp.jpg",
-            "Busted Caravan" : "/static/images/bgs/goblinfight.jpg",
-            "Grandma's house" : "/static/images/bgs/grandmafight.jpg",
-            "Wizard Tower" : "/static/images/bgs/wizardfight.jpg",
-            "boss" : "/static/images/bgs/bossfight.jpg"
-        }
+    if encounter in fight_bgs.keys():
         bg = fight_bgs[encounter]
     else:
+        session["encounter"] = "";
         bg = "/static/images/bgs/forestpath.jpg"
 
     return render_template("battle.html",
