@@ -283,6 +283,20 @@ P02: Makers Makin' It, Act I
       }
     }
 
+    #fade-overlay {
+      position: fixed;
+      inset: 0;
+      background: black;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 1s ease;
+      z-index: 9999;
+    }
+
+    #fade-overlay.show {
+      opacity: 1;
+    }
+
   </style>
 
 </head>
@@ -302,12 +316,12 @@ P02: Makers Makin' It, Act I
           <div class = "mb-3 player-sidebar">
             <h5 class = "fw-bold"> {{ battle.player.username }} </h5>
             <div class = "progress">
-              <div class = "progress-bar bg-danger player-hp" style = "width: {{ (battle.player.hp / 30) * 100 }}%">
+              <div class = "progress-bar bg-danger player-hp" style = "width: {{ (battle.player.hp / battle.player.max_hp) * 100 }}%">
               </div>
               <div id = "player-hp-text" class = "bar-text" style = "font-size: 13px;">{{ battle.player.hp }} / {{ battle.player.max_hp }}</div>
             </div>
             <div class = "progress">
-              <div class = "progress-bar bg-info player-energy" style = "width: {{ (battle.player.energy / 6) * 100 }}%">
+              <div class = "progress-bar bg-info player-energy" style = "width: {{ (battle.player.energy / battle.player.max_energy) * 100 }}%">
               </div>
               <div class = "bar-text player-energy-text" style = "font-size: 13px;">{{ battle.player.energy }} / {{ battle.player.max_energy }} </div>
             </div>
@@ -322,8 +336,8 @@ P02: Makers Makin' It, Act I
               </div>
             </div>
             <div class = "progress">
-              <div class = "progress-bar bg-info enemy-energy" style = "width: {{ (enemy.energy / 6) * 100 }}%">
-                  <div class = "bar-text enemy-energy-text" style = "font-size: 13px;"> {{ enemy.energy }} / 6 </div>
+              <div class = "progress-bar bg-info enemy-energy" style = "width: {{ (enemy.energy / battle.player.max_energy) * 100 }}%">
+                  <div class = "bar-text enemy-energy-text" style = "font-size: 13px;"> {{ enemy.energy }} / {{ enemy.max_energy }}</div>
               </div>
             </div>
           </div>
@@ -351,9 +365,9 @@ P02: Makers Makin' It, Act I
                   <div class = "bar-text player-hp-text">{{ battle.player.hp }} / {{ battle.player.max_hp }} </div>
                 </div>
                 <div class = "progress flex-grow-1" style = "height: 12px;">
-                  <div class = "progress-bar bg-info player-energy" style = "width: {{ (battle.player.energy / 6) * 100 }}%">
+                  <div class = "progress-bar bg-info player-energy" style = "width: {{ (battle.player.energy / battle.player.max_energy) * 100 }}%">
                   </div>
-                  <div class = "bar-text player-energy-text">{{ battle.player.energy }} / 6 </div>
+                  <div class = "bar-text player-energy-text">{{ battle.player.energy }} / {{ battle.player.max_energy }} </div>
                 </div>
               </div>
 
@@ -382,9 +396,9 @@ P02: Makers Makin' It, Act I
                   <div class = "bar-text enemy-hp-text"> {{ enemy.hp }} / {{ enemy.max_hp }} </div>
                 </div>
                 <div class = "progress flex-grow-1" style = "height: 12px;">
-                  <div class = "progress-bar bg-info enemy-energy" style = "width: {{ (enemy.energy / 6) * 100 }}%">
+                  <div class = "progress-bar bg-info enemy-energy" style = "width: {{ (enemy.energy / enemy.max_energy) * 100 }}%">
                   </div>
-                  <div class = "bar-text enemy-energy-text"> {{ enemy.energy }} / 6 </div>
+                  <div class = "bar-text enemy-energy-text"> {{ enemy.energy }} / {{ enemy.max_energy }} </div>
                 </div>
               </div>
 
@@ -414,12 +428,12 @@ P02: Makers Makin' It, Act I
 
         <div class = "d-flex gap-2 mb-2 mx-3">
           <div class = "progress flex-grow-1" style = "height: 18px;">
-            <div class = "progress-bar bg-danger player-hp" style = "width: {{ (battle.player.hp / 30) * 100 }}%">
+            <div class = "progress-bar bg-danger player-hp" style = "width: {{ (battle.player.hp / battle.player.max_hp) * 100 }}%">
             </div>
             <div class = "bar-text player-hp-text" style = "font-size: 13px;"> {{ battle.player.hp }} / {{ battle.player.max_hp }} </div>
           </div>
           <div class = "progress flex-grow-1" style = "height: 18px;">
-            <div class = "progress-bar bg-info player-energy" style = "width: {{ (battle.player.energy / 6) * 100 }}%">
+            <div class = "progress-bar bg-info player-energy" style = "width: {{ (battle.player.energy / battle.player.max_energy) * 100 }}%">
             </div>
             <div class = "bar-text player-energy-text" style = "font-size: 13px;'"> {{ battle.player.energy }} / {{ battle.player.max_energy }} </div>
           </div>
@@ -511,6 +525,7 @@ P02: Makers Makin' It, Act I
   <script>
   let turn = "player";
   let selected = null;
+  let pending = null;
   let currentBattle = null;
 
   // TIMINGGGGGG
@@ -563,11 +578,16 @@ P02: Makers Makin' It, Act I
             showHits("enemy", act.result, eid);
           }
         }
-      }
 
-      setTimeout(() => {
-        enemyTurn();
-      }, POPUP_MS + PAUSE_MS);
+        if (battle.enemies.length === 0) {
+          setTimeout(winBattle, POPUP_MS);
+          return;
+        }
+
+        setTimeout(() => {
+          enemyTurn();
+        }, POPUP_MS + PAUSE_MS);
+      }
     };
 
     xhttp.send(JSON.stringify({
@@ -626,12 +646,14 @@ P02: Makers Makin' It, Act I
 
         const battle = JSON.parse(this.responseText);
         const prevBattle = currentBattle;
-        currentBattle = battle;
 
-        turn = battle.turn
-        updateBattle(battle);
+        // turn = battle.turn
+        pending = battle;
+        // updateBattle(battle);
+        currentBattle = JSON.parse(JSON.stringify(battle));
 
         if (prevBattle) {
+          currentBattle.player.hp = prevBattle.player.hp;
           handleDeaths(prevBattle, battle);
         }
 
@@ -652,6 +674,13 @@ P02: Makers Makin' It, Act I
     updateTurnUI(eid);
     enemyAtkAnim(eid);
 
+    result.forEach(hit => {
+      const dmg = hit[1];
+      currentBattle.player.hp -= dmg;
+    });
+
+    updateHP();
+
     if (result.length > 0) {
       showHits("player", result);
     }
@@ -659,7 +688,21 @@ P02: Makers Makin' It, Act I
 
   function enemyActions(actions, i = 0) {
     if (i >= actions.length) {
+      currentBattle = pending;
+      pending = null;
+
+      if (currentBattle.player.hp <= 0) {
+        loseBattle();
+        return;
+      }
+
+      if (currentBattle.enemies.length === 0) {
+        winBattle();
+        return;
+      }
+
       turn = "player";
+      updateBattle(currentBattle);
       updateTurnUI();
       showActions();
       return;
@@ -869,6 +912,17 @@ P02: Makers Makin' It, Act I
     }, HIT_DELAY_MS + HIT_MS);
   }
 
+  function updateHP() {
+    // player HP
+    const p_hp = (currentBattle.player.hp / currentBattle.player.max_hp) * 100;
+    document.querySelectorAll(".player-hp").forEach(bar => {
+      bar.style.width = p_hp + "%";
+    });
+    document.querySelectorAll(".player-hp-text").forEach(txt => {
+      txt.innerText = `${currentBattle.player.hp} / ${currentBattle.player.max_hp}`;
+    });
+  }
+
   function updateBattle(battle) {
     // PLAYER BARS
     // hp
@@ -880,7 +934,7 @@ P02: Makers Makin' It, Act I
        txt.innerText = `${battle.player.hp} / ${battle.player.max_hp}`;
      });
     // energy
-    const p_energy = (battle.player.energy / 6) * 100;
+    const p_energy = (battle.player.energy / battle.player.max_energy) * 100;
     document.querySelectorAll(".player-energy").forEach(bar => {
       bar.style.width = p_energy + "%";
     });
@@ -891,7 +945,7 @@ P02: Makers Makin' It, Act I
     // ENEMY BARS
     battle.enemies.forEach((enemy, i) => {
       const e_hp = (enemy.hp / enemy.max_hp) * 100;
-      const e_energy = (enemy.energy / 6) * 100;
+      const e_energy = (enemy.energy / enemy.max_energy) * 100;
 
       // Sidebar HP
       const sidebar_e = document.querySelector(`.enemy-sidebar.enemy-${enemy.eid}`);
@@ -933,6 +987,42 @@ P02: Makers Makin' It, Act I
       turnNum.innerText = `Turn ${battle.turnNum}`;
     }
 
+    // Attack Buttons (cost/cd)
+    const atkBtns = document.querySelectorAll("#attacks-panel .atk-wrap");
+    atkBtns.forEach((btn, i) => {
+      const atk = battle.player.attacks[i];
+      // update cooldown text
+      const cdText = btn.querySelector("p");
+      if (battle.player.cds[i] > 0) {
+        cdText.innerText = `Cost: ${atk[3]} | Cooldown: ${battle.player.cds[i]}`;
+      } else {
+        cdText.innerText = `Cost: ${atk[3]} | Cooldown: ${atk[4]}`;
+      }
+      if (battle.player.energy < atk[3] || battle.player.cds[i] > 0) {
+        btn.classList.add("inactive");
+      } else {
+        btn.classList.remove("inactive");
+      }
+    });
+
+  }
+
+  function winBattle() {
+    const overlay = document.getElementById("fade-overlay");
+    overlay.classList.add("show");
+
+    setTimeout(() => {
+      window.location.href = "/campfire";
+    }, 1500);
+  }
+
+  function loseBattle() {
+    const overlay = document.getElementById("fade-overlay");
+    overlay.classList.add("show");
+
+    setTimeout(() => {
+      window.location.href = "/menu";
+    }, 1500);
   }
 
   turn = "player";
@@ -943,6 +1033,8 @@ P02: Makers Makin' It, Act I
   <div id="action-banner" class="action-banner">
     <span id="action-text"></span>
   </div>
+
+  <div id="fade-overlay"></div>
 
 </body>
 

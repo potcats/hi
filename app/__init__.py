@@ -124,55 +124,209 @@ statusEff = ["", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "",
 baseDmg = [12, 8, 4, 3, 6, 8, 6, 4, 5, 4, 7, 8, 10, 14, 3, 3, 4, 6, 9, 0, 6, 14, 8, 17, 3, 6, 6, 9, 0, 15, 0]
 
 # DIALOGUE
-scene = ["Busted Caravan", "Busted Caravan", "Busted Caravan",
-         "Busted Caravan", "Busted Caravan", "Busted Caravan",
-         "Busted Caravan", "Busted Caravan", "Busted Caravan",
-         "Busted Caravan", "Busted Caravan", "Busted Caravan",
+scene = ["Elven Camp", "Elven Camp", "Elven Camp",
+            "Elven Camp", "Elven Camp", "Elven Camp",
+            "Elven Camp", "Elven Camp", "Elven Camp",
+            "Elven Camp", "Elven Camp", "Elven Camp",
+            "Elven Camp",
 
-         "Grandma's House", "Grandma's House", "Grandma's House",
-         "Grandma's House", "Grandma's House", "Grandma's House",
-         "Grandma's House", "Grandma's House", "Grandma's House",]
-dialogueType = ["desc", "choice", "choice", "choice",
+            "Busted Caravan", "Busted Caravan", "Busted Caravan",
+            "Busted Caravan", "Busted Caravan", "Busted Caravan",
+            "Busted Caravan", "Busted Caravan", "Busted Caravan",
+            "Busted Caravan", "Busted Caravan", "Busted Caravan",
+
+            "Grandma's House", "Grandma's House", "Grandma's House",
+            "Grandma's House", "Grandma's House", "Grandma's House",
+            "Grandma's House", "Grandma's House", "Grandma's House",
+
+            "Wizard Tower", "Wizard Tower", "Wizard Tower"
+            "Wizard Tower", "Wizard Tower", "Wizard Tower",
+            "Wizard Tower", "Wizard Tower", "Wizard Tower",
+            "Wizard Tower", "Wizard Tower", "Wizard Tower",
+            "Wizard Tower",
+
+            "The Sword in the Stone", "The Sword in the Stone", "The Sword in the Stone",
+            "The Sword in the Stone", "The Sword in the Stone",
+
+            "Potion Seller", "Potion Seller", "Potion Seller",
+            "Potion Seller", "Potion Seller", "Potion Seller",
+            "Potion Seller", "Potion Seller", "Potion Seller",
+            "Potion Seller", "Potion Seller", "Potion Seller",
+            "Potion Seller", "Potion Seller", "Potion Seller",
+            "Potion Seller", "Potion Seller",
+
+            "Mystic River", "Mystic River", "Mystic River",
+            "Mystic River", "Mystic River", "Mystic River",
+            "Mystic River", "Mystic River",
+
+            "Short Rest", "Short Rest", "Short Rest"]
+dialogueType = ["desc", "choice", "choice",
                 "desc", "choice", "choice",
-                "desc", "desc", "choice", "desc", "choice"
+                "desc", "choice", "choice", "desc",
+                "desc", "choice", "desc",
 
                 "desc", "choice", "choice", "choice",
                 "desc", "choice", "choice",
-                "desc", "desc"]
-dlg = ["You find yourselves peeking through the trees towards a caravan that seems to have been stranded in the middle of the forest. What will you do?",
-       "Battle the goblins for their goods",
-       "Approach the goblin caravan",
-       "Walk away from the scene",
-       "A goblin walks up to stand between you and the caravan. ‘Hello, traveler. Our caravan tipped over, but we have to deliver these goods by nightfall. We would be grateful for your help.’",
-       "Help the goblins repair the caravan (STR)",
-       "Nah, they got it",
-       "The goblins cheer and get ready to go. ‘You have our gratitude. Here, have this.’",
-       "The goblins look at you impatiently. ‘You’re just here to hold us up, aren’t you?’",
-       "Fight the goblins",
-       "Fine! We'll make it work...",
-       "Move on from the scene",
+                "desc", "desc", "choice", "desc", "choice",
 
-       "You encounter a little house up ahead. Upon investigating, a nice, elderly woman walks out and invites you inside for some sweets. What do you do?",
-       "Kindly reject the grandma's offer for sweets",
-       "Decide to beat up the old lady",
-       "Accept the grandma's invitation for sweets",
-       "As you walk away, grandma looks at you sadly",
-       "Eat a cookie (random effect)",
-       "Suppress the urge to taste a sweet",
-       "Grandma smiles happily as you munch on the delicious cookie. As you walk away, you feel different...",
-       "As you walk away, grandma looks at you sadly.."]
-ord = [1, 1, 1, 1, 2, 2, 2, 3, 3, 3, 3, 3,
-       1, 1, 1, 1, 2, 2, 2, 3, 3]
-prevChoice = ["", "", "", "", "B", "B", "B", "A", "A", "A", "B", "B",
-              "", "", "", "", "A", "C", "C", "A", "B"]
-currChoice = ["", "A", "B", "C", "", "A", "B", "", "", "", "", "",
-              "", "A", "B", "C", "", "A", "B", "", ""]
-stat = ["", "", "", "", "", "str", "", "pass", "fail", "", "", "",
-        "", "", "", "", "", "", "", "", "",]
-statReq = [0, 0, 0, 0, 0, 10, 0, 0, 0, 0, 0, 0,
-           0, 0, 0, 0, 0, 0, 0, 0, 0]
-reward = ["", "", "", "", "", "", "", "gold", "", "", "", "",
-          "", "", "", "", "", "", "", "randomEffect", ""]
+                "desc", "choice", "choice", "choice",
+                "desc", "choice", "choice",
+                "desc", "desc",
+
+                "desc", "choice", "choice",
+                "desc", "choice", "choice",
+                "desc", "desc", "choice", "desc", "choice", "choice", "choice",
+                "desc",
+
+                "desc", "choice", "choice",
+                "desc", "desc",
+
+                "desc", "choice", "choice",
+                "desc", "choice", "choice",
+                "desc", "choice", "choice", "choice",
+                "desc", "desc", "desc", "desc", "choice",
+                "desc", "desc",
+
+                "desc", "choice", "choice", "choice", "choice",
+                "desc", "desc", "desc",
+
+                "desc", "choice", "choice"]
+dlg = [ "You come across a group of elves on your journey.",
+        "Speak to the elves",
+        "Walk away",
+        "Hello! We’re busy right now, but if you’re willing to help us, that’d be great. We have a wager with the dwarves that we have to win!",
+        "A wager?",
+        "Sorry, I’m not interested.",
+        "Yes, but we’re on track to lose… the dwarves want to duel, but we sent out too many elves on an expedition last week. Would you join us?",
+        "Sure, I’m in!",
+        "Sorry, I’m not interested.",
+        "As you walk away, the elves behind you resume training frantically. You hear the twang of bows and the frustrated exclamations of the elves.",
+        "You follow the elves to the dwarven camp.",
+        "Fight",
+        "As you walk away, the elves behind you resume training frantically. You hear the twang of bows and the frustrated exclamations of the elves.",
+
+        "You find yourselves peeking through the trees towards a caravan that seems to have been stranded in the middle of the forest. What will you do?",
+        "Battle the goblins for their goods",
+        "Approach the goblin caravan",
+        "Walk away from the scene",
+        "A goblin walks up to stand between you and the caravan. ‘Hello, traveler. Our caravan tipped over, but we have to deliver these goods by nightfall. We would be grateful for your help.’",
+        "Help the goblins repair the caravan (STR)",
+        "Nah, they got it",
+        "The goblins cheer and get ready to go. ‘You have our gratitude. Here, have this.’",
+        "The goblins look at you impatiently. ‘You’re just here to hold us up, aren’t you?’",
+        "Fight the goblins",
+        "Fine! We'll make it work...",
+        "Move on from the scene",
+
+        "You encounter a little house up ahead. Upon investigating, a nice, elderly woman walks out and invites you inside for some sweets. What do you do?",
+        "Kindly reject the grandma's offer for sweets",
+        "Decide to beat up the old lady",
+        "Accept the grandma's invitation for sweets",
+        "As you walk away, grandma looks at you sadly",
+        "Eat a cookie (random effect)",
+        "Suppress the urge to taste a sweet",
+        "Grandma smiles happily as you munch on the delicious cookie. As you walk away, you feel different...",
+        "As you walk away, grandma looks at you sadly.."
+
+        "In the distance, you see the spiral of a tower and the silhouette of an old wizard through the windows of its observatory.",
+        "Take a detour and look into the wizard tower",
+        "Continue on your path",
+        "The wizard hasn’t left the observatory. You see potion recipes, magical artifacts, and other miscellaneous objects scattered around the room.",
+        "Snoop around and rob the wizard (DEX)",
+        "Call out to the wizard",
+        "You successfully leave the tower with the stolen goods.",
+        "While you’re tiptoeing toward a shiny sword in the corner, you trip on the rug. As you desperately try to untangle yourself and run, the wizard appears in the doorway",
+        "Fight",
+        "Greetings, traveller. Are you interested in some magical goods?",
+        "Sure, I’d love some magical goods!",
+        "Attack the wizard",
+        "Oh, I was just passing by and got curious. I’ll be on my way..!",
+        "You leave the tower with a little something.",
+
+        "You recognize a sword embedded in a stone. Famous for being powerful but immovable, rumor says that the sword will choose its owner when the time comes.",
+        "Try to pull out the sword (LCK)",
+        "Walk away",
+        "The sword comes out with surprising ease. Could it be? You are the chosen one! This sword will serve as a memoir of this momentous moment in your life.",
+        "The sword doesn’t budge. Well, what did you expect anyways...",
+
+        "Along the path, nestled in the middle of a clearing, is a little hut.",
+        "Knock on the door",
+        "Continue on your path",
+        "Welcome to my potion brewery! What have you come for?",
+        "I want your strongest potion!",
+        "Umm… nothing, I was just curious! I’ll just be going now.",
+        "Your constitution couldn’t handle my strongest potion. Anything else?",
+        "No, wait! I can handle it, believe me! (CON)",
+        "Please! I’m going into battle and I really need it, please give me something…",
+        "What if I help you make it? (INT)",
+        "The witch gives you the benefit of the doubt and starts a few trials on you. You break after the third. Tired and defeated, you stumble your way out of the hut. The witch laughs at your misery...",
+        "The witch gives you the benefit of the doubt and starts a few trials on you. You push through.",
+        "Poor thing. I have a little something you can handle...",
+        "Let’s see what you can do then.",
+        "Try to make potion",
+        "You produce a Minor Healing Potion under the witch’s supervision.",
+        "You set yourself on fire after you throw in the wrong gray powder. The witch sniffs judgementally as you leave, mildly charred and extremely embarrassed.",
+
+        "You come across a pristine, sparkling river. The ambience draws you in.",
+        "Take a dip in the river",
+        "Scoop some water for later",
+        "Meditate by the bank (FTH)",
+        "Disregard the river and move on",
+        "The river water is cool and rejuvenating. You feel amazing.",
+        "Something calls out to you, and you feel strengthened.",
+        "You feel calmer, but eventually leave empty-handed.",
+
+        "You find a nice place to set up camp and take a short rest",
+        "Rest for a while and regain some health",
+        "Train your body and hone your skills"]
+ord = [1, 1, 1, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4,
+        1, 1, 1, 1, 2, 2, 2, 3, 3, 3, 3, 3,
+        1, 1, 1, 1, 2, 2, 2, 3, 3,
+        1, 1, 1, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 4,
+        1, 1, 1, 2, 2,
+        1, 1, 1, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5,
+        1, 1, 1, 1, 1, 2, 2, 2,
+        1, 1, 1]
+prevChoice = ["", "", "", "A", "A", "A", "A", "A", "A", "B", "A", "A", "B",
+                "", "", "", "", "B", "B", "B", "A", "A", "A", "B", "B",
+                "", "", "", "", "A", "C", "C", "A", "B",
+                "", "", "", "A", "A", "A", "A", "A", "A", "B", "B", "B", "B", "A",
+                "", "", "", "A", "A",
+                "", "", "", "A", "A", "A", "A", "A", "A", "A", "A", "A", "B", "C", "C", "A", "A",
+                "", "", "", "", "", "A", "C", "C",
+                "", "", ""]
+currChoice = ["", "A", "B", "", "A", "B", "", "A", "B", "", "", "A", "",
+                "", "A", "B", "C", "", "A", "B", "", "", "", "", "",
+                "", "A", "B", "C", "", "A", "B", "", "",
+                "", "A", "B", "", "A", "B", "", "", "A", "", "A", "B", "C", "",
+                "", "A", "B", "", "",
+                "", "A", "B", "", "A", "B", "", "A", "B", "C", "", "", "", "", "A", "", "",
+                "", "A", "B", "C", "D", "", "", "",
+                "", "A", "B"]
+stat = ["", "", "", "", "", "", "", "", "", "", "", "", "",
+        "", "", "", "", "", "str", "", "pass", "fail", "", "", "",
+        "", "", "", "", "", "", "", "", "",
+        "", "", "", "", "dex", "", "pass", "fail", "", "", "", "", "", "",
+        "", "lck", "", "pass", "fail",
+        "", "", "", "", "", "", "", "con", "", "", "pass", "fail", "", "", "int", "pass", "fail",
+        "", "", "", "fth", "", "", "pass", "fail",
+        "", "", ""]
+statReq = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 10, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 15, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 10, 0, 0, 0, 0, 0, 0, 15, 0, 0,
+            0, 0, 0, 10, 0, 0, 0, 0,
+            0, 0, 0]
+reward = ["", "", "", "", "", "", "", "", "", "", "", "", "",
+            "", "", "", "", "", "", "", "gold", "", "", "", "",
+            "", "", "", "", "", "", "", "randomEffect", ""
+            "", "", "", "", "", "", "magical vial of water", "", "", "", "", "", "", "magical vial of water",
+            "", "", "", "excalibur", "",
+            "", "", "", "", "", "", "", "", "", "", "", "healing potion", "magical vial of water", "", "", "minor healing potion", "",
+            "", "", "magical vial of water", "", "", "hp", "statPoint", "",
+            "", "hp", "statPoint"]
 
 DB_FILE = "data.db"
 
@@ -293,9 +447,15 @@ for i in range(len(name)):
     c.execute(q, d)
     db.commit()
 
+for i in range(len(scene)):
+    q = "INSERT OR REPLACE INTO dialogue(scene, type, dlg, ord, prevChoice, currChoice, stat, statReq, reward) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
+    d = (scene[i], dialogueType[i], dlg[i], ord[i], prevChoice[i], currChoice[i], stat[i], statReq[i], reward[i])
+    c.execute(q, d)
+    db.commit()
+
 #  ------------------------------------------------------------ #
 
-@app.route('/', methods=['GET', 'POST'])
+@app.route('/login', methods=['GET', 'POST'])
 def login():
     if loggedin():
         return redirect(url_for('menu'))
@@ -314,6 +474,8 @@ def login():
                     return render_template("login.html", invalid="Your password was incorrect")
 
                 session['username'] = request.form['username'].lower()
+
+                initializePlayer();
 
                 return redirect(url_for('menu'))
     else:
@@ -356,18 +518,19 @@ def register():
                 session.clear()
                 session.permanent = True
                 session['username'] = request.form['username'].lower()
+
+                initializePlayer();
+
                 return redirect(url_for('menu'))
     return render_template("register.html")
 
-@app.route('/menu', methods=['GET', 'POST'])
+@app.route('/', methods=['GET', 'POST'])
 def menu():
-    session['turn'] = 1
-    session['inventory'] = {} # [name] {name, type, quantity, gold}
-    session['gold'] = 0
-    session['hp'] = fetch_stats()[1]
-    session['statPoints'] = 0
-
-    addItemToInventory("simple sword")
+    if request.method == "POST":
+        if not loggedin():
+            return redirect(url_for('login'))
+        else:
+            return redirect(url_for('battle'))
 
     return render_template("menu.html")
 
@@ -671,6 +834,15 @@ def scavenge():
 
 def loggedin():
     return "username" in session
+
+def initializePlayer():
+    session['turn'] = 1
+    session['inventory'] = {} # [name] {name, type, quantity, gold}
+    session['gold'] = 0
+    session['hp'] = fetch_stats()[1]
+    session['statPoints'] = 0
+
+    addItemToInventory("simple sword")
 
 # ------------------------ DB HELPER FUNCTIONS  --------------------------- #
 

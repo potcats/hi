@@ -49,7 +49,7 @@ def randomEnemy(species):
         "init": init,
         "hp": hp,
         "max_hp": hp,
-        "energy": 1,
+        "energy": 0,
         "max_energy": 6,
         "weakness": weakness,
         "res": res,
@@ -166,7 +166,7 @@ def createBattle(enemies):
     player = {
         "username": player_info[0],
         "attacks": attacks_info,
-        "cds": [0, 0],
+        "cds": [0] * len(attacks_info),
         "init": random.randint(0, 100),
         "hp": player_info[3] + player_info[9],
         "max_hp": player_info[3] + player_info[9],
@@ -253,6 +253,11 @@ def player_attack(battle_id, defender, move):
         if attack_info_temp[0] == move:
             attack_info = attack_info_temp
 
+    # set cooldown for this move
+    for i in range(len(battle_id["player"]["attacks"])):
+        if battle_id["player"]["attacks"][i][0] == move:
+            battle_id["player"]["cds"][i] = attack_info[4]
+
     #remove energy used to cast
     battle_id["player"]["energy"] -= attack_info[3]
 
@@ -265,6 +270,7 @@ def player_attack(battle_id, defender, move):
     #do the hp reduction
     for i in result:
         enemy["hp"] -= i[1]
+        enemy["hp"] = max(0, enemy["hp"])
 
     #check for kills
     battle_id = killCheck(battle_id)
@@ -300,6 +306,7 @@ def enemy_attack(battle_id, attacker):
     #do the hp reduction
     for i in result:
         battle_id["player"]["hp"] -= i[1]
+        battle_id["player"]["hp"] = max(0, battle_id["player"]["hp"])
 
     #check for death
     if deathCheck(battle_id):
