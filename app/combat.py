@@ -260,6 +260,20 @@ def focus(battle_id):
     player["energy"] = min(player["energy"] + 1, player["max_energy"])
     return battle_id
 
+def use_item(battle, effect, item):
+    player = battle["player"]
+
+    player["hp"] = min(player["hp"] + effect, player["max_hp"])
+
+    battle["actions"] = [{
+        "source": "player",
+        "type": "item",
+        "item": item,
+        "hp": effect
+    }]
+
+    return battle
+
 def enemy_by_eid(battle, eid):
     for enemy in battle["enemies"]:
         if enemy["eid"] == eid:

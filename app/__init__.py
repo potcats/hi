@@ -653,32 +653,37 @@ def battle():
 
     if request.method == "GET":
         session.pop('battle', None)
+
+        addItemToInventory("healing potion")
+        addItemToInventory("healing potion")
+        addItemToInventory("honey")
+
         common_opponents = ['bandit', 'bee', 'goblin', 'pebble', 'pixie', 'rat']
         session['battle'] = createBattle([
-            randomEnemy(common_opponents[random.randint(0,6)]),
-            randomEnemy(common_opponents[random.randint(0,6)]),
-            randomEnemy(common_opponents[random.randint(0,6)])
+            randomEnemy(common_opponents[random.randint(0,5)]),
+            randomEnemy(common_opponents[random.randint(0,5)]),
+            randomEnemy(common_opponents[random.randint(0,5)])
         ])
-        if session['encounter'] == 'Grandma\'s House':
-            session['battle'] = createBattle([
-                randomEnemy('grandma')
-            ])
-        elif session['encounter'] == 'Wizard Tower':
-            session['battle'] = createBattle([
-                randomEnemy('wizard')
-            ])
-        elif session['encounter'] == 'Busted Caravan':
-            session['battle'] = createBattle([
-                randomEnemy('goblin'),
-                randomEnemy('goblin'),
-                randomEnemy('goblin')
-            ])
-        elif session['encounter'] == 'Elven Camp':
-            session['battle'] = createBattle([
-                randomEnemy('dwarf'),
-                randomEnemy('dwarfchief'),
-                randomEnemy('dwarf')
-            ])
+        # if session['encounter'] == 'Grandma\'s House':
+        #     session['battle'] = createBattle([
+        #         randomEnemy('grandma')
+        #     ])
+        # elif session['encounter'] == 'Wizard Tower':
+        #     session['battle'] = createBattle([
+        #         randomEnemy('wizard')
+        #     ])
+        # elif session['encounter'] == 'Busted Caravan':
+        #     session['battle'] = createBattle([
+        #         randomEnemy('goblin'),
+        #         randomEnemy('goblin'),
+        #         randomEnemy('goblin')
+        #     ])
+        # elif session['encounter'] == 'Elven Camp':
+        #     session['battle'] = createBattle([
+        #         randomEnemy('dwarf'),
+        #         randomEnemy('dwarfchief'),
+        #         randomEnemy('dwarf')
+        #     ])
 
         equipsR = fetch_equips()
         if equipsR["chestplate"] == "":
@@ -692,11 +697,17 @@ def battle():
                 "image": equip_images[i]
             })
 
+        consumable_c = 0
+        for item in session.get("inventory", {}).values():
+            if item[1] == "consumable":
+                consumable_c += 1
+
         return render_template("battle.html",
                 battle = session['battle'],
                 inventory = session.get('inventory'),
                 gold = session.get('gold'),
-                equips = equips
+                equips = equips,
+                consumable_c = consumable_c
             )
 
     if request.method == 'POST':
@@ -714,8 +725,14 @@ def battle():
 
         elif action == 'item':
             item = data.get('item')
-            # session['battle'] = useItem(session['battle'], item)
-            return jsonify(session["battle"])
+            hp_inc = fetch_itemEffects(item)
+            session["battle"] = use_item(session['battle'], hp_inc, item)
+            inv = session["inventory"]
+            if item in inv:
+                inv[item][2] = str(int(inv[item][2]) - 1)
+                if int(inv[item][2]) == 0:
+                    inv.pop(item)
+            return jsonify({"battle": session["battle"], "inventory": session["inventory"]})
 
         elif action == 'focus':
             session['battle'] = focus(session['battle'])
@@ -736,7 +753,8 @@ def battle():
             battle = session['battle'],
             inventory = session.get('inventory'),
             gold = session.get('gold'),
-            equips = equips
+            equips = equips,
+            consumable_c = consumable_c
         )
 
 @app.route('/encounters', methods=['GET', 'POST'])

@@ -144,18 +144,18 @@ P02: Makers Makin' It, Act I
       }
     }
 
-
     .items-grid {
       display: grid;
-      gap: 20px;
+      gap: 12px;
     }
 
     .slot {
-      width: 50px;
-      height: 50px;
+      width: 120px;
+      height: 80px;
       border: 2px solid white;
-      border-radius: 6px;
+      border-radius: 12px;
       cursor: pointer;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
     }
 
     .slot.empty {
@@ -164,6 +164,8 @@ P02: Makers Makin' It, Act I
 
     .slot:hover {
       outline: 2px solid white;
+      transform: scale(1.05);
+      box-shadow: 0 0 8px rgba(255, 255, 255, 0.25);
     }
 
     @keyframes player-atk {
@@ -518,17 +520,17 @@ P02: Makers Makin' It, Act I
 
     <!-- Items Panel -->
     <div id = "items-panel" class = "panel" style = "display: none;">
-      <div class = "items-grid" style = "grid-template-columns: repeat(8, 1fr);">
+      <div class = "items-grid" style = "grid-template-columns: repeat(4, 1fr);">
         {% for name, item in inventory.items() %}
           {% if item[1] == "consumable" %}
           <div class = "slot bg-dark d-flex flex-column align-items-center justify-content-center"
                onclick = "useItem('{{ name }}')">
-            <div class = "small text-center"> {{ name }} </div>
-            <div class = "small">x{{ item[2] }}</div>
+            <div class = "text-center text-white" style = "font-size: 15px;"> {{ name }} </div>
+            <div class = "text-center text-white" style = "font-size: 10px;">x{{ item[2] }}</div>
           </div>
           {% endif %}
         {% endfor %}
-        {% for i in range(8 - battle.player.inventory|length) %}
+        {% for i in range(4 - consumable_c) %}
         <div class = "slot empty"></div>
         {% endfor %}
       </div>
@@ -660,6 +662,35 @@ P02: Makers Makin' It, Act I
     sendAction({action: "guard"});
   }
 
+  function useItem(item) {
+    hide();
+    hideActions();
+
+    const xhttp = new XMLHttpRequest();
+    xhttp.open("POST", "/battle", true);
+    xhttp.setRequestHeader("Content-Type", "application/json");
+    xhttp.onload = function () {
+      if (this.status !== 200) return;
+
+      const data = JSON.parse(this.responseText);
+      currentBattle = data.battle
+      currentBattle.inventory = data.inventory
+      updateBattle(currentBattle);
+
+      setTimeout(() => {
+        if (currentBattle.actions && currentBattle.actions.length > 0) {
+          const act = currentBattle.actions[0];
+          if (act.type === "item") {
+            showHp(act.hp);
+          }
+        }
+        showActions();
+      }, 300);
+    };
+
+    xhttp.send(JSON.stringify({ action: "item", item }));
+  }
+
   function enemyTurn() {
     setTimeout(() => {
       let xhttp = new XMLHttpRequest();
@@ -727,6 +758,12 @@ P02: Makers Makin' It, Act I
       updateBattle(currentBattle);
 
       const next = currentBattle.turnOrder[currentBattle.turnIndex];
+      if (!next) {
+        turn = "player";
+        updateTurnUI();
+        showActions();
+        return;
+      }
 
       if (next.type === "enemy") {
         turn = "enemy";
@@ -805,6 +842,35 @@ P02: Makers Makin' It, Act I
 
     setTimeout(() => {
       popup.style.display = "none";
+    }, POPUP_MS);
+  }
+
+  function showHp(amount) {
+    const popup = document.createElement("div");
+    popup.className = "dmg-popup";
+    popup.innerText = `+${amount}`;
+    popup.style.color = "lightgreen";
+
+    const player = document.querySelector(".player-wrap");
+    if (!player) return;
+
+    const rect = player.getBoundingClientRect();
+    popup.style.left = rect.left + rect.width / 2 + "px";
+    popup.style.top = rect.top + "px";
+
+    document.body.appendChild(popup);
+
+    popup.style.display = "block";
+    popup.style.opacity = 1;
+    popup.style.transform = "translateY(0px)";
+
+    setTimeout(() => {
+      popup.style.transform = "translateY(-30px)";
+      popup.style.opacity = 0;
+    }, 200);
+
+    setTimeout(() => {
+      popup.remove();
     }, POPUP_MS);
   }
 
