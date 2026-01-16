@@ -606,18 +606,20 @@ def battle():
         elif action == 'item':
             item = data.get('item')
             # session['battle'] = useItem(session['battle'], item)
+            return jsonify(session["battle"])
+
         elif action == 'focus':
             session['battle'] = focus(session['battle'])
+            return jsonify(session["battle"])
+
+        elif action == 'guard':
+            session['battle'] = guard(session['battle'])
+            return jsonify(session["battle"])
 
         elif action == "advance":
             battle = advance_turn(session["battle"])
             session["battle"] = battle
             return jsonify(battle)
-
-        # Player Death Check
-        if deathCheck(session['battle']):
-            session.pop('battle')
-            return jsonify({"redirect": "/menu"})
 
         return jsonify(session["battle"])
 
