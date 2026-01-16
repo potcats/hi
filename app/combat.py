@@ -53,7 +53,7 @@ def randomEnemy(species):
         "max_energy": 6,
         "weakness": weakness,
         "res": res,
-        "drops": drops
+        "drops": drops,
     }
 
 '''
@@ -185,6 +185,9 @@ def createBattle(enemies):
         "focused": False
     }
 
+    for i, enemy in enumerate(enemies):
+        enemy["eid"] = i
+
     return {
         "turn": "player",
         "turnNum": 1,
@@ -202,7 +205,7 @@ def player_startTurn(battle_id):
     player["focused"] = False
 
     #reduce all cd by 1
-    for i in range(3):
+    for i in range(len(player["cds"])):
         if player["cds"][i] > 0:
             player["cds"][i] -= 1
 
@@ -224,6 +227,7 @@ def enemy_startTurn(battle_id, idx):
 
 def guard(battle_id):
     battle_id["player"]["guarding"] = True
+    battle_id["turn"] = "enemy"
     return battle_id
 
 def focus(battle_id):
@@ -231,7 +235,14 @@ def focus(battle_id):
     player["focused"] = True
     #increase energy by 1
     player["energy"] = min(player["energy"] + 1, player["max_energy"])
+    battle_id["turn"] = "enemy"
     return battle_id
+
+def enemy_by_eid(battle, eid):
+    for enemy in battle["enemies"]:
+        if enemy["eid"] == eid:
+            return enemy
+    return None
 
 # attack(forest_battle1, 2, 'attack1') means that in forest_battle1, the player is attacking enemy #2 (index from 0) with attack1
 def player_attack(battle_id, defender, move):
@@ -245,11 +256,15 @@ def player_attack(battle_id, defender, move):
     #remove energy used to cast
     battle_id["player"]["energy"] -= attack_info[3]
 
-    result = dealDamage(battle_id, battle_id["player"], battle_id["enemies"][defender], attack_info)
+    enemy = enemy_by_eid(battle_id, defender)
+    if enemy is None:
+        return battle_id
+
+    result = dealDamage(battle_id, battle_id["player"], enemy, attack_info)
 
     #do the hp reduction
     for i in result:
-        battle_id["enemies"][defender]["hp"] -= i[1]
+        enemy["hp"] -= i[1]
 
     #check for kills
     battle_id = killCheck(battle_id)
@@ -259,6 +274,7 @@ def player_attack(battle_id, defender, move):
         "target": defender,
         "result": result
     }]
+
     battle_id["turn"] = "enemy"
     return battle_id
 
@@ -348,13 +364,15 @@ def hit(battle_id, attacker, victim, attack_info):
         status = 'blocked'
         dmg /= 2
     dmg *= dmgMultiplier
-    return [status, dmg]
+    return [status, int(round(dmg))]
 
 def killCheck(battle_id):
-    #for enemies
-    for i in range(len(battle_id["enemies"]) - 1, -1, -1):
-        if battle_id["enemies"][i]["hp"] <= 0:
-            battle_id["enemies"].pop(i)
+    # for enemies
+    for enemy in battle_id["enemies"]:
+        if enemy["hp"] <= 0:
+            enemy["dead"] = True
+    battle_id["enemies"] = [e for e in battle_id["enemies"] if not e.get("dead", False)]
+
     return battle_id
 
 def deathCheck(battle_id):
@@ -374,7 +392,7 @@ def advance_turn(battle):
                 result = enemy_attack(battle, i)
                 battle["actions"].append({
                     "source": "enemy",
-                    "enemy_idx": i,
+                    "enemy_eid": enemy["eid"],
                     "result": result
                 })
                 if deathCheck(battle):
@@ -383,6 +401,7 @@ def advance_turn(battle):
 
         battle["turn"] = "player"
         battle["turnNum"] += 1
+        battle = player_startTurn(battle)
         return battle
 
     else:

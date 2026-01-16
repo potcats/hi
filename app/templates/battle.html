@@ -106,7 +106,7 @@ P02: Makers Makin' It, Act I
     .enemy-wrap.targeted .target-ind {
       opacity: 1;
       animation: float 2s ease;
-      animation-iteration-count: infinite; 
+      animation-iteration-count: infinite;
     }
 
     @keyframes float {
@@ -126,7 +126,7 @@ P02: Makers Makin' It, Act I
         transform: translateY(0);
       }
     }
-      
+
 
     .items-grid {
       display: grid;
@@ -314,7 +314,7 @@ P02: Makers Makin' It, Act I
           </div>
 
           {% for enemy in battle.enemies %}
-          <div class = "mb-3 enemy-sidebar enemy-{{ loop.index0 }}">
+          <div class = "mb-3 enemy-sidebar enemy-{{ enemy.eid }}">
             <h5 class = "fw-bold"> {{ enemy.species }} </h5>
             <div class = "progress">
               <div class = "progress-bar bg-danger enemy-hp" style = "width: {{ (enemy.hp / enemy.max_hp) * 100 }}%">
@@ -364,7 +364,7 @@ P02: Makers Makin' It, Act I
 
         <!-- Enemy Display -->
         {% for enemy in battle.enemies %}
-        <div class = "enemy-wrap enemy-{{ loop.index0 }}"
+        <div class = "enemy-wrap enemy-{{ enemy.eid }}"
              style = "right: {{ 15 + loop.index0 * 8 }}%; bottom: {{ 140 + loop.index0 * 60 }}px;">
 
           <div class="target-ind"> ▽ </div>
@@ -468,10 +468,10 @@ P02: Makers Makin' It, Act I
 
         {% for enemy in battle.enemies %}
         <div class = "atk-wrap flex-grow-1 bg-dark px-2 gap-2 mb-1 py-1
-             target-btn target-{{ loop.index0 }}"
-             onmouseenter = "highlight({{ loop.index0 }})"
-             onmouseleave = "unhighlight({{ loop.index0 }})"
-             onclick = "selectTarget({{ loop.index0 }})">
+             target-btn target-{{ enemy.eid }}"
+             onmouseenter = "highlight({{ enemy.eid }})"
+             onmouseleave = "unhighlight({{ enemy.eid }})"
+             onclick = "selectTarget({{ enemy.eid }})">
           <div class = "fw-bold">{{ enemy.species }}</div>
         </div>
         {% endfor %}
@@ -535,11 +535,11 @@ P02: Makers Makin' It, Act I
     show('targets');
   }
 
-  function selectTarget(i) {
+  function selectTarget(eid) {
     hide()
     hideActions();
     showActionBanner(selected.toUpperCase());
-    playerAtkAnim(i);
+    playerAtkAnim(eid);
 
     // Player Turn
     let xhttp = new XMLHttpRequest();
@@ -560,7 +560,7 @@ P02: Makers Makin' It, Act I
         if (battle.actions && battle.actions.length > 0) {
           const act = battle.actions[0];
           if (act.source === "player") {
-            showHits("enemy", act.result, i);
+            showHits("enemy", act.result, eid);
           }
         }
       }
@@ -573,18 +573,46 @@ P02: Makers Makin' It, Act I
     xhttp.send(JSON.stringify({
       action: "attack",
       move: selected,
-      target: i
+      target: eid
     }));
   }
 
-  function gainEnergy() {
+  function sendAction(data) {
     hide();
-    enemyTurn();
+    hideActions();
+
+    const xhttp = new XMLHttpRequest();
+    xhttp.open("POST", "/battle", true);
+    xhttp.setRequestHeader("Content-Type", "application/json");
+
+    xhttp.onload = function () {
+      if (this.status !== 200) return;
+
+      const battle = JSON.parse(this.responseText);
+      const prevBattle = currentBattle;
+      currentBattle = battle;
+      updateBattle(battle);
+
+      if (prevBattle) {
+        handleDeaths(prevBattle, battle);
+      }
+
+      setTimeout(() => {
+        enemyTurn();
+      }, POPUP_MS + PAUSE_MS);
+    };
+
+    xhttp.send(JSON.stringify(data));
   }
 
-  function guard() {
-    hide();
-    enemyTurn();
+  function gainEnergy() { // name focus doesn't work
+    showActionBanner("FOCUS");
+    sendAction({action: "focus"});
+  }
+
+  function guard() { // name focus doesn't work
+    showActionBanner("GUARD");
+    sendAction({action: "guard"});
   }
 
   function enemyTurn() {
@@ -620,9 +648,9 @@ P02: Makers Makin' It, Act I
     }, PAUSE_MS);
   }
 
-  function enemyAct(i, result) {
-    updateTurnUI(i);
-    enemyAtkAnim(i);
+  function enemyAct(eid, result) {
+    updateTurnUI(eid);
+    enemyAtkAnim(eid);
 
     if (result.length > 0) {
       showHits("player", result);
@@ -638,7 +666,7 @@ P02: Makers Makin' It, Act I
     }
 
     const act = actions[i];
-    enemyAct(act.enemy_idx, act.result);
+    enemyAct(act.enemy_eid, act.result);
 
     setTimeout(() => {
       enemyActions(actions, i + 1);
@@ -668,7 +696,7 @@ P02: Makers Makin' It, Act I
     if (target == "player") {
       element = document.querySelector(".player-wrap");
     } else if (target == "enemy" && enemyIdx != null) {
-      element = document.querySelectorAll(".enemy-wrap")[enemyIdx];
+      element = document.querySelector(`.enemy-wrap.enemy-${enemyIdx}`);
     }
 
     const rect = element.getBoundingClientRect(); // returns element pos/size
@@ -733,46 +761,48 @@ P02: Makers Makin' It, Act I
 
     if (newC >= prevC) return;
 
-    for (let i = newC; i < prevC; i++) {
-
-      // sprite
-      const sprite = document.querySelector(`.enemy-wrap.enemy-${i}`);
-      if (sprite) {
-        sprite.classList.add("dead");
-        setTimeout(() => {
-          sprite.remove();
-        }, 900);
+    for (let i = 0; i < prevC; i++) {
+      const prevEid = prevBat.enemies[i].eid;
+      let alive = false;
+      for (let j = 0; j < newC; j++) {
+        if (newBat.enemies[j].eid == prevEid) {
+          alive = true;
+        }
       }
 
-      // sidebar
-      const sidebar = document.querySelector(`.enemy-sidebar.enemy-${i}`);
-      if (sidebar) sidebar.remove();
+      if (!alive) {
+        // sprite
+        const sprite = document.querySelector(`.enemy-wrap.enemy-${prevEid}`);
+        if (sprite) {
+          sprite.classList.add("dead");
+          setTimeout(() => {
+            sprite.remove();
+          }, 900);
+        }
 
-      // targets panel
-      const target = document.querySelector(`.target-${i}`);
-      if (target) target.remove();
-    }
-    fixIndex();
-  }
+        // sidebar
+        const sidebar = document.querySelector(`.enemy-sidebar.enemy-${prevEid}`);
+        if (sidebar) sidebar.remove();
 
-  function fixIndex() {
-    document.querySelectorAll(".target-btn").forEach((btn, i) => {
-      btn.className = "atk-wrap flex-grow-1 bg-dark px-2 gap-2 mb-1 py-1 target-btn target-" + i;
-      btn.onclick = () => selectTarget(i);
-    });
-  }
+        // targets panel
+        const target = document.querySelector(`.target-${prevEid}`);
+        if (target) target.remove();
+      }
 
-  function highlight(i) {
-    const enemies = document.querySelectorAll(".enemy-wrap");
-    if (enemies[i]) {
-      enemies[i].classList.add("targeted");
     }
   }
 
-  function unhighlight(i) {
-    const enemies = document.querySelectorAll(".enemy-wrap");
-    if (enemies[i]) {
-      enemies[i].classList.remove("targeted");
+  function highlight(eid) {
+    const enemy = document.querySelector(`.enemy-wrap.enemy-${eid}`);
+    if (enemy) {
+      enemy.classList.add("targeted");
+    }
+  }
+
+  function unhighlight(eid) {
+    const enemy = document.querySelector(`.enemy-wrap.enemy-${eid}`);
+    if (enemy) {
+      enemy.classList.remove("targeted");
     }
   }
 
@@ -787,20 +817,20 @@ P02: Makers Makin' It, Act I
       .classList.remove("hidden");
   }
 
-  function playerAtkAnim(i) {
+  function playerAtkAnim(eid) {
     const player = document.querySelector(".player-wrap");
-    const enemy = document.querySelectorAll(".enemy-wrap");
+    const enemy = document.querySelector(`.enemy-wrap.enemy-${eid}`);
 
-    if (!player || !enemy[i]) return;
+    if (!player || !enemy) return;
 
     player.classList.add("player-atk");
 
     setTimeout(() => {
-      enemy[i].classList.add("shake");
+      enemy.classList.add("shake");
     }, HIT_DELAY_MS);
     setTimeout(() => {
       player.classList.remove("player-atk");
-      enemy[i].classList.remove("shake");
+      enemy.classList.remove("shake");
     }, HIT_DELAY_MS + HIT_MS);
   }
 
@@ -811,32 +841,30 @@ P02: Makers Makin' It, Act I
     if (turn === "player") {
       player.classList.remove("inactive");
       enemies.forEach(e => e.classList.add("inactive"));
-    }
-    else {
+    } else {
       player.classList.add("inactive");
-      enemies.forEach((e, i) => {
-        if (i === idx) {
-          e.classList.remove("inactive");
-        } else {
-          e.classList.add("inactive");
-        }
-      });
+      enemies.forEach(e => e.classList.add("inactive"));
+
+      if (idx !== null) {
+        const active = document.querySelector(`.enemy-sidebar.enemy-${idx}`);
+        if (active) active.classList.remove("inactive");
+      }
     }
   }
 
-  function enemyAtkAnim(i) {
+  function enemyAtkAnim(eid) {
     const player = document.querySelector(".player-wrap");
-    const enemy = document.querySelectorAll(".enemy-wrap");
+    const enemy = document.querySelector(`.enemy-wrap.enemy-${eid}`);
 
-    if (!player || !enemy[i]) return;
+    if (!player || !enemy) return;
 
-    enemy[i].classList.add("enemy-atk");
+    enemy.classList.add("enemy-atk");
 
     setTimeout(() => {
       player.classList.add("shake");
     }, HIT_DELAY_MS);
     setTimeout(() => {
-      enemy[i].classList.remove("enemy-atk");
+      enemy.classList.remove("enemy-atk");
       player.classList.remove("shake");
     }, HIT_DELAY_MS + HIT_MS);
   }
@@ -866,7 +894,7 @@ P02: Makers Makin' It, Act I
       const e_energy = (enemy.energy / 6) * 100;
 
       // Sidebar HP
-      const sidebar_e = document.querySelector(`.enemy-sidebar.enemy-${i}`);
+      const sidebar_e = document.querySelector(`.enemy-sidebar.enemy-${enemy.eid}`);
       sidebar_e.querySelectorAll(".enemy-hp").forEach(bar => {
         bar.style.width = e_hp + "%";
       });
@@ -882,7 +910,7 @@ P02: Makers Makin' It, Act I
       });
 
       // Battlefield HP
-      const field_e = document.querySelector(`.enemy-wrap.enemy-${i}`);
+      const field_e = document.querySelector(`.enemy-wrap.enemy-${enemy.eid}`);
       field_e.querySelectorAll(".enemy-hp").forEach(bar => {
         bar.style.width = e_hp + "%";
       });
