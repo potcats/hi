@@ -713,8 +713,8 @@ def battle():
 
     common_opponents = ['bandit', 'bee', 'goblin', 'pebble', 'pixie', 'rat']
     session['battle'] = createBattle([
-        # randomEnemy(random.choice(common_opponents)),
-        # randomEnemy(random.choice(common_opponents)),
+        randomEnemy(random.choice(common_opponents)),
+        randomEnemy(random.choice(common_opponents)),
         randomEnemy(random.choice(common_opponents))
     ])
     if session['encounter'] == 'Grandma\'s House':
