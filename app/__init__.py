@@ -660,10 +660,6 @@ def battle():
         if action == "attack":
             battle = session["battle"]
 
-            turn = battle["turnOrder"][battle["turnIndex"]]
-            if turn["type"] != "player":
-                return jsonify(battle)
-
             battle = player_attack(
                 battle,
                 data["target"],
