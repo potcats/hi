@@ -111,7 +111,7 @@ P02: Makers Makin' It, Act I
     <div class = "row justify-content-center">
       {% for e in encounters %}
       <div class = "col-md-3 px-0">
-        <div class = "encounter-card color-{{ loop.index0 }} text-center" onclick = "go({{ e.id }})">
+        <div class = "encounter-card color-{{ loop.index0 }} text-center" onclick = "go({{ e }})">
           <div class = "title-wrap">
             <h5 class = "fw-bold"> {{ e.name }} </h5>
           </div>
@@ -141,7 +141,7 @@ P02: Makers Makin' It, Act I
         <div class = "text-wrap"> x </div>
       </div>
       <div class = "col-md-3 px-0" style = "min-width: 180px;">
-        <a href = "{{ url_for('campfire') }}" class = "button text-wrap"> Rest </a>
+        <a href = "{{ url_for('dialogue', encounter='Short Rest') }}" class = "button text-wrap"> Rest </a>
       </div>
     </div>
   </div>
@@ -156,7 +156,19 @@ P02: Makers Makin' It, Act I
 
   <!-- PAGE-SPECIFIC JS -->
   <script>
+    var shops = ["Travelling Merchant", "Wanderer's Wares"]
 
+    function go(encounter) {
+      let location = "/"
+
+      if (shops.includes(encounter.name)) {
+        location += `shop/${encounter.name}`
+      } else {
+        location += `dialogue/${encounter.name}`
+      }
+
+      window.location.href = location;
+    }
   </script>
 
 </body>
