@@ -914,7 +914,7 @@ def generateShopItems(num):
     for item in selected:
         info = c.execute("SELECT type, gold FROM items WHERE name = ?", (item,)).fetchone()
 
-        shop[item] = [item, info[0], str(1), info[1]]
+        shop[item] = [item, info[0], str(1), info[1]*2]
 
     return shop
 
