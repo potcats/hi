@@ -787,6 +787,7 @@ def shop(type):
 
         if 'buy' in data:
             itm = data['buy']
+            session['gold'] = session['gold'] - shop[itm][3]
 
             addItemToInventory(itm)
             inv = session['inventory']
