@@ -536,6 +536,9 @@ def menu():
 
 @app.route('/campfire', methods=['GET', 'POST'])
 def campfire():
+    if not loggedin():
+        return redirect(url_for('login'))
+
     inv = session['inventory'] # [name] {name, type, quantity, gold}
     stats = fetch_stats() # [level, HP, str, dex, con, int, fth, lck]
     equips = fetch_equips() # [gearType] {name}
@@ -693,6 +696,9 @@ def battle():
 def encounters():
     if not loggedin():
         return redirect(url_for('login'))
+
+    session['turn'] = session['turn'] + 1
+    
     # testttttt
     encounters = []
     for i in range(len(name)):
