@@ -99,6 +99,7 @@ P02: Makers Makin' It, Act I
     h1{
         font-size: 200%;
     }
+
     .b{
        color: white;
        box-shadow: 0 0 0 4px #3b3b3b;
@@ -110,6 +111,10 @@ P02: Makers Makin' It, Act I
        padding-right: 1vw;
        margin-bottom: 2vh;
     }
+
+    .b:hover {
+      filter: brightness(140%);
+    }
   </style>
 
 </head>
@@ -119,21 +124,23 @@ P02: Makers Makin' It, Act I
    <div id="hold" class="aaa">
       <div class="side">
           <img src = "{{img[0][0]}}" class="img">
-      </div> 
+      </div>
       <div class="text">
           <h1> {{e}} </h1>
-          {% for options in dlg %}
-              {% if options[2] == "desc" and options[4] == t %}
+          <!-- {% for options in dlg %}
+              {% if options[2] == "desc" and options[4] == ord %}
                   {{options[3]}}
               {% endif %}
-          {% endfor %}
+          {% endfor %} -->
+          <p style="filter: brightness(70%)" id="description"> </p>
           <br>
           <br>
-          {% for options in dlg %}
+          <!-- {% for options in dlg %}
               {% if options[2] == "choice" and options[4] == t and options[5] == choice %}
                   <button class="b"> {{options[3]}} </button>
               {% endif %}
-          {% endfor %}
+          {% endfor %} -->
+          <div id="opts"> </div>
       </div>
    </div>
   <!-- BOOTSTRAP JS -->
@@ -146,19 +153,100 @@ P02: Makers Makin' It, Act I
 
   <!-- PAGE-SPECIFIC JS -->
   <script>
-    window.addEventListener('load', () => {
-        if(document.querySelector('#hold') !== null){
-            window.sessionStorage.setItem('Hold', 'displayed');
-        }
-        if(document.querySelector('#bg') !== null){
-            window.sessionStorage.setItem('Bg', 'displayed');
-        }
-    })
+    var dlg = {{ dlg | tojson }};
+    var currOrd = {{ ord }};
+    var lastSelected = "";
+
+    window.onload = function() {
+      // ANIMATIONS STUFF
+      if(document.querySelector('#hold') !== null){
+          window.sessionStorage.setItem('Hold', 'displayed');
+      }
+      if(document.querySelector('#bg') !== null){
+          window.sessionStorage.setItem('Bg', 'displayed');
+      }
+
+      // DIALOGUE
+      loadText();
+    }
+
+    // ANIMATIONS STUFF
     if (window.sessionStorage.getItem('Hold')) {
         document.querySelector('#hold').classList.remove('aaa')
     }
+
     if (window.sessionStorage.getItem('Bg')) {
         document.querySelector('#bg').classList.remove('kms')
+    }
+
+    function loadText() {
+      let nobuttons = true;
+      let id = "";
+      document.getElementById('description').innerHTML = "";
+      document.getElementById('opts').innerHTML = "";
+      console.log(dlg);
+      for (item of dlg) {
+        if (item[2] == "desc") {
+          if (item[4] == currOrd && item[5] == lastSelected) {
+            document.getElementById('description').innerHTML = item[3];
+
+            id = item[0]
+          }
+        } else {
+          if (item[4] == currOrd && item[5] == lastSelected) {
+            let parent = document.getElementById('opts');
+
+            let btn = document.createElement('button');
+            btn.className = `b ${item[6]} ${item[0]}`;
+            btn.innerHTML = item[3];
+            btn.style.display = "block";
+
+            btn.addEventListener("click", function() {
+              pressButton(this)}
+            );
+            parent.appendChild(btn);
+            nobuttons = false;
+          }
+        }
+      }
+
+      if (nobuttons) {
+        let aa = new XMLHttpRequest();
+        aa.open("POST", window.location.href, true);
+        aa.setRequestHeader("ord", currOrd);
+        aa.setRequestHeader("id", id);
+        aa.send();
+
+        aa.onload = function() {
+          if (this.readyState == 4 && this.status == 200) {
+            dlg = JSON.parse(this.response);
+
+            if ( dlg.length == 0 ) { setTimeout(function() {window.location.href = "/battle"}, 1500)}
+            else { loadText() };
+          }
+        }
+      }
+    }
+
+    function pressButton(btn) {
+      let useBtn = new XMLHttpRequest();
+      console.log(btn.classList[2]);
+      lastSelected = btn.classList[1];
+      currOrd += 1;
+
+      useBtn.open("POST", window.location.href, true);
+      useBtn.setRequestHeader("ord", currOrd);
+      useBtn.setRequestHeader("id", btn.classList[2]);
+      useBtn.send();
+
+      useBtn.onload = function() {
+        if (this.readyState == 4 && this.status == 200) {
+          dlg = JSON.parse(this.response);
+
+          if ( dlg.length == 0 ) { window.location.href = "/battle"}
+          else { loadText() };
+        }
+      }
     }
   </script>
 
