@@ -319,13 +319,13 @@ statReq = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 10, 0, 0, 0, 0, 0, 0, 15, 0, 0,
             0, 0, 0, 10, 0, 0, 0, 0,
             0, 0, 0]
-reward = ["", "", "", "", "", "", "", "", "", "", "", "", "",
-            "", "", "", "", "", "", "", "gold", "", "", "", "",
-            "", "", "", "", "", "", "", "randomEffect", ""
-            "", "", "", "", "", "", "magical vial of water", "", "", "", "", "", "", "magical vial of water",
-            "", "", "", "excalibur", "",
-            "", "", "", "", "", "", "", "", "", "", "", "healing potion", "magical vial of water", "", "", "minor healing potion", "",
-            "", "", "magical vial of water", "", "", "hp", "statPoint", "",
+reward = ["", "", "redirect", "", "", "", "", "", "", "redirect", "", "redirect", "redirect",
+            "", "redirect", "", "redirect", "", "", "", "gold", "", "redirect", "redirect", "redirect",
+            "", "", "redirect", "", "redirect", "", "", "randomEffect", "redirect",
+            "", "", "redirect", "", "", "", "magical vial of water", "", "redirect", "", "", "redirect", "redirect", "magical vial of water",
+            "", "", "redirect", "excalibur", "redirect",
+            "", "", "redirect", "", "", "redirect", "", "", "", "", "redirect", "healing potion", "magical vial of water", "", "", "minor healing potion", "redirect",
+            "", "", "magical vial of water", "", "redirect", "hp", "statPoint", "redirect",
             "", "hp", "statPoint"]
 
 DB_FILE = "data.db"
