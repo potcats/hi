@@ -653,73 +653,19 @@ def battle():
 
     # if 'battle' not in session:
     #     session['battle'] = createBattle([randomEnemy('goblin'), randomEnemy('goblin')])
-
-    if request.method == "GET":
-        session.pop('battle', None)
-
-        addItemToInventory("healing potion")
-        addItemToInventory("healing potion")
-        addItemToInventory("honey")
-
-        common_opponents = ['bandit', 'bee', 'goblin', 'pebble', 'pixie', 'rat']
-        session['battle'] = createBattle([
-            randomEnemy(random.choice(common_opponents)),
-            randomEnemy(random.choice(common_opponents)),
-            randomEnemy(random.choice(common_opponents))
-        ])
-        # if session['encounter'] == 'Grandma\'s House':
-        #     session['battle'] = createBattle([
-        #         randomEnemy('grandma')
-        #     ])
-        # elif session['encounter'] == 'Wizard Tower':
-        #     session['battle'] = createBattle([
-        #         randomEnemy('wizard')
-        #     ])
-        # elif session['encounter'] == 'Busted Caravan':
-        #     session['battle'] = createBattle([
-        #         randomEnemy('goblin'),
-        #         randomEnemy('goblin'),
-        #         randomEnemy('goblin')
-        #     ])
-        # elif session['encounter'] == 'Elven Camp':
-        #     session['battle'] = createBattle([
-        #         randomEnemy('dwarf'),
-        #         randomEnemy('dwarfchief'),
-        #         randomEnemy('dwarf')
-        #     ])
-
-        equipsR = fetch_equips()
-        if equipsR["chestplate"] == "":
-            equipsR["chestplate"] = "cloth robe"
-        equip_items = [item for item in equipsR.values() if item != ""]
-        equip_images = fetch_images(equip_items)
-        equips = []
-        for i in range(len(equip_items)):
-            equips.append({
-                "name": equip_items[i],
-                "image": equip_images[i]
-            })
-
-        consumable_c = 0
-        for item in session.get("inventory", {}).values():
-            if item[1] == "consumable":
-                consumable_c += 1
-
-        return render_template("battle.html",
-                battle = session['battle'],
-                inventory = session.get('inventory'),
-                gold = session.get('gold'),
-                equips = equips,
-                consumable_c = consumable_c
-            )
-
     if request.method == 'POST':
         data = request.get_json()
         action = data.get('action')
 
         if action == "attack":
+            battle = session["battle"]
+
+            turn = battle["turnOrder"][battle["turnIndex"]]
+            if turn["type"] != "player":
+                return jsonify(battle)
+
             battle = player_attack(
-                session["battle"],
+                battle,
                 data["target"],
                 data["move"]
             )
@@ -748,16 +694,79 @@ def battle():
         elif action == "advance":
             battle = advance_turn(session["battle"])
             session["battle"] = battle
+
+            if battle.get("ended", False) or len(battle.get("enemies", [])) == 0:
+                if session.get("encounter", "") != "":
+                    session["encounter"] = ""
             return jsonify(battle)
 
         return jsonify(session["battle"])
+
+    session.pop('battle', None)
+
+    addItemToInventory("healing potion")
+    addItemToInventory("healing potion")
+    addItemToInventory("honey")
+
+    common_opponents = ['bandit', 'bee', 'goblin', 'pebble', 'pixie', 'rat']
+    session['battle'] = createBattle([
+        randomEnemy(random.choice(common_opponents)),
+        randomEnemy(random.choice(common_opponents)),
+        randomEnemy(random.choice(common_opponents))
+    ])
+    # if session['encounter'] == 'Grandma\'s House':
+    #     session['battle'] = createBattle([
+    #         randomEnemy('grandma')
+    #     ])
+    # elif session['encounter'] == 'Wizard Tower':
+    #     session['battle'] = createBattle([
+    #         randomEnemy('wizard')
+    #     ])
+    # elif session['encounter'] == 'Busted Caravan':
+    #     session['battle'] = createBattle([
+    #         randomEnemy('goblin'),
+    #         randomEnemy('goblin'),
+    #         randomEnemy('goblin')
+    #     ])
+    # elif session['encounter'] == 'Elven Camp':
+    #     session['battle'] = createBattle([
+    #         randomEnemy('dwarf'),
+    #         randomEnemy('dwarfchief'),
+    #         randomEnemy('dwarf')
+    #     ])
+
+    equipsR = fetch_equips()
+    if equipsR["chestplate"] == "":
+        equipsR["chestplate"] = "cloth robe"
+    equip_items = [item for item in equipsR.values() if item != ""]
+    equip_images = fetch_images(equip_items)
+    equips = []
+    for i in range(len(equip_items)):
+        equips.append({
+            "name": equip_items[i],
+            "image": equip_images[i]
+        })
+
+    consumable_c = 0
+    for item in session.get("inventory", {}).values():
+        if item[1] == "consumable":
+            consumable_c += 1
+
+    encounter = session.get("encounter", "")
+    if encounter != "":
+        bg = fetch_bg(encounter)
+    else:
+        bg = "/static/images/bgs/forestpath.jpg"
+
+
 
     return render_template("battle.html",
             battle = session['battle'],
             inventory = session.get('inventory'),
             gold = session.get('gold'),
             equips = equips,
-            consumable_c = consumable_c
+            consumable_c = consumable_c,
+            bg = bg
         )
 
 @app.route('/encounters', methods=['GET', 'POST'])
@@ -774,7 +783,7 @@ def encounters():
     # testttttt
     encounters = []
     for i in range(len(name)):
-        if name[i] != "Short Rest" && name[i] != 'boss':
+        if name[i] != "Short Rest" and name[i] != 'boss':
             encounters.append({
                 "id": i,
                 "name": name[i],

@@ -29,7 +29,7 @@ P02: Makers Makin' It, Act I
   <style>
 
     body {
-      background: url('/static/images/bgs/forestpath.jpg');
+      background: url('{{ bg }}');
       background-size: cover;
       background-position: center;
       position: relative;
@@ -792,6 +792,10 @@ P02: Makers Makin' It, Act I
     }
 
     const act = actions[i];
+    if (act.source !== "enemy") {
+      enemyActions(actions, i + 1);
+      return;
+    }
     enemyAct(act.enemy_eid, act.result);
 
     setTimeout(() => {

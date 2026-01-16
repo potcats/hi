@@ -181,13 +181,25 @@ def enemy_startTurn(battle_id, idx):
 
 def guard(battle_id):
     battle_id["player"]["guarding"] = True
+    battle_id["actions"] = [{
+        "source": "player",
+        "type": "guard"
+    }]
+
+    battle_id["turnIndex"] += 1
     return battle_id
 
 def focus(battle_id):
     player = battle_id["player"]
     player["focused"] = True
-    #increase energy by 1
     player["energy"] = min(player["energy"] + 1, player["max_energy"])
+
+    battle_id["actions"] = [{
+        "source": "player",
+        "type": "focus"
+    }]
+
+    battle_id["turnIndex"] += 1
     return battle_id
 
 def use_item(battle, effect, item):
@@ -353,13 +365,13 @@ def killCheck(battle_id):
             #drop items
             drop_options = enemy['drops'].split(',')
             addItemToInventory(random.choice(drop_options))
-            '''
+
             #adjust turns and turn order
             for i in range(0, len(battle_id['turnOrder'])-1):
                 if battle_id['turnOrder'][i]['eid'] == enemy['eid'] and battle_id['turnIndex'] > i:
                     battle_id['turnIndex'] -= 1
             battle_id = turn_order(battle_id)
-            '''
+
     battle_id["enemies"] = [e for e in battle_id["enemies"] if not e.get("dead", False)]
 
     return battle_id
