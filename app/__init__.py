@@ -20,10 +20,10 @@ items = ["honey", "cookie", "minor healing potion", "healing potion", "magical v
          "iron chestplate", "iron helmet", "iron leggings", "rat hide boots",
         "rat hide cloak", "rat hide hood", "stinger pendant", "ring of goblin ears",
          "simple sword", "excalibur", "crude club", "noble's sabre"]
-img = ["", "", "", "", "", "/app/static/images/gear/chestplate/cloth.png", "/app/static/images/gear/helmet/cloth.png", "/app/static/images/gear/pants/cloth.png", "/app/static/images/gear/boots/iron.png",
-       "/app/static/images/gear/chestplate/iron.png", "/app/static/images/gear/helmet/iron.png", "/app/static/images/gear/pants/iron.png", "/app/static/images/gear/boots/rathide.png",
-       "/app/static/images/gear/chestplate/rathide.png", "/app/static/images/gear/helmet/rathide.png", "/app/static/images/gear/accessory/stinger.png", "/app/static/images/gear/accessory/ears.png",
-       "/app/static/images/gear/weapon/simple.png", "/app/static/images/gear/weapon/excalibur.png", "/app/static/images/gear/weapon/club.png", "/app/static/images/gear/weapon/sabre.png"]
+img = ["", "", "", "", "", "/static/images/gear/chestplate/cloth.png", "/static/images/gear/helmet/cloth.png", "/static/images/gear/pants/cloth.png", "/static/images/gear/boots/iron.png",
+       "/static/images/gear/chestplate/iron.png", "/static/images/gear/helmet/iron.png", "/static/images/gear/pants/iron.png", "/static/images/gear/boots/rathide.png",
+       "/static/images/gear/chestplate/rathide.png", "/static/images/gear/helmet/rathide.png", "/static/images/gear/accessory/stinger.png", "/static/images/gear/accessory/ears.png",
+       "/static/images/gear/weapon/simple.png", "/static/images/gear/weapon/excalibur.png", "/static/images/gear/weapon/club.png", "/static/images/gear/weapon/sabre.png"]
 statStr = [0, 0, 0, 0, 0, 0, 0, 0, 3, 4, 2, 4, 0, 0, 0, 0, 5, 3, 16, 12, 10]
 statDex = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 5, 2, 0, 5, 0, 0, 0, 0]
 statCon = [0, 0, 0, 0, 0, 0, 0, 0, 1, 6, 2, 3, 0, 0, 0, 0, 0, 0, 0, 6, 0]
@@ -679,7 +679,25 @@ def battle():
                 randomEnemy('dwarfchief'),
                 randomEnemy('dwarf')
             ])
-        return render_template("battle.html", battle = session['battle'], inventory = session.get('inventory'), gold = session.get('gold'))
+
+        equipsR = fetch_equips()
+        if equipsR["chestplate"] == "":
+            equipsR["chestplate"] = "cloth robe"
+        equip_items = [item for item in equipsR.values() if item != ""]
+        equip_images = fetch_images(equip_items)
+        equips = []
+        for i in range(len(equip_items)):
+            equips.append({
+                "name": equip_items[i],
+                "image": equip_images[i]
+            })
+
+        return render_template("battle.html",
+                battle = session['battle'],
+                inventory = session.get('inventory'),
+                gold = session.get('gold'),
+                equips = equips
+            )
 
     if request.method == 'POST':
         data = request.get_json()
@@ -714,7 +732,12 @@ def battle():
 
         return jsonify(session["battle"])
 
-    return render_template("battle.html", battle = session['battle'], inventory = session.get('inventory'), gold = session.get('gold'))
+    return render_template("battle.html",
+            battle = session['battle'],
+            inventory = session.get('inventory'),
+            gold = session.get('gold'),
+            equips = equips
+        )
 
 @app.route('/encounters', methods=['GET', 'POST'])
 def encounters():
@@ -722,7 +745,7 @@ def encounters():
         return redirect(url_for('login'))
 
     session['turn'] = session['turn'] + 1
-    
+
     # testttttt
     encounters = []
     for i in range(len(name)):
