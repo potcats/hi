@@ -663,6 +663,13 @@ def battle():
                 data["move"]
             )
             session["battle"] = battle
+
+            if len(battle["enemies"]) == 0:
+                curlvl = fetch_stats()[0]
+                encounter = session.get("encounter", "")
+                lvlup(encounter, curlvl)
+                session["encounter"] = ""
+
             return jsonify(battle)
 
         elif action == 'item':
@@ -691,9 +698,8 @@ def battle():
             if len(battle.get("enemies", [])) == 0 and not battle.get("ended", False):
                 curlvl = fetch_stats()[0]
                 encounter = session.get("encounter","")
-                if encounter != "":
-                    lvlup(encounter, curlvl)
-                    session["encounter"] = ""
+                lvlup(encounter, curlvl)
+                session["encounter"] = ""
 
             return jsonify(battle)
 
@@ -707,8 +713,8 @@ def battle():
 
     common_opponents = ['bandit', 'bee', 'goblin', 'pebble', 'pixie', 'rat']
     session['battle'] = createBattle([
-        randomEnemy(random.choice(common_opponents)),
-        randomEnemy(random.choice(common_opponents)),
+        # randomEnemy(random.choice(common_opponents)),
+        # randomEnemy(random.choice(common_opponents)),
         randomEnemy(random.choice(common_opponents))
     ])
     if session['encounter'] == 'Grandma\'s House':
