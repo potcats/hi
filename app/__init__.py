@@ -139,11 +139,11 @@ scene = ["Elven Camp", "Elven Camp", "Elven Camp",
             "Grandma's House", "Grandma's House", "Grandma's House",
             "Grandma's House", "Grandma's House", "Grandma's House",
 
-            "Wizard Tower", "Wizard Tower", "Wizard Tower"
             "Wizard Tower", "Wizard Tower", "Wizard Tower",
             "Wizard Tower", "Wizard Tower", "Wizard Tower",
             "Wizard Tower", "Wizard Tower", "Wizard Tower",
-            "Wizard Tower",
+            "Wizard Tower", "Wizard Tower", "Wizard Tower",
+            "Wizard Tower", "Wizard Tower",
 
             "The Sword in the Stone", "The Sword in the Stone", "The Sword in the Stone",
             "The Sword in the Stone", "The Sword in the Stone",
@@ -226,7 +226,7 @@ dlg = [ "You come across a group of elves on your journey.",
         "Eat a cookie (random effect)",
         "Suppress the urge to taste a sweet",
         "Grandma smiles happily as you munch on the delicious cookie. As you walk away, you feel different...",
-        "As you walk away, grandma looks at you sadly.."
+        "As you walk away, grandma looks at you sadly..",
 
         "In the distance, you see the spiral of a tower and the silhouette of an old wizard through the windows of its observatory.",
         "Take a detour and look into the wizard tower",
@@ -284,7 +284,7 @@ ord = [1, 1, 1, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4,
         1, 1, 1, 1, 2, 2, 2, 3, 3,
         1, 1, 1, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 4,
         1, 1, 1, 2, 2,
-        1, 1, 1, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5,
+        1, 1, 1, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 4, 5, 5,
         1, 1, 1, 1, 1, 2, 2, 2,
         1, 1, 1]
 prevChoice = ["", "", "", "A", "A", "A", "A", "A", "A", "B", "A", "A", "B",
@@ -319,13 +319,13 @@ statReq = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 10, 0, 0, 0, 0, 0, 0, 15, 0, 0,
             0, 0, 0, 10, 0, 0, 0, 0,
             0, 0, 0]
-reward = ["", "", "redirect", "", "", "", "", "", "", "redirect", "", "redirect", "redirect",
-            "", "redirect", "", "redirect", "", "", "", "gold", "", "redirect", "redirect", "redirect",
-            "", "", "redirect", "", "redirect", "", "", "randomEffect", "redirect",
-            "", "", "redirect", "", "", "", "magical vial of water", "", "redirect", "", "", "redirect", "redirect", "magical vial of water",
-            "", "", "redirect", "excalibur", "redirect",
-            "", "", "redirect", "", "", "redirect", "", "", "", "", "redirect", "healing potion", "magical vial of water", "", "", "minor healing potion", "redirect",
-            "", "", "magical vial of water", "", "redirect", "hp", "statPoint", "redirect",
+reward = ["", "", "leave", "", "", "", "", "", "", "leave", "", "fight", "leave",
+            "", "fight", "", "leave", "", "", "", "gold", "", "fight", "leave", "leave",
+            "", "", "fight", "", "leave", "", "", "randomEffect", "leave",
+            "", "", "leave", "", "", "", "magical vial of water", "", "fight", "", "", "fight", "leave", "magical vial of water",
+            "", "", "leave", "excalibur", "leave",
+            "", "", "leave", "", "", "leave", "", "", "", "", "leave", "healing potion", "magical vial of water", "", "", "minor healing potion", "leave",
+            "", "", "magical vial of water", "", "leave", "hp", "statPoint", "leave",
             "", "hp", "statPoint"]
 
 DB_FILE = "data.db"
@@ -699,7 +699,7 @@ def encounters():
         return redirect(url_for('login'))
 
     session['turn'] = session['turn'] + 1
-    
+
     # testttttt
     encounters = []
     for i in range(len(name)):
@@ -721,27 +721,84 @@ def encounters():
 def dialogue(encounter):
     if not loggedin():
         return redirect(url_for('login'))
-    with sqlite3.connect(DB_FILE) as db:
-        c = db.cursor()
-        c.execute("SELECT * FROM dialogue WHERE scene = ?", (encounter,))
-        dlg = c.fetchall()
-        c.execute("SELECT background FROM encounters WHERE type = ?", (encounter,))
-        bck = c.fetchall()
-        c.execute("SELECT str FROM player WHERE username = ?", (session["username"],))
-        str = c.fetchall()
-        c.execute("SELECT inte FROM player WHERE username = ?", (session["username"],))
-        int = c.fetchall()
-        c.execute("SELECT dex FROM player WHERE username = ?", (session["username"],))
-        dex = c.fetchall()
-        c.execute("SELECT con FROM player WHERE username = ?", (session["username"],))
-        con = c.fetchall()
-        c.execute("SELECT lck FROM player WHERE username = ?", (session["username"],))
-        lck = c.fetchall()
-        c.execute("SELECT fth FROM player WHERE username = ?", (session["username"],))
-        fth = c.fetchall()
-    t = {"str": str, "int" : int, "dex" : dex, "con" : con, "lck" : lck, "fth" : fth}
-    return render_template("dialogue.html", dlg=dlg, img=bck, e=encounter, pStats = t,
-				t = 1, choice = "", stat = "")
+
+    info = fetch_stats();
+    temp = {"str": info[2], "dex" : info[3],
+            "con" : info[4], "int" : info[5],
+            "lck" : info[6], "fth" : info[7]}
+
+    currOrd = 1;
+    if request.method == "POST":
+        data = request.headers
+
+        currOrd = data['ord']
+        with sqlite3.connect(DB_FILE) as db:
+            c = db.cursor()
+            c.execute("SELECT * FROM dialogue WHERE scene = ? AND ord = ?", (encounter, currOrd))
+            dlg = c.fetchall()
+
+            id = data['id']
+            c.execute("SELECT * FROM dialogue WHERE id = ?", (id, ))
+            selected = c.fetchall()[0]
+            # id INTEGER PRIMARY KEY NOT NULL, 0
+            # scene TEXT NOT NULL, 1
+            # type TEXT NOT NULL, 2
+            # dlg TEXT NOT NULL, 3
+            # ord INTEGER, 4
+            # prevChoice TEXT, 5
+            # currChoice TEXT, 6
+            # stat TEXT, 7
+            # statReq INTEGER, 8
+            # reward TEXT 9
+            print(selected)
+
+        wah = selected[9]
+        print(wah)
+        if wah != "":
+            if wah == "leave":
+                return [];
+            elif wah == "fight":
+                session['encounter'] = encounter;
+                return [];
+            elif wah == "statPoint":
+                session['statPoints'] = session['statPoints'] + 3
+                return [];
+            elif wah == "hp":
+                session['hp'] = info[1];
+                return [];
+            elif wah == "gold":
+                session['gold'] = session['gold'] + 10;
+                return [];
+            else:
+                addItemToInventory(wah)
+                print("ghiowhioesghioegshioegshiogeshio")
+                return [];
+
+        if selected[7] != "":
+            if selected[8] <= temp[selected[7]]:
+                session['pass'] = 'pass'
+
+            else:
+                session['pass'] = 'fail'
+
+            dlg = [d for d in dlg if d[7] == session['pass']]
+            return dlg
+
+        return dlg;
+    else:
+        with sqlite3.connect(DB_FILE) as db:
+            c = db.cursor()
+            c.execute("SELECT * FROM dialogue WHERE scene = ? AND ord = ?", (encounter, currOrd))
+            dlg = c.fetchall()
+            print(dlg)
+            c.execute("SELECT background FROM encounters WHERE type = ?", (encounter,))
+            bck = c.fetchall()
+
+    return render_template("dialogue.html",
+                            dlg=dlg,
+                            img=bck,
+                            e=encounter,
+                            ord=currOrd)
 
 @app.route('/shop/<string:type>', methods=['GET', 'POST'])
 def shop(type):
