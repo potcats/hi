@@ -511,6 +511,7 @@ P02: Makers Makin' It, Act I
   <script>
   let turn = "player";
   let selected = null;
+  let pending = null;
   let currentBattle = null;
 
   // TIMINGGGGGG
@@ -626,12 +627,14 @@ P02: Makers Makin' It, Act I
 
         const battle = JSON.parse(this.responseText);
         const prevBattle = currentBattle;
-        currentBattle = battle;
 
-        turn = battle.turn
-        updateBattle(battle);
+        // turn = battle.turn
+        pending = battle;
+        // updateBattle(battle);
+        currentBattle = JSON.parse(JSON.stringify(battle));
 
         if (prevBattle) {
+          currentBattle.player.hp = prevBattle.player.hp;
           handleDeaths(prevBattle, battle);
         }
 
@@ -652,6 +655,13 @@ P02: Makers Makin' It, Act I
     updateTurnUI(eid);
     enemyAtkAnim(eid);
 
+    result.forEach(hit => {
+      const dmg = hit[1];
+      currentBattle.player.hp -= dmg;
+    });
+
+    updateHP();
+
     if (result.length > 0) {
       showHits("player", result);
     }
@@ -659,7 +669,11 @@ P02: Makers Makin' It, Act I
 
   function enemyActions(actions, i = 0) {
     if (i >= actions.length) {
+      currentBattle = pending;
+      pending = null;
+
       turn = "player";
+      updateBattle(currentBattle);
       updateTurnUI();
       showActions();
       return;
@@ -869,6 +883,17 @@ P02: Makers Makin' It, Act I
     }, HIT_DELAY_MS + HIT_MS);
   }
 
+  function updateHP() {
+    // player HP
+    const p_hp = (currentBattle.player.hp / currentBattle.player.max_hp) * 100;
+    document.querySelectorAll(".player-hp").forEach(bar => {
+      bar.style.width = p_hp + "%";
+    });
+    document.querySelectorAll(".player-hp-text").forEach(txt => {
+      txt.innerText = `${currentBattle.player.hp} / ${currentBattle.player.max_hp}`;
+    });
+  }
+
   function updateBattle(battle) {
     // PLAYER BARS
     // hp
@@ -932,6 +957,24 @@ P02: Makers Makin' It, Act I
     if (turnNum && battle.turnNum !== undefined) {
       turnNum.innerText = `Turn ${battle.turnNum}`;
     }
+
+    // Attack Buttons (cost/cd)
+    const atkBtns = document.querySelectorAll("#attacks-panel .atk-wrap");
+    atkBtns.forEach((btn, i) => {
+      const atk = battle.player.attacks[i];
+      // update cooldown text
+      const cdText = btn.querySelector("p");
+      if (battle.player.cds[i] > 0) {
+        cdText.innerText = `Cost: ${atk[3]} | Cooldown: ${battle.player.cds[i]}`;
+      } else {
+        cdText.innerText = `Cost: ${atk[3]} | Cooldown: ${atk[4]}`;
+      }
+      if (battle.player.energy < atk[3] || battle.player.cds[i] > 0) {
+        btn.classList.add("inactive");
+      } else {
+        btn.classList.remove("inactive");
+      }
+    });
 
   }
 

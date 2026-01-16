@@ -166,7 +166,7 @@ def createBattle(enemies):
     player = {
         "username": player_info[0],
         "attacks": attacks_info,
-        "cds": [0, 0],
+        "cds": [0] * len(attacks_info),
         "init": random.randint(0, 100),
         "hp": player_info[3] + player_info[9],
         "max_hp": player_info[3] + player_info[9],
@@ -252,6 +252,11 @@ def player_attack(battle_id, defender, move):
     for attack_info_temp in battle_id["player"]["attacks"]:
         if attack_info_temp[0] == move:
             attack_info = attack_info_temp
+
+    # set cooldown for this move
+    for i in range(len(battle_id["player"]["attacks"])):
+        if battle_id["player"]["attacks"][i][0] == move:
+            battle_id["player"]["cds"][i] = attack_info[4]
 
     #remove energy used to cast
     battle_id["player"]["energy"] -= attack_info[3]
