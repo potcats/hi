@@ -531,6 +531,7 @@ def menu():
         if not loggedin():
             return redirect(url_for('login'))
         else:
+            session['encounter'] = ''
             return redirect(url_for('battle'))
 
     return render_template("menu.html")
@@ -655,9 +656,9 @@ def battle():
         session.pop('battle', None)
         common_opponents = ['bandit', 'bee', 'goblin', 'pebble', 'pixie', 'rat']
         session['battle'] = createBattle([
-            randomEnemy(common_opponents[random.randint(0,6)]),
-            randomEnemy(common_opponents[random.randint(0,6)]),
-            randomEnemy(common_opponents[random.randint(0,6)])
+            randomEnemy(random.choice(common_opponents)),
+            randomEnemy(random.choice(common_opponents)),
+            randomEnemy(random.choice(common_opponents))
         ])
         if session['encounter'] == 'Grandma\'s House':
             session['battle'] = createBattle([

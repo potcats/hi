@@ -5,6 +5,7 @@
 # 01/16/2026
 
 from flask import session
+from __init__ import *
 import random
 import sqlite3
 from flask import session
@@ -56,77 +57,6 @@ def randomEnemy(species):
         "drops": drops,
     }
 
-'''
-[ player, [enemies] ]
-
- |
- V
-
-[
-    [
-        username
-        [
-            [
-                [
-                    name
-                    level
-                    energy
-                    cd
-                    scale
-                    baseDamage
-                    effect
-                ]
-                attack2
-                attack3
-            ]
-            [0, 0, 0]
-        ]
-        init
-        hp
-        energy
-        level
-        str
-        dex
-        con
-        int
-        fth
-        lck
-        guard
-        focus
-    ]
-    [
-        [
-            species
-            [
-                [
-                    [
-                        name
-                        hits
-                        level
-                        energy
-                        cd
-                        scale
-                        statusEffects
-                        baseDamage
-                    ]
-                    attack2
-                    attack3
-                ]
-                [0, 0, 0]
-            ]
-            init
-            hp
-            energy
-            weakness
-            res
-            drops
-        ]
-        enemy2
-        enemy3
-    ]
-    True (True = player alive, False = player dead)
-]
-'''
 def turn_order(battle_id):
     battle_id["enemies"] = [e for e in battle_id["enemies"] if e["hp"] > 0]
 
@@ -406,6 +336,17 @@ def killCheck(battle_id):
     for enemy in battle_id["enemies"]:
         if enemy["hp"] <= 0:
             enemy["dead"] = True
+            #drop items
+            drop_options = enemy['drops'].split(',')
+            addItemToInventory(random.choice(drop_options))
+            '''
+            #adjust turns and turn order
+            for i in range(0, len(battle_id['turnOrder'])-1):
+                if battle_id['turnOrder'][i]['eid'] == enemy['eid'] and battle_id['turnIndex'] > i:
+                    battle_id['turnIndex'] -= 1
+            
+            '''
+            battle_id = turn_order(battle_id)
     battle_id["enemies"] = [e for e in battle_id["enemies"] if not e.get("dead", False)]
 
     return battle_id
