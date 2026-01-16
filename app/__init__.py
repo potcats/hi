@@ -775,14 +775,18 @@ def dialogue(encounter):
                 return [];
 
         if selected[7] != "":
-            if selected[8] <= temp[selected[7]]:
-                session['pass'] = 'pass'
+            if 'pass' not in session:
+                if selected[8] <= temp[selected[7]]:
+                    session['pass'] = 'pass'
 
+                else:
+                    session['pass'] = 'fail'
+
+                dlg = [d for d in dlg if d[7] == session['pass']]
+                return dlg
             else:
-                session['pass'] = 'fail'
-
-            dlg = [d for d in dlg if d[7] == session['pass']]
-            return dlg
+                session.pop('pass')
+                return []
 
         return dlg;
     else:
