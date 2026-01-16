@@ -641,6 +641,7 @@ def campfire():
         statPoints = session['statPoints'],
         )
 
+
 @app.route('/battle', methods=['GET', 'POST'])
 def battle():
     if not loggedin():
@@ -652,10 +653,32 @@ def battle():
 
     if request.method == "GET":
         session.pop('battle', None)
+        common_opponents = ['bandit', 'bee', 'goblin', 'pebble', 'pixie', 'rat']
         session['battle'] = createBattle([
-            randomEnemy('goblin'),
-            randomEnemy('bee')
+            randomEnemy(common_opponents[random.randint(0,6)]),
+            randomEnemy(common_opponents[random.randint(0,6)]),
+            randomEnemy(common_opponents[random.randint(0,6)])
         ])
+        if session['encounter'] == 'Grandma\'s House':
+            session['battle'] = createBattle([
+                randomEnemy('grandma')
+            ])
+        elif session['encounter'] == 'Wizard Tower':
+            session['battle'] = createBattle([
+                randomEnemy('wizard')
+            ])
+        elif session['encounter'] == 'Busted Caravan':
+            session['battle'] = createBattle([
+                randomEnemy('goblin'),
+                randomEnemy('goblin'),
+                randomEnemy('goblin')
+            ])
+        elif session['encounter'] == 'Elven Camp':
+            session['battle'] = createBattle([
+                randomEnemy('dwarf'),
+                randomEnemy('dwarfchief'),
+                randomEnemy('dwarf')
+            ])
 
         equipsR = fetch_equips()
         if equipsR["chestplate"] == "":
@@ -742,6 +765,7 @@ def encounters():
 
 @app.route('/dialogue/<encounter>', methods=['GET', 'POST'])
 def dialogue(encounter):
+    session['encounter'] = encounter
     if not loggedin():
         return redirect(url_for('login'))
     with sqlite3.connect(DB_FILE) as db:
