@@ -972,6 +972,7 @@ def initializePlayer():
     session['gold'] = 0
     session['hp'] = fetch_stats()[1]
     session['statPoints'] = 0
+    session['encounter'] = ""
 
     addItemToInventory("simple sword")
 
