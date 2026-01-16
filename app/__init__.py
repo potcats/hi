@@ -547,6 +547,18 @@ def encounters():
         encounters=rd,
         turn=session.get("turn", 1))
 
+@app.route('/dialogue/<encounter>', methods=['GET', 'POST'])
+def dialogue(encounter):
+    if not loggedin():
+        return redirect(url_for('login'))
+    with sqlite3.connect(DB_FILE) as db:
+        c = db.cursor()
+        c.execute("SELECT * FROM dialogue WHERE scene = ?", (encounter,))
+        dlg = c.fetchall()
+        c.execute("SELECT background FROM encounters WHERE type = ?", (encounter,))
+        bck = c.fetchall()
+    return render_template("dialogue.html", dlg=dlg, img=bck, e=encounter)
+
 @app.route('/shop/<string:type>', methods=['GET', 'POST'])
 def shop(type):
     inv = session['inventory'] # [name] {name, type, quantity, gold}
@@ -635,11 +647,6 @@ def shop(type):
         fth=stats[6],
         lck=stats[7],
         shop=shop)
-
-@app.route('/dialogue/<string:encounter>', methods=['GET', 'POST'])
-def dialogue(encounter):
-
-    return render_template("dialogue.html", )
 
 @app.route('/scavenge', methods=['GET', 'POST'])
 def scavenge():
