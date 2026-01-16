@@ -319,13 +319,13 @@ statReq = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 10, 0, 0, 0, 0, 0, 0, 15, 0, 0,
             0, 0, 0, 10, 0, 0, 0, 0,
             0, 0, 0]
-reward = ["", "", "", "", "", "", "", "", "", "", "", "", "",
-            "", "", "", "", "", "", "", "gold", "", "", "", "",
-            "", "", "", "", "", "", "", "randomEffect", ""
-            "", "", "", "", "", "", "magical vial of water", "", "", "", "", "", "", "magical vial of water",
-            "", "", "", "excalibur", "",
-            "", "", "", "", "", "", "", "", "", "", "", "healing potion", "magical vial of water", "", "", "minor healing potion", "",
-            "", "", "magical vial of water", "", "", "hp", "statPoint", "",
+reward = ["", "", "redirect", "", "", "", "", "", "", "redirect", "", "redirect", "redirect",
+            "", "redirect", "", "redirect", "", "", "", "gold", "", "redirect", "redirect", "redirect",
+            "", "", "redirect", "", "redirect", "", "", "randomEffect", "redirect",
+            "", "", "redirect", "", "", "", "magical vial of water", "", "redirect", "", "", "redirect", "redirect", "magical vial of water",
+            "", "", "redirect", "excalibur", "redirect",
+            "", "", "redirect", "", "", "redirect", "", "", "", "", "redirect", "healing potion", "magical vial of water", "", "", "minor healing potion", "redirect",
+            "", "", "magical vial of water", "", "redirect", "hp", "statPoint", "redirect",
             "", "hp", "statPoint"]
 
 DB_FILE = "data.db"
@@ -537,6 +537,9 @@ def menu():
 
 @app.route('/campfire', methods=['GET', 'POST'])
 def campfire():
+    if not loggedin():
+        return redirect(url_for('login'))
+
     inv = session['inventory'] # [name] {name, type, quantity, gold}
     stats = fetch_stats() # [level, HP, str, dex, con, int, fth, lck]
     equips = fetch_equips() # [gearType] {name}
@@ -694,6 +697,9 @@ def battle():
 def encounters():
     if not loggedin():
         return redirect(url_for('login'))
+
+    session['turn'] = session['turn'] + 1
+    
     # testttttt
     encounters = []
     for i in range(len(name)):
@@ -802,6 +808,7 @@ def shop(type):
 
         if 'buy' in data:
             itm = data['buy']
+            session['gold'] = session['gold'] - shop[itm][3]
 
             addItemToInventory(itm)
             inv = session['inventory']
@@ -936,7 +943,7 @@ def generateShopItems(num):
     for item in selected:
         info = c.execute("SELECT type, gold FROM items WHERE name = ?", (item,)).fetchone()
 
-        shop[item] = [item, info[0], str(1), info[1]]
+        shop[item] = [item, info[0], str(1), info[1]*2]
 
     return shop
 
