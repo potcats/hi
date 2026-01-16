@@ -114,6 +114,14 @@ COMBAT SYSTEM
     - a lot of debugging
     - attack turn system
 
+joyceL -- 2026-1-15 05:30
+HTML AND DB INTERACTIONS
+* NEW CHANGES:
+    - Fixed equipping issue with campfire
+    - Set up scavenging
+    - Completed shop function
+    - made small changes to encounters
+
 christineC -- 2026-1-15 7:15
 BATTLE
 * NEW CHANGES:
@@ -125,3 +133,11 @@ BATTLE
     - Debugging
     - Guard/focus
     - Battle end
+
+joyceL -- 2026-1-15 21:27
+DB AND SMALL CHANGES
+* NEW CHANGES:
+    - Added rest of dialogue to db
+    - Changed method in which player is initially created
+      (flow between menu/startscreen and login/register)
+    - made shop items more expensive in comparison to when player is selling it 

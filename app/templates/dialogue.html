@@ -18,7 +18,9 @@ P02: Makers Makin' It, Act I
   <link rel="stylesheet"
     type="text/css"
     href="/static/css/style.css">
-
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+      <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+      <link href="https://fonts.googleapis.com/css2?family=Silkscreen&display=swap" rel="stylesheet">
   <!-- BOOTSTRAP CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
     rel="stylesheet"
@@ -27,13 +29,113 @@ P02: Makers Makin' It, Act I
 
   <!-- PAGE SPECIFIC CSS -->
   <style>
+    body {
+       overflow: hidden;
+       background-color: black;
+       color: #3d251d;
+       font-family: "Silkscreen", sans-serif;
+     }
 
+     #bg {
+    	 filter: blur(6px);
+       width: 100%;
+    	 height: 100%;
+    	 background-image: url("/static/images/bgs/forestpath.jpg");
+       background-repeat: no-repeat;
+       background-size: cover;
+    	 background-attachment: fixed;
+    	 position: absolute;
+       top: 0;
+    	 left: 0;
+    	 z-index: -10000;
+     }
+
+    .kms{
+        animation: 3s blurs;
+    }
+
+     #hold {
+       margin-top: 10vh;
+       margin-left: 10vw;
+       margin-right: 10vw;
+       padding-top: 15vh;
+       padding-bottom: 15vh;
+       color: white;
+       box-shadow: 0 0 0 5px #3b3b3b, 0 0 0 9px #525252, 0 0 0 17px grey;
+       background-color: #303030;
+       display: flex;
+     }
+
+    .aaa{
+        animation: 3s slide;
+    }
+  	 @keyframes slide {
+	     from {
+         translate: 0 150vh;
+	     }
+	     to {
+    		 translate: 0 0;
+       }
+  	 }
+
+  	 @keyframes blurs {
+       from {
+         filter: blur(0px);
+	     }
+	     to {
+    		 filter: blur(6px);
+       }
+  	 }
+    .side{
+        margin-left: 5vw;
+    }
+    .text{
+	margin-left: 70px;
+    }
+    .img{
+        height: 35vh;
+        object-fit: cover;
+    }
+    h1{
+        font-size: 200%;
+    }
+    .b{
+       color: white;
+       box-shadow: 0 0 0 4px #3b3b3b;
+       background-color: #525252;
+       border: none;
+       padding-top: 0.5vh;
+       padding-bottom: 0.5vh;
+       padding-left: 1vw;
+       padding-right: 1vw;
+       margin-bottom: 2vh;
+    }
   </style>
 
 </head>
 
 <body>
-
+   <div id="bg" class="kms"></div>
+   <div id="hold" class="aaa">
+      <div class="side">
+          <img src = "{{img[0][0]}}" class="img">
+      </div> 
+      <div class="text">
+          <h1> {{e}} </h1>
+          {% for options in dlg %}
+              {% if options[2] == "desc" and options[4] == t %}
+                  {{options[3]}}
+              {% endif %}
+          {% endfor %}
+          <br>
+          <br>
+          {% for options in dlg %}
+              {% if options[2] == "choice" and options[4] == t and options[5] == choice %}
+                  <button class="b"> {{options[3]}} </button>
+              {% endif %}
+          {% endfor %}
+      </div>
+   </div>
   <!-- BOOTSTRAP JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
     integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
@@ -44,7 +146,20 @@ P02: Makers Makin' It, Act I
 
   <!-- PAGE-SPECIFIC JS -->
   <script>
-
+    window.addEventListener('load', () => {
+        if(document.querySelector('#hold') !== null){
+            window.sessionStorage.setItem('Hold', 'displayed');
+        }
+        if(document.querySelector('#bg') !== null){
+            window.sessionStorage.setItem('Bg', 'displayed');
+        }
+    })
+    if (window.sessionStorage.getItem('Hold')) {
+        document.querySelector('#hold').classList.remove('aaa')
+    }
+    if (window.sessionStorage.getItem('Bg')) {
+        document.querySelector('#bg').classList.remove('kms')
+    }
   </script>
 
 </body>

@@ -61,6 +61,9 @@ P02: Makers Makin' It, Act I
 </head>
 
 <body>
+  <!-- FORM THAT START BUTTON IS LINKED TO -->
+  <form id="play" method="POST" action="/"> </form>
+
   <!-- AUDIO -->
   <audio loop id="bgm" src="/static/sound/startbgm.mp3"> </audio>
 
@@ -76,8 +79,8 @@ P02: Makers Makin' It, Act I
       <image src="/static/images/title.png" id="title" class="center" style="margin-left: 72%; filter: invert(80%);">
     </div>
     <div style="margin-top: 50px; width: 80%" class="container">
-      <button onclick="window.location.href='battle'" class="main" style="width: 35%">
-        READY
+      <button type="submit" form="play" class="main" style="width: 35%">
+        ENTER
       </button>
     </div>
   </div>

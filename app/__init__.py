@@ -124,7 +124,13 @@ statusEff = ["", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "",
 baseDmg = [12, 8, 4, 3, 6, 8, 6, 4, 5, 4, 7, 8, 10, 14, 3, 3, 4, 6, 9, 0, 6, 14, 8, 17, 3, 6, 6, 9, 0, 15, 0]
 
 # DIALOGUE
-scene = ["Busted Caravan", "Busted Caravan", "Busted Caravan",
+scene = ["Elven Camp", "Elven Camp", "Elven Camp",
+            "Elven Camp", "Elven Camp", "Elven Camp",
+            "Elven Camp", "Elven Camp", "Elven Camp",
+            "Elven Camp", "Elven Camp", "Elven Camp",
+            "Elven Camp",
+
+            "Busted Caravan", "Busted Caravan", "Busted Caravan",
             "Busted Caravan", "Busted Caravan", "Busted Caravan",
             "Busted Caravan", "Busted Caravan", "Busted Caravan",
             "Busted Caravan", "Busted Caravan", "Busted Caravan",
@@ -149,8 +155,17 @@ scene = ["Busted Caravan", "Busted Caravan", "Busted Caravan",
             "Potion Seller", "Potion Seller", "Potion Seller",
             "Potion Seller", "Potion Seller",
 
-            ]
-dialogueType = ["desc", "choice", "choice", "choice",
+            "Mystic River", "Mystic River", "Mystic River",
+            "Mystic River", "Mystic River", "Mystic River",
+            "Mystic River", "Mystic River",
+
+            "Short Rest", "Short Rest", "Short Rest"]
+dialogueType = ["desc", "choice", "choice",
+                "desc", "choice", "choice",
+                "desc", "choice", "choice", "desc",
+                "desc", "choice", "desc",
+
+                "desc", "choice", "choice", "choice",
                 "desc", "choice", "choice",
                 "desc", "desc", "choice", "desc", "choice",
 
@@ -172,8 +187,25 @@ dialogueType = ["desc", "choice", "choice", "choice",
                 "desc", "desc", "desc", "desc", "choice",
                 "desc", "desc",
 
-                ]
-dlg = ["You find yourselves peeking through the trees towards a caravan that seems to have been stranded in the middle of the forest. What will you do?",
+                "desc", "choice", "choice", "choice", "choice",
+                "desc", "desc", "desc",
+
+                "desc", "choice", "choice"]
+dlg = [ "You come across a group of elves on your journey.",
+        "Speak to the elves",
+        "Walk away",
+        "Hello! We’re busy right now, but if you’re willing to help us, that’d be great. We have a wager with the dwarves that we have to win!",
+        "A wager?",
+        "Sorry, I’m not interested.",
+        "Yes, but we’re on track to lose… the dwarves want to duel, but we sent out too many elves on an expedition last week. Would you join us?",
+        "Sure, I’m in!",
+        "Sorry, I’m not interested.",
+        "As you walk away, the elves behind you resume training frantically. You hear the twang of bows and the frustrated exclamations of the elves.",
+        "You follow the elves to the dwarven camp.",
+        "Fight",
+        "As you walk away, the elves behind you resume training frantically. You hear the twang of bows and the frustrated exclamations of the elves.",
+
+        "You find yourselves peeking through the trees towards a caravan that seems to have been stranded in the middle of the forest. What will you do?",
         "Battle the goblins for their goods",
         "Approach the goblin caravan",
         "Walk away from the scene",
@@ -235,43 +267,66 @@ dlg = ["You find yourselves peeking through the trees towards a caravan that see
         "You produce a Minor Healing Potion under the witch’s supervision.",
         "You set yourself on fire after you throw in the wrong gray powder. The witch sniffs judgementally as you leave, mildly charred and extremely embarrassed.",
 
-        ]
-ord = [1, 1, 1, 1, 2, 2, 2, 3, 3, 3, 3, 3,
+        "You come across a pristine, sparkling river. The ambience draws you in.",
+        "Take a dip in the river",
+        "Scoop some water for later",
+        "Meditate by the bank (FTH)",
+        "Disregard the river and move on",
+        "The river water is cool and rejuvenating. You feel amazing.",
+        "Something calls out to you, and you feel strengthened.",
+        "You feel calmer, but eventually leave empty-handed.",
+
+        "You find a nice place to set up camp and take a short rest",
+        "Rest for a while and regain some health",
+        "Train your body and hone your skills"]
+ord = [1, 1, 1, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4,
+        1, 1, 1, 1, 2, 2, 2, 3, 3, 3, 3, 3,
         1, 1, 1, 1, 2, 2, 2, 3, 3,
         1, 1, 1, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 4,
         1, 1, 1, 2, 2,
         1, 1, 1, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5,
-        ]
-prevChoice = ["", "", "", "", "B", "B", "B", "A", "A", "A", "B", "B",
+        1, 1, 1, 1, 1, 2, 2, 2,
+        1, 1, 1]
+prevChoice = ["", "", "", "A", "A", "A", "A", "A", "A", "B", "A", "A", "B",
+                "", "", "", "", "B", "B", "B", "A", "A", "A", "B", "B",
                 "", "", "", "", "A", "C", "C", "A", "B",
                 "", "", "", "A", "A", "A", "A", "A", "A", "B", "B", "B", "B", "A",
                 "", "", "", "A", "A",
                 "", "", "", "A", "A", "A", "A", "A", "A", "A", "A", "A", "B", "C", "C", "A", "A",
-                ]
-currChoice = ["", "A", "B", "C", "", "A", "B", "", "", "", "", "",
+                "", "", "", "", "", "A", "C", "C",
+                "", "", ""]
+currChoice = ["", "A", "B", "", "A", "B", "", "A", "B", "", "", "A", "",
+                "", "A", "B", "C", "", "A", "B", "", "", "", "", "",
                 "", "A", "B", "C", "", "A", "B", "", "",
                 "", "A", "B", "", "A", "B", "", "", "A", "", "A", "B", "C", "",
                 "", "A", "B", "", "",
                 "", "A", "B", "", "A", "B", "", "A", "B", "C", "", "", "", "", "A", "", "",
-                ]
-stat = ["", "", "", "", "", "str", "", "pass", "fail", "", "", "",
+                "", "A", "B", "C", "D", "", "", "",
+                "", "A", "B"]
+stat = ["", "", "", "", "", "", "", "", "", "", "", "", "",
+        "", "", "", "", "", "str", "", "pass", "fail", "", "", "",
         "", "", "", "", "", "", "", "", "",
         "", "", "", "", "dex", "", "pass", "fail", "", "", "", "", "", "",
         "", "lck", "", "pass", "fail",
         "", "", "", "", "", "", "", "con", "", "", "pass", "fail", "", "", "int", "pass", "fail",
-        ]
-statReq = [0, 0, 0, 0, 0, 10, 0, 0, 0, 0, 0, 0,
+        "", "", "", "fth", "", "", "pass", "fail",
+        "", "", ""]
+statReq = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 10, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 15, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 10, 0, 0, 0, 0, 0, 0, 15, 0, 0,
-            ]
-reward = ["", "", "", "", "", "", "", "gold", "", "", "", "",
-            "", "", "", "", "", "", "", "randomEffect", ""
-            "", "", "", "", "", "", "magical vial of water", "", "", "", "", "", "", "magical vial of water",
-            "", "", "", "excalibur", "",
-            "", "", "", "", "", "", "", "", "", "", "", "healing potion", "magical vial of water", "", "", "minor healing potion", "",
-            ]
+            0, 0, 0, 10, 0, 0, 0, 0,
+            0, 0, 0]
+reward = ["", "", "redirect", "", "", "", "", "", "", "redirect", "", "redirect", "redirect",
+            "", "redirect", "", "redirect", "", "", "", "gold", "", "redirect", "redirect", "redirect",
+            "", "", "redirect", "", "redirect", "", "", "randomEffect", "redirect",
+            "", "", "redirect", "", "", "", "magical vial of water", "", "redirect", "", "", "redirect", "redirect", "magical vial of water",
+            "", "", "redirect", "excalibur", "redirect",
+            "", "", "redirect", "", "", "redirect", "", "", "", "", "redirect", "healing potion", "magical vial of water", "", "", "minor healing potion", "redirect",
+            "", "", "magical vial of water", "", "redirect", "hp", "statPoint", "redirect",
+            "", "hp", "statPoint"]
 
 DB_FILE = "data.db"
 
@@ -326,6 +381,7 @@ c.execute("""
 
 c.execute("""
     CREATE TABLE IF NOT EXISTS dialogue (
+    id INTEGER PRIMARY KEY NOT NULL,
     scene TEXT NOT NULL,
     type TEXT NOT NULL,
     dlg TEXT NOT NULL,
@@ -392,9 +448,15 @@ for i in range(len(name)):
     c.execute(q, d)
     db.commit()
 
+for i in range(len(scene)):
+    q = "INSERT OR REPLACE INTO dialogue(id, scene, type, dlg, ord, prevChoice, currChoice, stat, statReq, reward) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+    d = (i, scene[i], dialogueType[i], dlg[i], ord[i], prevChoice[i], currChoice[i], stat[i], statReq[i], reward[i])
+    c.execute(q, d)
+    db.commit()
+
 #  ------------------------------------------------------------ #
 
-@app.route('/', methods=['GET', 'POST'])
+@app.route('/login', methods=['GET', 'POST'])
 def login():
     if loggedin():
         return redirect(url_for('menu'))
@@ -413,6 +475,8 @@ def login():
                     return render_template("login.html", invalid="Your password was incorrect")
 
                 session['username'] = request.form['username'].lower()
+
+                initializePlayer();
 
                 return redirect(url_for('menu'))
     else:
@@ -455,23 +519,27 @@ def register():
                 session.clear()
                 session.permanent = True
                 session['username'] = request.form['username'].lower()
+
+                initializePlayer();
+
                 return redirect(url_for('menu'))
     return render_template("register.html")
 
-@app.route('/menu', methods=['GET', 'POST'])
+@app.route('/', methods=['GET', 'POST'])
 def menu():
-    session['turn'] = 1
-    session['inventory'] = {} # [name] {name, type, quantity, gold}
-    session['gold'] = 0
-    session['hp'] = fetch_stats()[1]
-    session['statPoints'] = 0
-
-    addItemToInventory("simple sword")
+    if request.method == "POST":
+        if not loggedin():
+            return redirect(url_for('login'))
+        else:
+            return redirect(url_for('battle'))
 
     return render_template("menu.html")
 
 @app.route('/campfire', methods=['GET', 'POST'])
 def campfire():
+    if not loggedin():
+        return redirect(url_for('login'))
+
     inv = session['inventory'] # [name] {name, type, quantity, gold}
     stats = fetch_stats() # [level, HP, str, dex, con, int, fth, lck]
     equips = fetch_equips() # [gearType] {name}
@@ -629,6 +697,9 @@ def battle():
 def encounters():
     if not loggedin():
         return redirect(url_for('login'))
+
+    session['turn'] = session['turn'] + 1
+    
     # testttttt
     encounters = []
     for i in range(len(name)):
@@ -645,6 +716,32 @@ def encounters():
     return render_template("encounters.html",
         encounters=rd,
         turn=session.get("turn", 1))
+
+@app.route('/dialogue/<encounter>', methods=['GET', 'POST'])
+def dialogue(encounter):
+    if not loggedin():
+        return redirect(url_for('login'))
+    with sqlite3.connect(DB_FILE) as db:
+        c = db.cursor()
+        c.execute("SELECT * FROM dialogue WHERE scene = ?", (encounter,))
+        dlg = c.fetchall()
+        c.execute("SELECT background FROM encounters WHERE type = ?", (encounter,))
+        bck = c.fetchall()
+        c.execute("SELECT str FROM player WHERE username = ?", (session["username"],))
+        str = c.fetchall()
+        c.execute("SELECT inte FROM player WHERE username = ?", (session["username"],))
+        int = c.fetchall()
+        c.execute("SELECT dex FROM player WHERE username = ?", (session["username"],))
+        dex = c.fetchall()
+        c.execute("SELECT con FROM player WHERE username = ?", (session["username"],))
+        con = c.fetchall()
+        c.execute("SELECT lck FROM player WHERE username = ?", (session["username"],))
+        lck = c.fetchall()
+        c.execute("SELECT fth FROM player WHERE username = ?", (session["username"],))
+        fth = c.fetchall()
+    t = {"str": str, "int" : int, "dex" : dex, "con" : con, "lck" : lck, "fth" : fth}
+    return render_template("dialogue.html", dlg=dlg, img=bck, e=encounter, pStats = t,
+				t = 1, choice = "", stat = "")
 
 @app.route('/shop/<string:type>', methods=['GET', 'POST'])
 def shop(type):
@@ -711,6 +808,7 @@ def shop(type):
 
         if 'buy' in data:
             itm = data['buy']
+            session['gold'] = session['gold'] - shop[itm][3]
 
             addItemToInventory(itm)
             inv = session['inventory']
@@ -735,11 +833,6 @@ def shop(type):
         lck=stats[7],
         shop=shop)
 
-@app.route('/dialogue/<string:encounter>', methods=['GET', 'POST'])
-def dialogue(encounter):
-
-    return render_template("dialogue.html", )
-
 @app.route('/scavenge', methods=['GET', 'POST'])
 def scavenge():
     consumables = ["honey", "cookie", "healing potion", "magical vial of water"]
@@ -763,6 +856,15 @@ def scavenge():
 
 def loggedin():
     return "username" in session
+
+def initializePlayer():
+    session['turn'] = 1
+    session['inventory'] = {} # [name] {name, type, quantity, gold}
+    session['gold'] = 0
+    session['hp'] = fetch_stats()[1]
+    session['statPoints'] = 0
+
+    addItemToInventory("simple sword")
 
 # ------------------------ DB HELPER FUNCTIONS  --------------------------- #
 
@@ -841,7 +943,7 @@ def generateShopItems(num):
     for item in selected:
         info = c.execute("SELECT type, gold FROM items WHERE name = ?", (item,)).fetchone()
 
-        shop[item] = [item, info[0], str(1), info[1]]
+        shop[item] = [item, info[0], str(1), info[1]*2]
 
     return shop
 
