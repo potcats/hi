@@ -56,7 +56,6 @@ P02: Makers Makin' It, Act I
 
      #hold {
        margin-top: 10vh;
-       text-align: center;
        margin-left: 10vw;
        margin-right: 10vw;
        padding-top: 15vh;
@@ -97,6 +96,20 @@ P02: Makers Makin' It, Act I
         height: 35vh;
         object-fit: cover;
     }
+    h1{
+        font-size: 200%;
+    }
+    .b{
+       color: white;
+       box-shadow: 0 0 0 4px #3b3b3b;
+       background-color: #525252;
+       border: none;
+       padding-top: 0.5vh;
+       padding-bottom: 0.5vh;
+       padding-left: 1vw;
+       padding-right: 1vw;
+       margin-bottom: 2vh;
+    }
   </style>
 
 </head>
@@ -108,7 +121,19 @@ P02: Makers Makin' It, Act I
           <img src = "{{img[0][0]}}" class="img">
       </div> 
       <div class="text">
-{{dlg}}
+          <h1> {{e}} </h1>
+          {% for options in dlg %}
+              {% if options[2] == "desc" and options[4] == t %}
+                  {{options[3]}}
+              {% endif %}
+          {% endfor %}
+          <br>
+          <br>
+          {% for options in dlg %}
+              {% if options[2] == "choice" and options[4] == t and options[5] == choice %}
+                  <button class="b"> {{options[3]}} </button>
+              {% endif %}
+          {% endfor %}
       </div>
    </div>
   <!-- BOOTSTRAP JS -->
@@ -121,7 +146,20 @@ P02: Makers Makin' It, Act I
 
   <!-- PAGE-SPECIFIC JS -->
   <script>
-
+    window.addEventListener('load', () => {
+        if(document.querySelector('#hold') !== null){
+            window.sessionStorage.setItem('Hold', 'displayed');
+        }
+        if(document.querySelector('#bg') !== null){
+            window.sessionStorage.setItem('Bg', 'displayed');
+        }
+    })
+    if (window.sessionStorage.getItem('Hold')) {
+        document.querySelector('#hold').classList.remove('aaa')
+    }
+    if (window.sessionStorage.getItem('Bg')) {
+        document.querySelector('#bg').classList.remove('kms')
+    }
   </script>
 
 </body>

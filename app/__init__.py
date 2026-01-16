@@ -381,6 +381,7 @@ c.execute("""
 
 c.execute("""
     CREATE TABLE IF NOT EXISTS dialogue (
+    id INTEGER PRIMARY KEY NOT NULL,
     scene TEXT NOT NULL,
     type TEXT NOT NULL,
     dlg TEXT NOT NULL,
@@ -448,8 +449,8 @@ for i in range(len(name)):
     db.commit()
 
 for i in range(len(scene)):
-    q = "INSERT OR REPLACE INTO dialogue(scene, type, dlg, ord, prevChoice, currChoice, stat, statReq, reward) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
-    d = (scene[i], dialogueType[i], dlg[i], ord[i], prevChoice[i], currChoice[i], stat[i], statReq[i], reward[i])
+    q = "INSERT OR REPLACE INTO dialogue(id, scene, type, dlg, ord, prevChoice, currChoice, stat, statReq, reward) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+    d = (i, scene[i], dialogueType[i], dlg[i], ord[i], prevChoice[i], currChoice[i], stat[i], statReq[i], reward[i])
     c.execute(q, d)
     db.commit()
 
@@ -720,7 +721,21 @@ def dialogue(encounter):
         dlg = c.fetchall()
         c.execute("SELECT background FROM encounters WHERE type = ?", (encounter,))
         bck = c.fetchall()
-    return render_template("dialogue.html", dlg=dlg, img=bck, e=encounter)
+        c.execute("SELECT str FROM player WHERE username = ?", (session["username"],))
+        str = c.fetchall()
+        c.execute("SELECT inte FROM player WHERE username = ?", (session["username"],))
+        int = c.fetchall()
+        c.execute("SELECT dex FROM player WHERE username = ?", (session["username"],))
+        dex = c.fetchall()
+        c.execute("SELECT con FROM player WHERE username = ?", (session["username"],))
+        con = c.fetchall()
+        c.execute("SELECT lck FROM player WHERE username = ?", (session["username"],))
+        lck = c.fetchall()
+        c.execute("SELECT fth FROM player WHERE username = ?", (session["username"],))
+        fth = c.fetchall()
+    t = {"str": str, "int" : int, "dex" : dex, "con" : con, "lck" : lck, "fth" : fth}
+    return render_template("dialogue.html", dlg=dlg, img=bck, e=encounter, pStats = t,
+				t = 1, choice = "", stat = "")
 
 @app.route('/shop/<string:type>', methods=['GET', 'POST'])
 def shop(type):
