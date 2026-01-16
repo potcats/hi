@@ -447,9 +447,15 @@ for i in range(len(name)):
     c.execute(q, d)
     db.commit()
 
+for i in range(len(scene)):
+    q = "INSERT OR REPLACE INTO dialogue(scene, type, dlg, ord, prevChoice, currChoice, stat, statReq, reward) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
+    d = (scene[i], dialogueType[i], dlg[i], ord[i], prevChoice[i], currChoice[i], stat[i], statReq[i], reward[i])
+    c.execute(q, d)
+    db.commit()
+
 #  ------------------------------------------------------------ #
 
-@app.route('/', methods=['GET', 'POST'])
+@app.route('/login', methods=['GET', 'POST'])
 def login():
     if loggedin():
         return redirect(url_for('menu'))
@@ -468,6 +474,8 @@ def login():
                     return render_template("login.html", invalid="Your password was incorrect")
 
                 session['username'] = request.form['username'].lower()
+
+                initializePlayer();
 
                 return redirect(url_for('menu'))
     else:
@@ -510,18 +518,19 @@ def register():
                 session.clear()
                 session.permanent = True
                 session['username'] = request.form['username'].lower()
+
+                initializePlayer();
+
                 return redirect(url_for('menu'))
     return render_template("register.html")
 
-@app.route('/menu', methods=['GET', 'POST'])
+@app.route('/', methods=['GET', 'POST'])
 def menu():
-    session['turn'] = 1
-    session['inventory'] = {} # [name] {name, type, quantity, gold}
-    session['gold'] = 0
-    session['hp'] = fetch_stats()[1]
-    session['statPoints'] = 0
-
-    addItemToInventory("simple sword")
+    if request.method == "POST":
+        if not loggedin():
+            return redirect(url_for('login'))
+        else:
+            return redirect(url_for('battle'))
 
     return render_template("menu.html")
 
@@ -818,6 +827,15 @@ def scavenge():
 
 def loggedin():
     return "username" in session
+
+def initializePlayer():
+    session['turn'] = 1
+    session['inventory'] = {} # [name] {name, type, quantity, gold}
+    session['gold'] = 0
+    session['hp'] = fetch_stats()[1]
+    session['statPoints'] = 0
+
+    addItemToInventory("simple sword")
 
 # ------------------------ DB HELPER FUNCTIONS  --------------------------- #
 
