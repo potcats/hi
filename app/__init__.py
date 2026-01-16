@@ -750,7 +750,14 @@ def battle():
 
     encounter = session.get("encounter", "")
     if encounter != "":
-        bg = fetch_bg(encounter)
+        fight_bgs = {
+            "Elven Camp" : "/static/images/bgs/dwarvencamp.jpg",
+            "Busted Caravan" : "/static/images/bgs/goblinfight.jpg",
+            "Grandma's house" : "/static/images/bgs/grandmafight.jpg",
+            "Wizard Tower" : "/static/images/bgs/wizardfight.jpg",
+            "boss" : "/static/images/bgs/bossfight.jpg"
+        }
+        bg = fight_bgs[encounter]
     else:
         bg = "/static/images/bgs/forestpath.jpg"
 
