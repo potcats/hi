@@ -290,7 +290,6 @@ P02: Makers Makin' It, Act I
       opacity: 0;
       pointer-events: none;
       transition: opacity 1s ease;
-      z-index: 9999;
     }
 
     #fade-overlay.show {
@@ -314,7 +313,7 @@ P02: Makers Makin' It, Act I
         <div class = "p-3 bg-dark">
 
           <div class = "mb-3 player-sidebar">
-            <h5 class = "fw-bold"> {{ battle.player.username }} </h5>
+            <h5 class = "fw-bold"> {{ battle.player.username }} ({{ battle.player.init }}) </h5>
             <div class = "progress">
               <div class = "progress-bar bg-danger player-hp" style = "width: {{ (battle.player.hp / battle.player.max_hp) * 100 }}%">
               </div>
@@ -329,7 +328,7 @@ P02: Makers Makin' It, Act I
 
           {% for enemy in battle.enemies %}
           <div class = "mb-3 enemy-sidebar enemy-{{ enemy.eid }}">
-            <h5 class = "fw-bold"> {{ enemy.species }} </h5>
+            <h5 class = "fw-bold"> {{ enemy.species }} ({{ enemy.init }}) </h5>
             <div class = "progress">
               <div class = "progress-bar bg-danger enemy-hp" style = "width: {{ (enemy.hp / enemy.max_hp) * 100 }}%">
                   <div class = "bar-text enemy-hp-text" style = "font-size: 13px;"> {{ enemy.hp }} / {{ enemy.max_hp }} </div>
@@ -527,6 +526,7 @@ P02: Makers Makin' It, Act I
   let selected = null;
   let pending = null;
   let currentBattle = null;
+  currentBattle = {{ battle | tojson }};
 
   // TIMINGGGGGG
   const ATK_MS = 800;
@@ -544,6 +544,9 @@ P02: Makers Makin' It, Act I
     hide();
     document.getElementById(type + '-panel').style.display = 'block';
   }
+
+  window.show = show;
+  window.hide = hide;
 
   function selectAtk(atk) {
     selected = atk;
@@ -647,10 +650,8 @@ P02: Makers Makin' It, Act I
         const battle = JSON.parse(this.responseText);
         const prevBattle = currentBattle;
 
-        // turn = battle.turn
-        pending = battle;
-        // updateBattle(battle);
-        currentBattle = JSON.parse(JSON.stringify(battle));
+        pending = JSON.parse(JSON.stringify(battle));
+        currentBattle = battle;
 
         if (prevBattle) {
           currentBattle.player.hp = prevBattle.player.hp;
@@ -701,10 +702,33 @@ P02: Makers Makin' It, Act I
         return;
       }
 
-      turn = "player";
       updateBattle(currentBattle);
-      updateTurnUI();
-      showActions();
+
+      const next = currentBattle.turnOrder[currentBattle.turnIndex];
+
+      if (next.type === "enemy") {
+        turn = "enemy";
+        updateTurnUI(next.eid);
+        enemyTurn();
+      } else {
+        let xhttp = new XMLHttpRequest();
+        xhttp.open("POST", "/battle", true);
+        xhttp.setRequestHeader("Content-Type", "application/json");
+
+        xhttp.onload = function () {
+          if (this.status !== 200) return;
+
+          const battle = JSON.parse(this.responseText);
+          currentBattle = battle;
+          updateBattle(battle);
+
+          turn = "player";
+          updateTurnUI();
+          showActions();
+        };
+
+        xhttp.send(JSON.stringify({ action: "advance" }));
+      }
       return;
     }
 
@@ -1025,8 +1049,17 @@ P02: Makers Makin' It, Act I
     }, 1500);
   }
 
-  turn = "player";
-  updateTurnUI();
+  const first = currentBattle.turnOrder[currentBattle.turnIndex];
+  if (first.type === "enemy") {
+    turn = "enemy";
+    updateTurnUI(first.eid);
+    hideActions();
+    enemyTurn();
+  } else {
+    turn = "player";
+    updateTurnUI();
+    showActions();
+  }
 
   </script>
 

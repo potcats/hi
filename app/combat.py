@@ -128,16 +128,35 @@ def randomEnemy(species):
 ]
 '''
 def turn_order(battle_id):
-    player_init = battle_id[0][2]
-    enemy_init = []
-    order = ['player']
+    battle_id["enemies"] = [e for e in battle_id["enemies"] if e["hp"] > 0]
 
-    for i in range(0, len(battle_id[1])):
-        enemy_init.append([i, battle_id[1][i][2]])
-    #uh oh now what
+    order = []
+
+    order.append({
+        "type": "player",
+        "init": battle_id["player"]["init"]
+    })
+    for enemy in battle_id["enemies"]:
+        order.append({
+            "type": "enemy",
+            "eid": enemy["eid"],
+            "init": enemy["init"]
+        })
+
+    ordered = []
+    while order:
+        max_i = 0
+        for i in range(1, len(order)):
+            if order[i]["init"] > order[max_i]["init"]:
+                max_i = i
+        ordered.append(order.pop(max_i))
+
+    battle_id["turnOrder"] = ordered
+    battle_id["turnIndex"] = 0
+    return battle_id
 
 def game_lost(battle_id):
-    return not battle_id[3]
+    return battle.get("ended", False) and battle["player"]["hp"] <= 0
 
 # forest_battle1 = createBattle( [randomEnemy('goblin'), randomEnemy('bee')] )
 def createBattle(enemies):
@@ -167,7 +186,7 @@ def createBattle(enemies):
         "username": player_info[0],
         "attacks": attacks_info,
         "cds": [0] * len(attacks_info),
-        "init": random.randint(0, 100),
+        "init": random.randint(0, 9),
         "hp": player_info[3] + player_info[9],
         "max_hp": player_info[3] + player_info[9],
         "energy": 0,
@@ -188,14 +207,19 @@ def createBattle(enemies):
     for i, enemy in enumerate(enemies):
         enemy["eid"] = i
 
-    return {
-        "turn": "player",
+    battle = {
+        "turn": "initiative",
         "turnNum": 1,
         "player": player,
         "enemies": enemies,
         "actions": [],
-        "ended": False
+        "ended": False,
+        "turnOrder": [],
+        "turnIndex": 0
     }
+
+    battle = turn_order(battle)
+    return battle
 
 def player_startTurn(battle_id):
     player = battle_id["player"]
@@ -227,7 +251,6 @@ def enemy_startTurn(battle_id, idx):
 
 def guard(battle_id):
     battle_id["player"]["guarding"] = True
-    battle_id["turn"] = "enemy"
     return battle_id
 
 def focus(battle_id):
@@ -235,7 +258,6 @@ def focus(battle_id):
     player["focused"] = True
     #increase energy by 1
     player["energy"] = min(player["energy"] + 1, player["max_energy"])
-    battle_id["turn"] = "enemy"
     return battle_id
 
 def enemy_by_eid(battle, eid):
@@ -281,7 +303,13 @@ def player_attack(battle_id, defender, move):
         "result": result
     }]
 
-    battle_id["turn"] = "enemy"
+    battle_id["turnIndex"] += 1
+
+    if battle_id["turnIndex"] >= len(battle_id["turnOrder"]):
+        battle_id["turnIndex"] = 0
+        battle_id["turnNum"] += 1
+        battle_id = turn_order(battle_id)
+
     return battle_id
 
 # attack(forest_battle1, 2) means that enemy #2 (index from 0) is attacking
@@ -391,28 +419,37 @@ def deathCheck(battle_id):
 def advance_turn(battle):
     battle["actions"] = []
 
-    # Enemy Turn
-    if battle["turn"] == "enemy":
-        for i, enemy in enumerate(battle["enemies"]):
-            if enemy["hp"] > 0:
-                battle = enemy_startTurn(battle, i)
-                result = enemy_attack(battle, i)
-                battle["actions"].append({
-                    "source": "enemy",
-                    "enemy_eid": enemy["eid"],
-                    "result": result
-                })
-                if deathCheck(battle):
-                    battle["ended"] = True
-                    return battle
+    turn = battle["turnOrder"][battle["turnIndex"]]
 
-        battle["turn"] = "player"
+    if turn["type"] == "player":
+        battle = player_startTurn(battle)
+        return battle
+
+    eid = turn["eid"]
+    enemy = enemy_by_eid(battle, eid)
+    if enemy is None:
+        battle["turnIndex"] += 1
+        return advance_turn(battle)
+
+    i = battle["enemies"].index(enemy)
+
+    battle = enemy_startTurn(battle, i)
+    result = enemy_attack(battle, i)
+    battle["actions"].append({
+        "source": "enemy",
+        "enemy_eid": enemy["eid"],
+        "result": result
+    })
+
+    if deathCheck(battle):
+        battle["ended"] = True
+        return battle
+
+    battle["turnIndex"] += 1
+
+    if battle["turnIndex"] >= len(battle["turnOrder"]):
+        battle["turnIndex"] = 0
         battle["turnNum"] += 1
-        battle = player_startTurn(battle)
-        return battle
+        battle = turn_order(battle)
 
-    else:
-        # start of player turn
-        battle = player_startTurn(battle)
-        battle["turn"] = "player"
-        return battle
+    return battle
