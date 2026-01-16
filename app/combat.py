@@ -367,10 +367,13 @@ def killCheck(battle_id):
             addItemToInventory(random.choice(drop_options))
 
             #adjust turns and turn order
-            for i in range(0, len(battle_id['turnOrder'])-1):
-                if battle_id['turnOrder'][i]['eid'] == enemy['eid'] and battle_id['turnIndex'] > i:
-                    battle_id['turnIndex'] -= 1
+            for i in range(len(battle_id['turnOrder'])):
+                t = battle_id['turnOrder'][i]
+                if t["type"] == "enemy" and t["eid"] == enemy["eid"] and battle_id["turnIndex"] > i:
+                    battle_id["turnIndex"] -= 1
+
             battle_id = turn_order(battle_id)
+
 
     battle_id["enemies"] = [e for e in battle_id["enemies"] if not e.get("dead", False)]
 
