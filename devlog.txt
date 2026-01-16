@@ -141,3 +141,23 @@ DB AND SMALL CHANGES
     - Changed method in which player is initially created
       (flow between menu/startscreen and login/register)
     - made shop items more expensive in comparison to when player is selling it 
+
+cindyL -- 2026-1-16 2:30
+COMBAT
+* NEW CHANGES:
+    - added drops
+    - recalculated dmg multipliers
+
+joyceL -- 2026-1-16 7:30
+DB AND SMALL CHANGES
+* NEW CHANGES:
+    - set up dialogue
+    - fixed leveling up
+    - fixed background loading
+
+christineC -- 2026-1-16 7:30
+BATTLE
+* NEW CHANGES:
+    - implemented initiative
+    - equipment display
+    - fixed bugs

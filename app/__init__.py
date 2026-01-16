@@ -648,11 +648,8 @@ def campfire():
 @app.route('/battle', methods=['GET', 'POST'])
 def battle():
     if not loggedin():
-        session['username'] = 'tester'
-    #     return redirect(url_for('login'))
+        return redirect(url_for('login'))
 
-    # if 'battle' not in session:
-    #     session['battle'] = createBattle([randomEnemy('goblin'), randomEnemy('goblin')])
     if request.method == 'POST':
         data = request.get_json()
         action = data.get('action')
@@ -691,9 +688,13 @@ def battle():
             battle = advance_turn(session["battle"])
             session["battle"] = battle
 
-            if battle.get("ended", False) or len(battle.get("enemies", [])) == 0:
-                if session.get("encounter", "") != "":
+            if len(battle.get("enemies", [])) == 0 and not battle.get("ended", False):
+                curlvl = fetch_stats()[0]
+                encounter = session.get("encounter","")
+                if encounter != "":
+                    lvlup(encounter, curlvl)
                     session["encounter"] = ""
+
             return jsonify(battle)
 
         return jsonify(session["battle"])
@@ -710,26 +711,26 @@ def battle():
         randomEnemy(random.choice(common_opponents)),
         randomEnemy(random.choice(common_opponents))
     ])
-    # if session['encounter'] == 'Grandma\'s House':
-    #     session['battle'] = createBattle([
-    #         randomEnemy('grandma')
-    #     ])
-    # elif session['encounter'] == 'Wizard Tower':
-    #     session['battle'] = createBattle([
-    #         randomEnemy('wizard')
-    #     ])
-    # elif session['encounter'] == 'Busted Caravan':
-    #     session['battle'] = createBattle([
-    #         randomEnemy('goblin'),
-    #         randomEnemy('goblin'),
-    #         randomEnemy('goblin')
-    #     ])
-    # elif session['encounter'] == 'Elven Camp':
-    #     session['battle'] = createBattle([
-    #         randomEnemy('dwarf'),
-    #         randomEnemy('dwarfchief'),
-    #         randomEnemy('dwarf')
-    #     ])
+    if session['encounter'] == 'Grandma\'s House':
+        session['battle'] = createBattle([
+            randomEnemy('grandma')
+        ])
+    elif session['encounter'] == 'Wizard Tower':
+        session['battle'] = createBattle([
+            randomEnemy('wizard')
+        ])
+    elif session['encounter'] == 'Busted Caravan':
+        session['battle'] = createBattle([
+            randomEnemy('goblin'),
+            randomEnemy('goblin'),
+            randomEnemy('goblin')
+        ])
+    elif session['encounter'] == 'Elven Camp':
+        session['battle'] = createBattle([
+            randomEnemy('dwarf'),
+            randomEnemy('dwarfchief'),
+            randomEnemy('dwarf')
+        ])
 
     equipsR = fetch_equips()
     if equipsR["chestplate"] == "":
@@ -760,8 +761,6 @@ def battle():
         bg = fight_bgs[encounter]
     else:
         bg = "/static/images/bgs/forestpath.jpg"
-
-
 
     return render_template("battle.html",
             battle = session['battle'],
