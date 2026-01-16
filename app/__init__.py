@@ -16,24 +16,24 @@ app.secret_key = 'wahhhhhhhhhhhhhhhhh'
 # ------------------------ DATABASING  ------------------------ #
 
 # ITEMS
-items = ["honey", "cookie", "healing potion", "magical vial of water", "cloth robe", "cloth veil", "cloth leggings", "iron greaves",
+items = ["honey", "cookie", "minor healing potion", "healing potion", "magical vial of water", "cloth robe", "cloth veil", "cloth leggings", "iron greaves",
          "iron chestplate", "iron helmet", "iron leggings", "rat hide boots",
         "rat hide cloak", "rat hide hood", "stinger pendant", "ring of goblin ears",
          "simple sword", "excalibur", "crude club", "noble's sabre"]
-img = ["", "", "", "", "/app/static/images/gear/chestplate/cloth.png", "/app/static/images/gear/helmet/cloth.png", "/app/static/images/gear/pants/cloth.png", "/app/static/images/gear/boots/iron.png",
+img = ["", "", "", "", "", "/app/static/images/gear/chestplate/cloth.png", "/app/static/images/gear/helmet/cloth.png", "/app/static/images/gear/pants/cloth.png", "/app/static/images/gear/boots/iron.png",
        "/app/static/images/gear/chestplate/iron.png", "/app/static/images/gear/helmet/iron.png", "/app/static/images/gear/pants/iron.png", "/app/static/images/gear/boots/rathide.png",
        "/app/static/images/gear/chestplate/rathide.png", "/app/static/images/gear/helmet/rathide.png", "/app/static/images/gear/accessory/stinger.png", "/app/static/images/gear/accessory/ears.png",
        "/app/static/images/gear/weapon/simple.png", "/app/static/images/gear/weapon/excalibur.png", "/app/static/images/gear/weapon/club.png", "/app/static/images/gear/weapon/sabre.png"]
-statStr = [0, 0, 0, 0, 0, 0, 0, 3, 4, 2, 4, 0, 0, 0, 0, 5, 3, 16, 12, 10]
-statDex = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 5, 2, 0, 5, 0, 0, 0, 0]
-statCon = [0, 0, 0, 0, 0, 0, 0, 1, 6, 2, 3, 0, 0, 0, 0, 0, 0, 0, 6, 0]
-statInt = [0, 0, 0, 0, 6, 0, 3, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0]
-statFth = [0, 0, 0, 0, 4, 4, 4, 0, 0, 0, 0, 0, 0, 0, 6, 0, 0, 0, 0, 0]
-statLck = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-hpInc = [5, 3, 18, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-gold = [5, 5, 20, 10, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 20, 20, 5, 30, 30, 30]
-type = ["consumable", "consumable", "consumable", "consumable", "gear", "gear", "gear", "gear", "gear", "gear", "gear", "gear", "gear", "gear", "gear", "gear", "gear", "gear", "gear", "gear"]
-gearType = ["", "", "", "", "chestplate", "helmet", "pants", "boots", "chestplate", "helmet", "pants", "boots", "chestplate", "helmet", "accessory", "accessory", "weapon", "weapon", "weapon", "weapon"]
+statStr = [0, 0, 0, 0, 0, 0, 0, 0, 3, 4, 2, 4, 0, 0, 0, 0, 5, 3, 16, 12, 10]
+statDex = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 5, 2, 0, 5, 0, 0, 0, 0]
+statCon = [0, 0, 0, 0, 0, 0, 0, 0, 1, 6, 2, 3, 0, 0, 0, 0, 0, 0, 0, 6, 0]
+statInt = [0, 0, 0, 0, 0, 6, 0, 3, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0]
+statFth = [0, 0, 0, 0, 0, 4, 4, 4, 0, 0, 0, 0, 0, 0, 0, 6, 0, 0, 0, 0, 0]
+statLck = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+hpInc = [5, 3, 9, 18, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+gold = [5, 5, 10, 20, 10, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 20, 20, 5, 30, 30, 30]
+type = ["consumable", "consumable", "consumable", "consumable", "consumable", "gear", "gear", "gear", "gear", "gear", "gear", "gear", "gear", "gear", "gear", "gear", "gear", "gear", "gear", "gear", "gear"]
+gearType = ["", "", "", "", "", "chestplate", "helmet", "pants", "boots", "chestplate", "helmet", "pants", "boots", "chestplate", "helmet", "accessory", "accessory", "weapon", "weapon", "weapon", "weapon"]
 
 # ENEMIES
 species = ["bandit",
@@ -124,28 +124,21 @@ statusEff = ["", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "",
 baseDmg = [12, 8, 4, 3, 6, 8, 6, 4, 5, 4, 7, 8, 10, 14, 3, 3, 4, 6, 9, 0, 6, 14, 8, 17, 3, 6, 6, 9, 0, 15, 0]
 
 # DIALOGUE
-scene = ["Busted Caravan",
-         "Busted Caravan",
-         "Busted Caravan",
-         "Busted Caravan",
-         "Busted Caravan",
-         "Busted Caravan",
-         "Busted Caravan",
-         "Busted Caravan",
-         "Busted Caravan",
-         "Busted Caravan",
-         "Busted Caravan",
-         "Busted Caravan",
+scene = ["Busted Caravan", "Busted Caravan", "Busted Caravan",
+         "Busted Caravan", "Busted Caravan", "Busted Caravan",
+         "Busted Caravan", "Busted Caravan", "Busted Caravan",
+         "Busted Caravan", "Busted Caravan", "Busted Caravan",
 
-         "Grandma's House",
-         "Grandma's House",
-         "Grandma's House",
-         "Grandma's House",]
+         "Grandma's House", "Grandma's House", "Grandma's House",
+         "Grandma's House", "Grandma's House", "Grandma's House",
+         "Grandma's House", "Grandma's House", "Grandma's House",]
 dialogueType = ["desc", "choice", "choice", "choice",
                 "desc", "choice", "choice",
                 "desc", "desc", "choice", "desc", "choice"
 
-                "desc", "choice", "choice", "choice"]
+                "desc", "choice", "choice", "choice",
+                "desc", "choice", "choice",
+                "desc", "desc"]
 dlg = ["You find yourselves peeking through the trees towards a caravan that seems to have been stranded in the middle of the forest. What will you do?",
        "Battle the goblins for their goods",
        "Approach the goblin caravan",
@@ -162,16 +155,24 @@ dlg = ["You find yourselves peeking through the trees towards a caravan that see
        "You encounter a little house up ahead. Upon investigating, a nice, elderly woman walks out and invites you inside for some sweets. What do you do?",
        "Kindly reject the grandma's offer for sweets",
        "Decide to beat up the old lady",
-       "Accept the grandma's invitation for sweets",]
+       "Accept the grandma's invitation for sweets",
+       "As you walk away, grandma looks at you sadly",
+       "Eat a cookie (random effect)",
+       "Suppress the urge to taste a sweet",
+       "Grandma smiles happily as you munch on the delicious cookie. As you walk away, you feel different...",
+       "As you walk away, grandma looks at you sadly.."]
 ord = [1, 1, 1, 1, 2, 2, 2, 3, 3, 3, 3, 3,
-       1, 1, 1, 1,]
+       1, 1, 1, 1, 2, 2, 2, 3, 3]
 prevChoice = ["", "", "", "", "B", "B", "B", "A", "A", "A", "B", "B",
-              "", "", "", "",]
+              "", "", "", "", "A", "C", "C", "A", "B"]
 currChoice = ["", "A", "B", "C", "", "A", "B", "", "", "", "", "",
-              "", "A", "B", "C",]
-stat = ["", "", "", "", "", "str", "", "pass", "fail", "", "", ""]
-statReq = [0, 0, 0, 0, 0, 10, 0, 0, 0, 0, 0, 0]
-reward = ["", "", "", "", "", "", "", "gold", "", "", "", 0]
+              "", "A", "B", "C", "", "A", "B", "", ""]
+stat = ["", "", "", "", "", "str", "", "pass", "fail", "", "", "",
+        "", "", "", "", "", "", "", "", "",]
+statReq = [0, 0, 0, 0, 0, 10, 0, 0, 0, 0, 0, 0,
+           0, 0, 0, 0, 0, 0, 0, 0, 0]
+reward = ["", "", "", "", "", "", "", "gold", "", "", "", "",
+          "", "", "", "", "", "", "", "randomEffect", ""]
 
 DB_FILE = "data.db"
 
@@ -308,9 +309,9 @@ def login():
                 result = rows.fetchone()
 
                 if result is None:
-                    return render_template("login.html", "Username does not exist")
+                    return render_template("login.html", invalid="Username does not exist")
                 elif (request.form['password'] != result[1]):
-                    return render_template("login.html", "Your password was incorrect")
+                    return render_template("login.html", invalid="Your password was incorrect")
 
                 session['username'] = request.form['username'].lower()
 
@@ -488,7 +489,7 @@ def battle():
             randomEnemy('goblin'),
             randomEnemy('bee')
         ])
-        return render_template("battle.html", battle=session['battle'])
+        return render_template("battle.html", battle = session['battle'], inventory = session.get('inventory'), gold = session.get('gold'))
 
     if request.method == 'POST':
         data = request.get_json()
@@ -521,7 +522,7 @@ def battle():
 
         return jsonify(session["battle"])
 
-    return render_template("battle.html", battle = session['battle'])
+    return render_template("battle.html", battle = session['battle'], inventory = session.get('inventory'), gold = session.get('gold'))
 
 @app.route('/encounters', methods=['GET', 'POST'])
 def encounters():

@@ -31,79 +31,92 @@ P02: Makers Makin' It, Act I
 
   <!-- PAGE SPECIFIC CSS -->
   <style>
-     body{
-	 overflow: hidden;
-         background-color: black;
-         color: #3d251d;
-         font-family: "Silkscreen", sans-serif;
+     body {
+    	 overflow: hidden;
+       background-color: black;
+       color: #3d251d;
+       font-family: "Silkscreen", sans-serif;
      }
-     .bg{
-	 filter: blur(6px);
-         width: 100%;
-	 height: 100%;
-	 background-image: url("/static/images/bgs/tavern.png");
-         background-repeat: no-repeat;
-         background-size: cover;
-	 background-attachment: fixed;
-	 position: absolute;
-         top: 0;
-	 left: 0;
-	 z-index: -10000;
-	 animation: 3s blurs;
-      }
-         .hold{
-         margin-top: 10vh;
-         text-align: center;
-         margin-left: 10vw;
-         margin-right: 10vw;
-         padding-top: 10vh;
-         color: white;
-         animation: 3s slide;
-         }
-	 @keyframes slide{
+
+     #bg {
+    	 filter: blur(6px);
+       width: 100%;
+    	 height: 100%;
+    	 background-image: url("/static/images/bgs/tavern.png");
+       background-repeat: no-repeat;
+       background-size: cover;
+    	 background-attachment: fixed;
+    	 position: absolute;
+       top: 0;
+    	 left: 0;
+    	 z-index: -10000;
+     }
+
+    .kms{
+        animation: 3s blurs;
+    }
+
+     #hold {
+       margin-top: 10vh;
+       text-align: center;
+       margin-left: 10vw;
+       margin-right: 10vw;
+       padding-top: 10vh;
+       color: white;
+     }
+
+    .aaa{
+        animation: 3s slide;
+    }
+  	 @keyframes slide {
 	     from {
-	         translate: 0 150vh;
+         translate: 0 150vh;
 	     }
 	     to {
-		 translate: 0 0;
-             }
-	 }
-	 @keyframes blurs{
-	     from {
-	         filter: blur(0px);
+    		 translate: 0 0;
+       }
+  	 }
+
+  	 @keyframes blurs {
+       from {
+         filter: blur(0px);
 	     }
 	     to {
-		 filter: blur(6px);
-             }
-	 }
-         h1{
-         font-size: 600%
-         }
-         .a{
-         color: black;
-         font-family: "Silkscreen", sans-serif;
-         }
-         .b{
-         padding-top: 0.5vh;
-         padding-bottom: 0.5vh;
-         padding-left: 1vw;
-         padding-right: 1vw;
-         background-color: white;
-         border: none;
-         border-radius: 6px;
-         color: black;
-         }
-         .b:hover{
-         background-color: #C7C7C7;
-         color: black;
+    		 filter: blur(6px);
+       }
+  	 }
+
+     h1 {
+       font-size: 600%
+     }
+
+     .a {
+       color: black;
+       font-family: "Silkscreen", sans-serif;
+     }
+
+     .b {
+       padding-top: 0.5vh;
+       padding-bottom: 0.5vh;
+       padding-left: 1vw;
+       padding-right: 1vw;
+       background-color: white;
+       border: none;
+       border-radius: 6px;
+       color: black;
+     }
+
+     .b:hover {
+       background-color: #C7C7C7;
+       color: black;
      }
   </style>
 
 </head>
 
 <body>
-    <div class="bg"></div>
-    <div class="hold">
+    <div id="bg" class="kms"></div>
+    <div id="hold" class="aaa">
          <h1>
             Login
          </h1>
@@ -136,7 +149,20 @@ P02: Makers Makin' It, Act I
 
   <!-- PAGE-SPECIFIC JS -->
   <script>
-
+    window.addEventListener('load', () => {
+        if(document.querySelector('#hold') !== null){
+            window.sessionStorage.setItem('Hold', 'displayed');
+        }
+        if(document.querySelector('#bg') !== null){
+            window.sessionStorage.setItem('Bg', 'displayed');
+        }
+    })
+    if (window.sessionStorage.getItem('Hold')) {
+        document.querySelector('#hold').classList.remove('aaa')
+    }
+    if (window.sessionStorage.getItem('Bg')) {
+        document.querySelector('#bg').classList.remove('kms')
+    }
   </script>
 
 </body>

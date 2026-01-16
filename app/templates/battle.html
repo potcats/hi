@@ -90,9 +90,43 @@ P02: Makers Makin' It, Act I
       cursor: pointer;
     }
 
-    .enemy-wrap.targeted img {
-      outline: 4px solid white;
+    .target-ind {
+      position: absolute;
+      top: -50px;
+      left: 48%;
+      transform: translateX(-50%);
+      font-size: 28px;
+      font-weight: bold;
+      color: white;
+      text-shadow: 0 0 6px black;
+      opacity: 0;
+      transition: opacity 0.2s ease, transform 0.2s ease;
     }
+
+    .enemy-wrap.targeted .target-ind {
+      opacity: 1;
+      animation: float 2s ease;
+      animation-iteration-count: infinite; 
+    }
+
+    @keyframes float {
+      0% {
+        transform: translateY(0);
+      }
+      25% {
+        transform: translateY(8px);
+      }
+      50% {
+        transform: translateY(-8px);
+      }
+      75% {
+        transform: translateY(8px);
+      }
+      100% {
+        transform: translateY(0);
+      }
+    }
+      
 
     .items-grid {
       display: grid;
@@ -195,6 +229,60 @@ P02: Makers Makin' It, Act I
       display: none;
     }
 
+    @keyframes death {
+      0% {
+        transform: scale(1);
+        opacity: 1;
+        filter: none;
+      }
+      40% {
+        transform: scale(1.05);
+      }
+      100% {
+        transform: scale(0.6) translateY(40px);
+        opacity: 0;
+        filter: grayscale(1);
+      }
+    }
+
+    .dead {
+      animation: death 0.9s ease forwards;
+    }
+
+    .action-banner {
+      position: fixed;
+      top: 77%;
+      left: -100%;
+      width: 100%;
+      height: 50px;
+      background: rgba(120, 120, 120, 0.95);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 22px;
+      font-weight: bold;
+    }
+
+    .action-banner.show {
+      animation: banner-slide 1.2s ease forwards;
+    }
+
+    @keyframes banner-slide {
+      0% {
+        left: -100%;
+      }
+      40% {
+        left: 0;
+      }
+      60% {
+        left: 0;
+      }
+      100% {
+        left: 100%;
+      }
+    }
+
   </style>
 
 </head>
@@ -207,7 +295,7 @@ P02: Makers Makin' It, Act I
     <div class = "row flex-grow-1 position-relative">
 
       <div class= "text-white" style = "position: absolute; top: 30%; left: 0; width: 200px;">
-        <h5 class = "fw-bold text-center"> Turn {{ battle.turn }} </h5>
+        <h5 id = "turn-num" class = "fw-bold text-center"> Turn {{ battle.turnNum }} </h5>
 
         <div class = "p-3 bg-dark">
 
@@ -215,13 +303,13 @@ P02: Makers Makin' It, Act I
             <h5 class = "fw-bold"> {{ battle.player.username }} </h5>
             <div class = "progress">
               <div class = "progress-bar bg-danger player-hp" style = "width: {{ (battle.player.hp / 30) * 100 }}%">
-                <div id = "player-hp-text">{{ battle.player.hp }} / {{ battle.player.max_hp }}</div>
               </div>
+              <div id = "player-hp-text" class = "bar-text" style = "font-size: 13px;">{{ battle.player.hp }} / {{ battle.player.max_hp }}</div>
             </div>
             <div class = "progress">
               <div class = "progress-bar bg-info player-energy" style = "width: {{ (battle.player.energy / 6) * 100 }}%">
-                {{ battle.player.energy }} / 6
               </div>
+              <div class = "bar-text player-energy-text" style = "font-size: 13px;">{{ battle.player.energy }} / {{ battle.player.max_energy }} </div>
             </div>
           </div>
 
@@ -230,12 +318,12 @@ P02: Makers Makin' It, Act I
             <h5 class = "fw-bold"> {{ enemy.species }} </h5>
             <div class = "progress">
               <div class = "progress-bar bg-danger enemy-hp" style = "width: {{ (enemy.hp / enemy.max_hp) * 100 }}%">
-                {{ enemy.hp }} / {{ enemy.max_hp }}
+                  <div class = "bar-text enemy-hp-text" style = "font-size: 13px;"> {{ enemy.hp }} / {{ enemy.max_hp }} </div>
               </div>
             </div>
             <div class = "progress">
               <div class = "progress-bar bg-info enemy-energy" style = "width: {{ (enemy.energy / 6) * 100 }}%">
-                {{ enemy.energy }} / 6
+                  <div class = "bar-text enemy-energy-text" style = "font-size: 13px;"> {{ enemy.energy }} / 6 </div>
               </div>
             </div>
           </div>
@@ -251,7 +339,7 @@ P02: Makers Makin' It, Act I
 
           <img class = "player-sprite" src = "/static/images/warrior.png" style = "width: 200px;">
 
-          <div class = "d-flex justify-content-center" style = "position: absolute; bottom: -20px; left: -60px;">
+          <div class = "d-flex justify-content-center" style = "position: absolute; bottom: -20px;">
             <div class = "bg-dark text-white px-1" style = "border-radius: 8px; width: 200px;">
 
               <span class = "fw-bold small"> {{ battle.player.username }} </span>
@@ -279,6 +367,7 @@ P02: Makers Makin' It, Act I
         <div class = "enemy-wrap enemy-{{ loop.index0 }}"
              style = "right: {{ 15 + loop.index0 * 8 }}%; bottom: {{ 140 + loop.index0 * 60 }}px;">
 
+          <div class="target-ind"> ▽ </div>
           <img class = "enemy-sprite" src = "/static/images/enemies/{{ enemy.species }}.png" style = "width: 200px;">
 
           <div class = "d-flex justify-content-center" style = "position: absolute; bottom: -20px; left: -60px;">
@@ -318,7 +407,7 @@ P02: Makers Makin' It, Act I
             <h5 class = "fw-bold"> Warrior &nbsp Lvl {{ battle.player.level }} </h5>
           </div>
           <div class = "d-flex align-items-center gap-1">
-            <h5 class = "fw-bold"> 0 </h5>
+            <h5 class = "fw-bold"> {{ gold }} </h5>
             <img class = "mb-2" src = "/static/images/icons/coin.png" style = "width: 20px;">
           </div>
         </div>
@@ -327,12 +416,12 @@ P02: Makers Makin' It, Act I
           <div class = "progress flex-grow-1" style = "height: 18px;">
             <div class = "progress-bar bg-danger player-hp" style = "width: {{ (battle.player.hp / 30) * 100 }}%">
             </div>
-            <div class = "bar-text player-hp-text"> {{ battle.player.hp }} / {{ battle.player.max_hp }} </div>
+            <div class = "bar-text player-hp-text" style = "font-size: 13px;"> {{ battle.player.hp }} / {{ battle.player.max_hp }} </div>
           </div>
           <div class = "progress flex-grow-1" style = "height: 18px;">
             <div class = "progress-bar bg-info player-energy" style = "width: {{ (battle.player.energy / 6) * 100 }}%">
             </div>
-            <div class = "bar-text player-energy-text"> {{ battle.player.energy }} / {{ battle.player.max_energy }} </div>
+            <div class = "bar-text player-energy-text" style = "font-size: 13px;'"> {{ battle.player.energy }} / {{ battle.player.max_energy }} </div>
           </div>
         </div>
 
@@ -350,11 +439,23 @@ P02: Makers Makin' It, Act I
     <div id = "attacks-panel" class = "panel" style = "display: none;">
       <div class = "d-flex gap-2 justify-content-center">
       {% for atk in battle.player.attacks %}
-      <div class = "atk-wrap flex-grow-1 bg-dark px-2 gap-2 mb-1 py-1" onclick = "selectAtk('{{ atk[0] }}')">
+      <div class = "atk-wrap flex-grow-1 bg-dark px-2 gap-2 mb-1 py-1
+          {% if battle.player.energy < atk[3] or battle.player.cds[loop.index0] > 0 %}
+          inactive
+          {% endif %}"
+          onclick = "selectAtk('{{ atk[0] }}')">
         <img src = "/static/images/icons/atk-icon.png" style = "width: 50px;">
         <div>
           <div class = "fw-bold"> {{ atk[0] }} </div>
-          <p style = "font-size: 10px;"> Cost: ? | Cooldown: ? </p>
+          <p style = "font-size: 10px;">
+             Cost: {{ atk[3] }} |
+             Cooldown:
+             {% if battle.player.cds[loop.index0] > 0 %}
+               {{ battle.player.cds[loop.index0] }}
+             {% else %}
+               {{ atk[4] }}
+             {% endif %}
+          </p>
         </div>
       </div>
       {% endfor %}
@@ -366,7 +467,8 @@ P02: Makers Makin' It, Act I
       <div class = "d-flex gap-2 justify-content-center">
 
         {% for enemy in battle.enemies %}
-        <div class = "atk-wrap flex-grow-1 bg-dark px-2 gap-2 mb-1 py-1"
+        <div class = "atk-wrap flex-grow-1 bg-dark px-2 gap-2 mb-1 py-1
+             target-btn target-{{ loop.index0 }}"
              onmouseenter = "highlight({{ loop.index0 }})"
              onmouseleave = "unhighlight({{ loop.index0 }})"
              onclick = "selectTarget({{ loop.index0 }})">
@@ -382,11 +484,14 @@ P02: Makers Makin' It, Act I
     <!-- Items Panel -->
     <div id = "items-panel" class = "panel" style = "display: none;">
       <div class = "items-grid" style = "grid-template-columns: repeat(8, 1fr);">
-        {% for item in inventory %}
-        <div class = "slot bg-dark d-flex flex-column align-items-center justify-content-center"
-             onclick = "useItem(item)">
-             Help
-        </div>
+        {% for name, item in inventory.items() %}
+          {% if item[1] == "consumable" %}
+          <div class = "slot bg-dark d-flex flex-column align-items-center justify-content-center"
+               onclick = "useItem('{{ name }}')">
+            <div class = "small text-center"> {{ name }} </div>
+            <div class = "small">x{{ item[2] }}</div>
+          </div>
+          {% endif %}
         {% endfor %}
         {% for i in range(8 - battle.player.inventory|length) %}
         <div class = "slot empty"></div>
@@ -433,6 +538,7 @@ P02: Makers Makin' It, Act I
   function selectTarget(i) {
     hide()
     hideActions();
+    showActionBanner(selected.toUpperCase());
     playerAtkAnim(i);
 
     // Player Turn
@@ -443,8 +549,13 @@ P02: Makers Makin' It, Act I
     xhttp.onload = function() {
       if (this.status == 200) {
         const battle = JSON.parse(this.responseText);
+        const prevBattle = currentBattle;
         currentBattle = battle;
         updateBattle(battle);
+
+        if (prevBattle) {
+          handleDeaths(prevBattle, battle);
+        }
 
         if (battle.actions && battle.actions.length > 0) {
           const act = battle.actions[0];
@@ -486,10 +597,15 @@ P02: Makers Makin' It, Act I
         if (this.status !== 200) return;
 
         const battle = JSON.parse(this.responseText);
+        const prevBattle = currentBattle;
         currentBattle = battle;
 
         turn = battle.turn
         updateBattle(battle);
+
+        if (prevBattle) {
+          handleDeaths(prevBattle, battle);
+        }
 
         if (battle.actions && battle.actions.length > 0) {
           enemyActions(battle.actions);
@@ -599,6 +715,53 @@ P02: Makers Makin' It, Act I
     });
   }
 
+  function showActionBanner(text) {
+    const banner = document.getElementById("action-banner");
+    const txt = document.getElementById("action-text");
+
+    banner.classList.remove("show");
+
+    setTimeout(() => {
+      txt.innerText = text;
+      banner.classList.add("show");
+    }, 20);
+  }
+
+  function handleDeaths(prevBat, newBat) {
+    const prevC = prevBat.enemies.length;
+    const newC = newBat.enemies.length;
+
+    if (newC >= prevC) return;
+
+    for (let i = newC; i < prevC; i++) {
+
+      // sprite
+      const sprite = document.querySelector(`.enemy-wrap.enemy-${i}`);
+      if (sprite) {
+        sprite.classList.add("dead");
+        setTimeout(() => {
+          sprite.remove();
+        }, 900);
+      }
+
+      // sidebar
+      const sidebar = document.querySelector(`.enemy-sidebar.enemy-${i}`);
+      if (sidebar) sidebar.remove();
+
+      // targets panel
+      const target = document.querySelector(`.target-${i}`);
+      if (target) target.remove();
+    }
+    fixIndex();
+  }
+
+  function fixIndex() {
+    document.querySelectorAll(".target-btn").forEach((btn, i) => {
+      btn.className = "atk-wrap flex-grow-1 bg-dark px-2 gap-2 mb-1 py-1 target-btn target-" + i;
+      btn.onclick = () => selectTarget(i);
+    });
+  }
+
   function highlight(i) {
     const enemies = document.querySelectorAll(".enemy-wrap");
     if (enemies[i]) {
@@ -619,6 +782,7 @@ P02: Makers Makin' It, Act I
   }
 
   function showActions() {
+    hide()
     document.getElementById("actions")
       .classList.remove("hidden");
   }
@@ -734,12 +898,23 @@ P02: Makers Makin' It, Act I
       });
 
     });
+
+    // Turn #
+    const turnNum = document.getElementById("turn-num");
+    if (turnNum && battle.turnNum !== undefined) {
+      turnNum.innerText = `Turn ${battle.turnNum}`;
+    }
+
   }
 
   turn = "player";
   updateTurnUI();
 
   </script>
+
+  <div id="action-banner" class="action-banner">
+    <span id="action-text"></span>
+  </div>
 
 </body>
 
